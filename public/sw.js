@@ -6,9 +6,9 @@
  * - Si no hay conexión al navegar, se muestra /offline.html.
  * - Preparado para notificaciones push (sin activar todavía).
  */
-const VERSION = 'nngg-v1'
+const VERSION = 'nngg-v2'
 const STATIC_CACHE = `${VERSION}-static`
-const PRECACHE = ['/offline.html', '/icons/icon.svg', '/icons/icon-192.png']
+const PRECACHE = ['/offline.html', '/brand/nngg-euskadi-blanco.png', '/icons/icon-192.png']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(STATIC_CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting()))
@@ -34,7 +34,7 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/icons/')) {
+  if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/icons/') || url.pathname.startsWith('/brand/')) {
     event.respondWith(
       caches.open(STATIC_CACHE).then(async (cache) => {
         const cached = await cache.match(request)

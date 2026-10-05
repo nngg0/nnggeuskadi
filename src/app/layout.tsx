@@ -13,7 +13,10 @@ export const metadata: Metadata = {
   // Intranet privada: no indexar.
   robots: { index: false, follow: false },
   icons: {
-    icon: [{ url: '/icons/icon.svg', type: 'image/svg+xml' }, { url: '/icons/icon-192.png', sizes: '192x192' }],
+    icon: [
+      { url: '/icons/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
     apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180' }],
   },
 }

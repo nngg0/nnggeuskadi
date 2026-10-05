@@ -146,7 +146,7 @@ aceptados, validación, refresco y cifras agregadas. Plantillas CSV en [`docs/pl
 | `npm run check:secrets` | Busca secretos en los archivos versionados |
 | `npm run check` | lint + typecheck + test + build |
 | `npm run build` / `npm start` | Build y servidor de producción |
-| `npm run icons` | Regenera los PNG de la PWA desde `public/icons/icon.svg` |
+| `npm run icons` | Regenera los iconos de la PWA desde el logotipo oficial (`public/brand/nngg-euskadi-blanco.png`) |
 | `npm run invite` | Alta autorizada de un afiliado |
 
 La CI de GitHub (`.github/workflows/ci.yml`) ejecuta todo lo anterior en cada PR.
