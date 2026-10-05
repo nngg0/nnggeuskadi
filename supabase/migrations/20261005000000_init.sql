@@ -195,6 +195,16 @@ create policy "ver mi perfil" on public.profiles for select to authenticated
 create policy "editar mi perfil" on public.profiles for update to authenticated
   using (id = (select auth.uid())) with check (id = (select auth.uid()));
 
+-- Permisos de tabla explícitos (no depender de los privilegios por defecto del proyecto).
+-- RLS decide además QUÉ filas ve o modifica cada usuario.
+revoke all on public.territories, public.roles, public.member_allowlist, public.profiles,
+  public.event_registrations, public.project_participations, public.saved_documents from anon, authenticated;
+grant select on public.territories, public.roles, public.profiles, public.event_registrations,
+  public.project_participations, public.saved_documents to authenticated;
+grant insert, update, delete on public.project_participations, public.saved_documents to authenticated;
+grant all on public.territories, public.roles, public.member_allowlist, public.profiles,
+  public.event_registrations, public.project_participations, public.saved_documents to service_role;
+
 -- Solo se pueden modificar nombre visible y ajustes: rol y territorio los fija la organización.
 revoke update on public.profiles from authenticated, anon;
 grant update (display_name, settings) on public.profiles to authenticated;
