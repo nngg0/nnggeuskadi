@@ -217,7 +217,6 @@ const opportunitySchema = z.object({
   proyecto_id: cell(id),
   nombre: cell(requiredText(80)),
   descripcion: cell(optionalText(1000)),
-  plazas: cell(optionalPositiveInt),
   fecha_limite: cell(optionalDate),
   estado: cell(enumOf(OPPORTUNITY_STATUSES, 'abierta')),
   visible: cell(bool(true)),
@@ -313,7 +312,6 @@ export function parseOpportunities(table: RawTable | undefined): Parsed<Opportun
     projectId: r.proyecto_id,
     name: r.nombre,
     description: r.descripcion,
-    capacity: r.plazas,
     deadline: r.fecha_limite,
     status: r.estado,
     visible: r.visible,
@@ -349,6 +347,7 @@ export const DEFAULT_CONFIG: AppConfig = {
   heroTitle: 'Lo que estamos haciendo juntos.',
   heroSubtitle: 'Qué viene, qué estamos preparando y dónde puedes participar.',
   documentCategories: ['Organización', 'Argumentarios', 'Comunicación', 'Campañas', 'Formación', 'Material gráfico'],
+  featuredProjectId: null,
   raw: {},
 }
 
@@ -368,6 +367,7 @@ export function parseConfig(table: RawTable | undefined): Parsed<AppConfig> {
         heroTitle: raw[CONFIG_KEYS.heroTitle]?.trim() || DEFAULT_CONFIG.heroTitle,
         heroSubtitle: raw[CONFIG_KEYS.heroSubtitle]?.trim() || DEFAULT_CONFIG.heroSubtitle,
         documentCategories: categories.length > 0 ? categories : DEFAULT_CONFIG.documentCategories,
+        featuredProjectId: raw[CONFIG_KEYS.featuredProject]?.trim() || null,
         raw,
       },
     ],

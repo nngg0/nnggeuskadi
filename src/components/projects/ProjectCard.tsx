@@ -11,8 +11,6 @@ export function toOptions(view: ProjectView): OpportunityOption[] {
     id: opportunity.id,
     name: opportunity.name,
     description: opportunity.description,
-    capacity: opportunity.capacity,
-    remaining: availability.remaining,
     deadline: opportunity.deadline,
     isOpen: availability.isOpen,
     chosen,
@@ -59,7 +57,7 @@ export function ProjectCard({ view, tone = 'light', className }: { view: Project
 
       {open.length > 0 ? (
         <div className="mt-5">
-          <p className={cn('eyebrow !text-[0.62rem]', dark ? 'text-white/50' : 'text-slate')}>Buscamos personas para</p>
+          <p className={cn('eyebrow !text-[0.62rem]', dark ? 'text-white/50' : 'text-slate')}>Puedes participar en</p>
           <ul className="mt-2.5 flex flex-wrap gap-2">
             {open.map(({ opportunity, chosen }) => (
               <li
@@ -80,7 +78,7 @@ export function ProjectCard({ view, tone = 'light', className }: { view: Project
         </div>
       ) : (
         <p className={cn('mt-5 text-sm font-semibold', dark ? 'text-white/60' : 'text-slate')}>
-          Ahora mismo no hay huecos abiertos en este proyecto.
+          Ahora mismo no hay ámbitos abiertos en este proyecto.
         </p>
       )}
 

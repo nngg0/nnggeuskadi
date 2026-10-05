@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { demoWorkbook } from '@/demo/content'
 import { parseWorkbook } from '@/lib/sheets/parse'
 import {
+  daysUntil,
   documentCategories,
+  featuredProject,
   homeUpcoming,
   openOpportunities,
   opportunityAvailability,
@@ -47,16 +49,20 @@ describe('personalización por territorio', () => {
 describe('oportunidades', () => {
   const opp = content.opportunities.find((o) => o.id === 'OP-003')!
 
-  it('cierra la oportunidad cuando se cubren las plazas', () => {
-    expect(opportunityAvailability(opp, 2, '2026-10-05')).toMatchObject({ remaining: 1, isOpen: true })
-    expect(opportunityAvailability(opp, 3, '2026-10-05')).toMatchObject({ remaining: 0, isOpen: false })
+  it('sin cupos: sigue abierta tenga las personas que tenga', () => {
+    expect(opportunityAvailability(opp, 0, '2026-10-05')).toEqual({ participants: 0, isOpen: true })
+    expect(opportunityAvailability(opp, 500, '2026-10-05')).toEqual({ participants: 500, isOpen: true })
+  })
+
+  it('la organización la cierra manualmente', () => {
+    expect(opportunityAvailability({ ...opp, status: 'cerrada' }, 0, '2026-10-05').isOpen).toBe(false)
   })
 
   it('cierra la oportunidad pasada la fecha límite', () => {
     expect(opportunityAvailability({ ...opp, deadline: '2026-10-01' }, 0, '2026-10-05').isOpen).toBe(false)
   })
 
-  it('Puedes participar en... excluye cubiertas', () => {
+  it('Puedes participar en... excluye las cerradas', () => {
     const list = openOpportunities(content, new Map(), 'bizkaia', '2026-10-05')
     expect(list.some((o) => o.opportunity.id === 'OP-014')).toBe(false)
     expect(list[0]?.project.territory).toBe('bizkaia')
@@ -73,5 +79,18 @@ describe('documentos', () => {
 
   it('las categorías respetan el orden configurado', () => {
     expect(documentCategories(content.documents, ['Formación', 'Organización'])[0]).toBe('Formación')
+  })
+})
+
+describe('campaña principal', () => {
+  it('se elige desde CONFIGURACION (campana_principal)', () => {
+    expect(featuredProject(content)?.title).toBe('Campaña 29N')
+    expect(featuredProject({ ...content, config: { ...content.config, featuredProjectId: 'NO-EXISTE' } })).toBeNull()
+    expect(featuredProject({ ...content, config: { ...content.config, featuredProjectId: null } })).toBeNull()
+  })
+
+  it('cuenta los días que faltan', () => {
+    expect(daysUntil('2026-11-29', '2026-10-05')).toBe(55)
+    expect(daysUntil('2026-10-05', '2026-10-05')).toBe(0)
   })
 })

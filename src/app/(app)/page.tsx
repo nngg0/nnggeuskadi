@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ActivityCard } from '@/components/activities/ActivityCard'
 import { Container } from '@/components/layout/PageHeader'
+import { CampaignBlock } from '@/components/projects/CampaignBlock'
 import { OpportunityCard } from '@/components/projects/OpportunityCard'
 import { ProjectCard } from '@/components/projects/ProjectCard'
 import { ArrowLink } from '@/components/ui/Button'
@@ -11,7 +12,7 @@ import { EmptyState } from '@/components/ui/States'
 import { requireUser } from '@/lib/auth/session'
 import { getContent } from '@/lib/content/source'
 import { formatRelativeDay, madridDate } from '@/lib/domain/dates'
-import { homeUpcoming, openOpportunities, preparingProjects, upcomingActivities } from '@/lib/domain/selectors'
+import { featuredProject, homeUpcoming, openOpportunities, preparingProjects, upcomingActivities } from '@/lib/domain/selectors'
 import { personalStore } from '@/lib/personal'
 import { activityViews } from '@/lib/view/activities'
 import { projectViews } from '@/lib/view/projects'
@@ -33,16 +34,24 @@ export default async function HomePage() {
   const today = madridDate(now)
 
   const upcoming = homeUpcoming(content.activities, user.territory, now)
-  const preparing = preparingProjects(content.projects, user.territory).slice(0, 3)
+  const campaign = featuredProject(content)
+  const preparing = preparingProjects(content.projects, user.territory)
+    .filter((p) => p.id !== campaign?.id)
+    .slice(0, 3)
   const store = personalStore()
 
-  const [upcomingViews, myRegs, preparingViews, counts] = await Promise.all([
+  const [upcomingViews, myRegs, preparingViews, campaignViews, counts] = await Promise.all([
     activityViews(upcoming.items, user.id, now),
     store.myRegistrations(user.id),
     projectViews(preparing, content.opportunities, user.id, now),
+    projectViews(campaign ? [campaign] : [], content.opportunities, user.id, now),
     store.participationCounts(content.projects.map((p) => p.id)),
   ])
-  const opportunities = openOpportunities(content, counts.byOpportunity, user.territory, today).slice(0, 8)
+  const campaignView = campaignViews[0] ?? null
+  // La campaña ya muestra sus ámbitos en su bloque: aquí, el resto.
+  const opportunities = openOpportunities(content, counts.byOpportunity, user.territory, today)
+    .filter((o) => o.project.id !== campaign?.id)
+    .slice(0, 8)
   const myIds = new Set(myRegs.map((r) => r.eventId))
   const nextPlan = upcomingActivities(content.activities, now).find((a) => myIds.has(a.id) && a.status !== 'cancelada')
   const firstName = user.displayName.split(' ')[0]
@@ -86,6 +95,8 @@ export default async function HomePage() {
           </nav>
         </Container>
       </section>
+
+      {campaignView ? <CampaignBlock view={campaignView} today={today} /> : null}
 
       {/* Próximamente */}
       <section id="proximamente" className="scroll-mt-20 py-10 md:py-14">
@@ -148,18 +159,18 @@ export default async function HomePage() {
       {/* Puedes participar en... */}
       <section id="participar" className="scroll-mt-20 py-10 md:py-14">
         <Container>
-          <SectionHeader eyebrow="Puedes participar en…" title="Hace falta gente para esto." />
+          <SectionHeader eyebrow="Puedes participar en…" title="Súmate a lo que quieras." />
           {opportunities.length > 0 ? (
             <ul className="scrollbar-none -mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
               {opportunities.map((item) => (
-                <li key={item.opportunity.id} className="flex min-w-0">
+                <li key={item.opportunity.id} className="flex shrink-0 sm:min-w-0 sm:shrink">
                   <OpportunityCard item={item} />
                 </li>
               ))}
             </ul>
           ) : (
-            <EmptyState title="Todo cubierto por ahora" icon="users" action={{ href: '/calendario', label: 'Ver calendario' }}>
-              No hay huecos abiertos en este momento. Te avisaremos aquí cuando necesitemos manos.
+            <EmptyState title="Nada abierto ahora mismo" icon="users" action={{ href: '/calendario', label: 'Ver calendario' }}>
+              Cuando abramos una nueva iniciativa para participar, aparecerá aquí.
             </EmptyState>
           )}
         </Container>

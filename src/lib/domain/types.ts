@@ -45,7 +45,8 @@ export interface Project {
   featured: boolean
 }
 
-export const OPPORTUNITY_STATUSES = ['abierta', 'cubierta', 'cerrada'] as const
+/** Participa quien quiera; la organización cierra cada ámbito cuando lo considera. */
+export const OPPORTUNITY_STATUSES = ['abierta', 'cerrada'] as const
 export type OpportunityStatus = (typeof OPPORTUNITY_STATUSES)[number]
 
 export interface Opportunity {
@@ -53,8 +54,6 @@ export interface Opportunity {
   projectId: string
   name: string
   description: string
-  /** Personas necesarias. Null = abierto, sin límite. */
-  capacity: number | null
   deadline: string | null
   status: OpportunityStatus
   visible: boolean
@@ -76,6 +75,8 @@ export interface AppConfig {
   heroTitle: string
   heroSubtitle: string
   documentCategories: string[]
+  /** Proyecto que se muestra como bloque principal en Inicio y Participa (p. ej. la Campaña 29N). */
+  featuredProjectId: string | null
   /** Pares clave/valor sin interpretar, para futuras opciones. */
   raw: Record<string, string>
 }

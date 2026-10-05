@@ -1,4 +1,4 @@
-id,proyecto_id,nombre,descripcion,plazas,fecha_limite,estado,visible
-OP-001,PRY-001,Ideas,"Propón temas, formatos o ponentes.",,19/11/2026,abierta,sí
-OP-003,PRY-001,Comunicación,"Redes sociales, fotos y vídeo.",3,02/02/2027,abierta,sí
-OP-005,PRY-001,Logística,"Transporte, alojamiento y material.",5,04/03/2027,abierta,sí
+id,proyecto_id,nombre,descripcion,fecha_limite,estado,visible
+OP-29N-1,PRY-29N,Ideas y propuestas,"Qué mensajes, acciones y formatos debería tener la campaña.",28/11/2026,abierta,sí
+OP-29N-2,PRY-29N,Redes sociales,"Vídeos, publicaciones y difusión.",,abierta,sí
+OP-DEB-1,PRY-DEBATE,Organización,"Formato, fechas, sede y equipos: todo está por decidir.",,abierta,sí

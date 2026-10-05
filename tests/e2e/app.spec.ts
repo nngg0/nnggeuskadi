@@ -13,7 +13,7 @@ test.describe('acceso', () => {
 
   test('login demo, vuelta a la ruta pedida y logout', async ({ page }) => {
     await page.goto('/participa')
-    await page.getByRole('button', { name: /Ane Ruiz/ }).click()
+    await page.getByRole('button', { name: /Alba/ }).click()
     await expect(page).toHaveURL('/participa')
     await page.goto('/perfil')
     await page.getByRole('button', { name: 'Cerrar sesión' }).click()
@@ -30,19 +30,22 @@ test.describe('acceso', () => {
 
 test.describe('inicio', () => {
   test('responde a qué viene, qué preparamos y dónde participar', async ({ page }) => {
-    await loginAs(page, /Ane Ruiz/)
+    await loginAs(page, /Alba/)
     await expect(page.getByRole('heading', { name: 'Lo que estamos haciendo juntos.' })).toBeVisible()
     await expect(page.locator('#proximamente')).toContainText('Próximamente')
     await expect(page.locator('#en-preparacion')).toContainText('lo estamos preparando.')
     await expect(page.locator('#participar')).toContainText('Puedes participar en')
-    // Ane es de Álava: Próximamente no muestra actividades de otros territorios si hay de los suyos.
+    // Las tarjetas de ámbitos mantienen un ancho legible (no se aplastan en móvil).
+    const cardWidth = await page.locator('#participar li').first().evaluate((el) => el.getBoundingClientRect().width)
+    expect(cardWidth).toBeGreaterThan(200)
+    // Alba es de Álava: Próximamente no muestra actividades de otros territorios si hay de los suyos.
     await expect(page.locator('#proximamente').getByText('Gipuzkoa', { exact: true })).toHaveCount(0)
   })
 })
 
 test.describe('inscripciones', () => {
   test('inscribirse, verlo en el perfil y cancelar', async ({ page }) => {
-    await loginAs(page, /Ane Ruiz/)
+    await loginAs(page, /Alba/)
     await page.goto('/actividades/ACT-035')
     await expect(page.getByText('7 inscritos')).toBeVisible()
     await page.getByRole('button', { name: 'Inscribirme' }).click()
@@ -62,7 +65,7 @@ test.describe('inscripciones', () => {
   })
 
   test('estados: completo, cerrada, no abierta, cancelada y finalizada', async ({ page }) => {
-    await loginAs(page, /Iker/)
+    await loginAs(page, /Pablo/)
     const cases: [string, string][] = [
       ['ACT-037', 'Plazas completas'],
       ['ACT-040', 'Inscripción cerrada'],
@@ -78,7 +81,7 @@ test.describe('inscripciones', () => {
   })
 
   test('las actividades en borrador o inexistentes no se pueden abrir', async ({ page }) => {
-    await loginAs(page, /Iker/)
+    await loginAs(page, /Pablo/)
     await page.goto('/actividades/ACT-099')
     await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
     await page.goto('/actividades/NO-EXISTE')
@@ -86,7 +89,7 @@ test.describe('inscripciones', () => {
   })
 
   test('estado vacío útil cuando no hay planes', async ({ page }) => {
-    await loginAs(page, /Maite/)
+    await loginAs(page, /Pablo/)
     for (const id of ['ACT-031', 'ACT-036']) {
       await page.goto(`/actividades/${id}`)
       await page.getByRole('button', { name: 'Cancelar inscripción' }).click()
@@ -101,7 +104,7 @@ test.describe('inscripciones', () => {
 
 test.describe('participa', () => {
   test('quiero participar: elegir ámbitos, confirmar, verlo en el perfil y retirarse', async ({ page }) => {
-    await loginAs(page, /Ane Ruiz/)
+    await loginAs(page, /Alba/)
     await page.goto('/participa/PRY-001')
     await page.getByRole('button', { name: 'Quiero participar' }).first().click()
     const dialog = page.getByRole('dialog')
@@ -121,7 +124,7 @@ test.describe('participa', () => {
   })
 
   test('las oportunidades cubiertas no se pueden elegir', async ({ page }) => {
-    await loginAs(page, /Iker/)
+    await loginAs(page, /Pablo/)
     await page.goto('/participa/PRY-004')
     await page.getByRole('button', { name: 'Quiero participar' }).first().click()
     await expect(page.getByRole('dialog').getByRole('checkbox', { name: /Contenidos para campus/ })).toBeDisabled()
@@ -130,7 +133,7 @@ test.describe('participa', () => {
 
 test.describe('filtros y documentos', () => {
   test('el filtro territorial del calendario muestra solo ese territorio', async ({ page }) => {
-    await loginAs(page, /Ane Ruiz/)
+    await loginAs(page, /Alba/)
     await page.goto('/calendario')
     await page.getByRole('radio', { name: /Gipuzkoa/ }).click()
     await expect(page).toHaveURL(/t=gipuzkoa/)
@@ -140,7 +143,7 @@ test.describe('filtros y documentos', () => {
   })
 
   test('vista mensual del calendario', async ({ page }) => {
-    await loginAs(page, /Ane Ruiz/)
+    await loginAs(page, /Alba/)
     await page.goto('/calendario?vista=mes')
     await expect(page.getByRole('grid')).toBeVisible()
     await page.getByRole('link', { name: 'Mes siguiente' }).click()
@@ -148,7 +151,7 @@ test.describe('filtros y documentos', () => {
   })
 
   test('búsqueda, sin resultados y guardar documento', async ({ page }) => {
-    await loginAs(page, /Iker/)
+    await loginAs(page, /Pablo/)
     await page.goto('/documentos')
     await page.getByRole('searchbox', { name: 'Buscar documentos' }).fill('identidad')
     await expect(page).toHaveURL(/q=identidad/)
@@ -166,13 +169,13 @@ test.describe('filtros y documentos', () => {
 
 test.describe('permisos', () => {
   test('un afiliado no ve listados nominales', async ({ page }) => {
-    await loginAs(page, /Ane Ruiz/)
+    await loginAs(page, /Alba/)
     await page.goto('/actividades/ACT-031')
     await expect(page.getByText('Gestión · Inscritos')).toHaveCount(0)
   })
 
   test('la dirección provincial solo ve su territorio', async ({ page }) => {
-    await loginAs(page, /Jon Arana/)
+    await loginAs(page, /Miguel/)
     await page.goto('/actividades/ACT-035')
     await expect(page.getByText('Gestión · Inscritos')).toBeVisible()
     await page.goto('/actividades/ACT-032')
@@ -182,7 +185,7 @@ test.describe('permisos', () => {
   })
 
   test('la dirección de Euskadi ve todos los territorios', async ({ page }) => {
-    await loginAs(page, /Laura Ibarra/)
+    await loginAs(page, /Adrián/)
     await page.goto('/actividades/ACT-032')
     await expect(page.getByText('Gestión · Inscritos')).toBeVisible()
   })
@@ -199,7 +202,7 @@ test.describe('PWA y navegación', () => {
   })
 
   test('navegación principal entre las cinco secciones', async ({ page, isMobile }) => {
-    await loginAs(page, /Ane Ruiz/)
+    await loginAs(page, /Alba/)
     const nav = page.getByRole('navigation', { name: 'Principal' }).filter({ visible: true })
     const sections: [string, string][] = [
       ['Calendario', '/calendario'],
@@ -216,5 +219,43 @@ test.describe('PWA y navegación', () => {
     // Sin scroll horizontal en ninguna pantalla.
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
     expect(overflow, isMobile ? 'móvil' : 'escritorio').toBeLessThanOrEqual(0)
+  })
+})
+
+test.describe('campaña principal y calendario', () => {
+  test('Inicio y Participa muestran la Campaña 29N como bloque principal', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    const block = page.locator('#campana')
+    await expect(block.getByRole('heading', { name: 'Campaña 29N' })).toBeVisible()
+    await expect(block.getByRole('button', { name: 'Quiero participar' })).toBeVisible()
+    await page.goto('/participa')
+    await expect(page.locator('#campana').getByRole('heading', { name: 'Campaña 29N' })).toBeVisible()
+    // No se repite en la lista de proyectos.
+    await expect(page.locator('main article').filter({ hasText: 'Campaña 29N' })).toHaveCount(0)
+  })
+
+  test('sin cupos: nunca se muestra "faltan personas"', async ({ page }) => {
+    await loginAs(page, /Pablo/)
+    for (const path of ['/', '/participa', '/participa/PRY-001']) {
+      await page.goto(path)
+      await expect(page.getByText(/Faltan? \d|Necesitamos \d|Hace falta gente/)).toHaveCount(0)
+    }
+  })
+
+  test('añadir una actividad al calendario descarga un evento .ics', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/actividades/ACT-031')
+    const link = page.getByRole('link', { name: 'Añadir a mi calendario' })
+    await expect(link).toBeVisible()
+    const response = await page.request.get((await link.getAttribute('href'))!)
+    expect(response.headers()['content-type']).toContain('text/calendar')
+    const body = await response.text()
+    expect(body).toContain('SUMMARY:Encuentro NNGG Euskadi')
+    await expect(page.getByRole('link', { name: /Google Calendar/ })).toHaveAttribute('href', /calendar\.google\.com/)
+  })
+
+  test('el .ics exige sesión', async ({ request }) => {
+    const response = await request.get('/actividades/ACT-031/ics', { maxRedirects: 0 })
+    expect([307, 401]).toContain(response.status())
   })
 })

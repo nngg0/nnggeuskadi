@@ -72,25 +72,34 @@ export function preparingProjects(projects: Project[], userTerritory: TerritoryI
   )
 }
 
+/** Proyecto destacado (CONFIGURACION → campana_principal), si existe y sigue visible. */
+export function featuredProject(content: Pick<ContentBundle, 'projects' | 'config'>): Project | null {
+  const id = content.config.featuredProjectId
+  return id ? (visibleProjects(content.projects).find((p) => p.id === id) ?? null) : null
+}
+
+/** Días que faltan hasta una fecha (0 = hoy). */
+export function daysUntil(date: string, today: string): number {
+  return Math.round((Date.parse(`${date}T12:00:00Z`) - Date.parse(`${today}T12:00:00Z`)) / 864e5)
+}
+
 export function opportunitiesForProject(opportunities: Opportunity[], projectId: string): Opportunity[] {
   return opportunities.filter((o) => o.projectId === projectId && o.visible)
 }
 
 export interface OpportunityAvailability {
   participants: number
-  remaining: number | null
   isOpen: boolean
 }
 
+/** Sin cupos: una oportunidad está abierta hasta que la organización la cierra o vence su fecha límite. */
 export function opportunityAvailability(
   opportunity: Opportunity,
   participants: number,
   today: string,
 ): OpportunityAvailability {
-  const remaining = opportunity.capacity === null ? null : Math.max(0, opportunity.capacity - participants)
   const expired = opportunity.deadline !== null && opportunity.deadline < today
-  const isOpen = opportunity.status === 'abierta' && !expired && remaining !== 0
-  return { participants, remaining, isOpen }
+  return { participants, isOpen: opportunity.status === 'abierta' && !expired }
 }
 
 export interface OpenOpportunity {

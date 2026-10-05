@@ -11,7 +11,7 @@ export const SHEETS = {
   PROYECTOS: [
     'id', 'titulo', 'descripcion', 'tipo', 'territorio', 'estado', 'fecha_inicio', 'fecha_prevista', 'visible', 'destacado',
   ],
-  OPORTUNIDADES: ['id', 'proyecto_id', 'nombre', 'descripcion', 'plazas', 'fecha_limite', 'estado', 'visible'],
+  OPORTUNIDADES: ['id', 'proyecto_id', 'nombre', 'descripcion', 'fecha_limite', 'estado', 'visible'],
   DOCUMENTOS: ['id', 'titulo', 'descripcion', 'categoria', 'territorio', 'url', 'fecha', 'destacado', 'visible'],
   CONFIGURACION: ['clave', 'valor'],
   TERRITORIOS: ['id', 'nombre', 'activo'],
@@ -29,4 +29,5 @@ export const CONFIG_KEYS = {
   heroTitle: 'inicio_titulo',
   heroSubtitle: 'inicio_subtitulo',
   documentCategories: 'categorias_documentos',
+  featuredProject: 'campana_principal',
 } as const

@@ -63,9 +63,10 @@ Solo `en_preparacion` aparece en «En preparación». `en_marcha` sigue aceptand
 ### OPORTUNIDADES
 
 `id`, `proyecto_id` (id de PROYECTOS), `nombre` (p. ej. Comunicación), `descripcion`,
-`plazas` (vacío = abierto), `fecha_limite`, `estado` (`abierta` · `cubierta` · `cerrada`), `visible`.
+`fecha_limite` (opcional), `estado` (`abierta` · `cerrada`), `visible`.
 
-Una oportunidad deja de admitir personas al cubrir sus plazas, pasar su fecha límite o cambiar de estado.
+**Sin cupos:** puede apuntarse quien quiera a todos los ámbitos. La organización cierra un ámbito poniendo
+`estado = cerrada` (o con una `fecha_limite`). Quien ya estaba apuntado sigue apareciendo.
 
 ### DOCUMENTOS
 
@@ -81,6 +82,7 @@ compartido con la organización), `fecha`, `destacado`, `visible`.
 | `inicio_titulo` | Titular de Inicio |
 | `inicio_subtitulo` | Subtítulo de Inicio |
 | `categorias_documentos` | Orden de categorías, separadas por comas |
+| `campana_principal` | id del proyecto que se muestra como **bloque principal** en Inicio y Participa (p. ej. `PRY-29N`). Vacío = sin bloque |
 
 ### TERRITORIOS
 
