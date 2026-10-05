@@ -65,9 +65,9 @@ do $$ begin
   end;
   begin
     perform * from public.member_allowlist;
+    raise exception 'la lista de alta no debe ser legible';
   exception when insufficient_privilege then null;
   end;
-  assert (select count(*) from public.member_allowlist) = 0, 'la lista de alta no es legible';
 end $$;
 update public.profiles set display_name = 'Ane R.' where id = auth.uid();
 
@@ -108,7 +108,11 @@ do $$ begin
     raise exception 'anon no debe ejecutar funciones';
   exception when insufficient_privilege then null;
   end;
-  assert (select count(*) from public.event_registrations) = 0, 'anon no ve inscripciones';
+  begin
+    perform * from public.event_registrations;
+    raise exception 'anon no debe poder leer inscripciones';
+  exception when insufficient_privilege then null;
+  end;
 end $$;
 
 rollback;
