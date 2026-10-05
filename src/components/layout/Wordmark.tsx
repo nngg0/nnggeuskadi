@@ -1,13 +1,16 @@
+import Image from 'next/image'
 import { cn } from '@/lib/cn'
+import logo from '@/assets/nngg-euskadi-blanco.png'
 
-/** Identidad de la app en texto (sin reproducir logotipos oficiales). */
+/** Logotipo oficial de NNGG Euskadi en blanco (para zonas de identidad en azul). */
 export function Wordmark({ className, size = 'md' }: { className?: string; size?: 'md' | 'lg' }) {
   return (
-    <span className={cn('inline-flex items-baseline gap-2 text-white', className)}>
-      <span className={cn('font-extrabold tracking-[-0.04em]', size === 'lg' ? 'text-3xl' : 'text-xl')}>
-        NNGG<span className="text-electric">.</span>
-      </span>
-      <span className={cn('eyebrow text-white/70', size === 'lg' ? '!text-[0.8rem]' : '!text-[0.62rem]')}>Euskadi</span>
-    </span>
+    <Image
+      src={logo}
+      alt="NNGG Euskadi"
+      priority
+      className={cn('w-auto', size === 'lg' ? 'h-16 sm:h-20' : 'h-9 md:h-10', className)}
+      sizes={size === 'lg' ? '112px' : '56px'}
+    />
   )
 }
