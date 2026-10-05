@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#071330" />
+    <title>Sin conexión · NNGG Euskadi</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center;
+        padding: 32px 24px; background: #071330; color: #fff;
+        font-family: 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+      .wrap { max-width: 28rem; margin: 0 auto; }
+      .mark { font-weight: 800; font-size: 1.5rem; letter-spacing: -0.04em; }
+      .mark span { color: #1e5bff; }
+      .eyebrow { margin-top: 48px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #7fb2ff; }
+      h1 { margin: 12px 0 0; font-size: 2.4rem; line-height: 1; font-weight: 800; letter-spacing: -0.035em; }
+      p { color: rgba(255,255,255,.7); line-height: 1.6; }
+      button {
+        margin-top: 24px; width: 100%; min-height: 56px; border: 0; border-radius: 14px; background: #1e5bff; color: #fff;
+        font: inherit; font-weight: 700; font-size: 1rem; cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="mark">NNGG<span>.</span> <small style="font-size:.65rem;letter-spacing:.16em;opacity:.7">EUSKADI</small></div>
+      <p class="eyebrow">Sin conexión</p>
+      <h1>Ahora mismo no hay red.</h1>
+      <p>Cuando vuelvas a tener conexión podrás ver las actividades, inscribirte y participar.</p>
+      <button type="button" onclick="location.reload()">Reintentar</button>
+    </div>
+  </body>
+</html>

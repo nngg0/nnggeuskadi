@@ -1,0 +1,4 @@
+id,proyecto_id,nombre,descripcion,plazas,fecha_limite,estado,visible
+OP-001,PRY-001,Ideas,"Propón temas, formatos o ponentes.",,19/11/2026,abierta,sí
+OP-003,PRY-001,Comunicación,"Redes sociales, fotos y vídeo.",3,02/02/2027,abierta,sí
+OP-005,PRY-001,Logística,"Transporte, alojamiento y material.",5,04/03/2027,abierta,sí
