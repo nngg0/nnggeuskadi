@@ -83,7 +83,7 @@ export default async function ProjectPage({ params }: { params: Params }) {
       <Container className="-mt-5 grid gap-5 pb-10 lg:grid-cols-[1fr_24rem] lg:items-start">
         <Card className="order-2 lg:order-1">
           <Eyebrow>Oportunidades</Eyebrow>
-          <h2 className="mt-2 text-xl font-extrabold tracking-[-0.02em] text-night">Dónde hace falta ayuda</h2>
+          <h2 className="mt-2 text-xl font-extrabold tracking-[-0.02em] text-night">Dónde puedes participar</h2>
           {view.opportunities.length === 0 ? (
             <p className="mt-4 text-sm text-slate">Todavía no se han definido ámbitos de colaboración. Vuelve pronto.</p>
           ) : (
@@ -100,19 +100,19 @@ export default async function ProjectPage({ params }: { params: Params }) {
                         <Icon name="check" size={12} strokeWidth={3} /> Te has ofrecido
                       </Tag>
                     ) : availability.isOpen ? (
-                      <Tag tone="success">{opportunity.capacity === null ? 'Abierto' : availability.remaining === 1 ? 'Falta 1 persona' : `Faltan ${availability.remaining}`}</Tag>
+                      <Tag tone="success">Abierto</Tag>
                     ) : (
-                      <Tag>{opportunity.status === 'cubierta' || availability.remaining === 0 ? 'Cubierto' : 'Cerrado'}</Tag>
+                      <Tag>Cerrado</Tag>
                     )}
                   </div>
                   {opportunity.description ? <p className="mt-1.5 text-sm leading-relaxed text-slate">{opportunity.description}</p> : null}
                   <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold text-slate">
-                    <span className="inline-flex items-center gap-1.5">
-                      <Icon name="users" size={14} className="text-electric" />
-                      {opportunity.capacity === null
-                        ? `${availability.participants} ${availability.participants === 1 ? 'persona' : 'personas'}`
-                        : `${availability.participants} de ${opportunity.capacity} personas`}
-                    </span>
+                    {availability.participants > 0 ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        <Icon name="users" size={14} className="text-electric" />
+                        {availability.participants === 1 ? '1 persona apuntada' : `${availability.participants} personas apuntadas`}
+                      </span>
+                    ) : null}
                     {opportunity.deadline ? (
                       <span className="inline-flex items-center gap-1.5">
                         <Icon name="clock" size={14} className="text-electric" />
@@ -132,8 +132,8 @@ export default async function ProjectPage({ params }: { params: Params }) {
             {view.participation
               ? 'Ya te has ofrecido. Puedes cambiar los ámbitos o retirarte cuando quieras.'
               : view.hasOpenOpportunities
-                ? 'Elige uno o varios ámbitos. Sin compromiso de horas: quien lo prepara te contará los detalles.'
-                : 'Ahora mismo no quedan huecos abiertos en este proyecto.'}
+                ? 'Apúntate en todos los ámbitos que quieras. Sin compromiso de horas: quien lo prepara te contará los detalles.'
+                : 'La participación en este proyecto está cerrada.'}
           </p>
           <div className="mt-5">
             <ParticipateFlow projectId={project.id} projectTitle={project.title} options={toOptions(view)} participating={view.participation !== null} />

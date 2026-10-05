@@ -25,12 +25,20 @@ function table(header: string[], rows: string[][]): RawTable {
 export function demoWorkbook(now: Date = new Date()): RawWorkbook {
   const t = madridDate(now)
   const D = (offset: number) => d(offset, t)
+  // Campaña 29N: el próximo 29 de noviembre (o el de este año si aún no ha pasado).
+  const year = Number(t.slice(0, 4))
+  const n29 = t <= `${year}-11-29` ? `${year}-11-29` : `${year + 1}-11-29`
+  const D29N = (offset = 0) => {
+    const [y, m, day] = addDays(n29, offset).split('-')
+    return `${day}/${m}/${y}`
+  }
 
   return {
     ACTIVIDADES: table(
       ['id', 'titulo', 'descripcion', 'territorio', 'fecha', 'hora', 'lugar', 'plazas', 'inscripcion_inicio', 'inscripcion_fin', 'estado', 'visible', 'destacado'],
       [
         ['ACT-031', 'Encuentro NNGG Euskadi', 'Nos juntamos afiliados de los tres territorios para arrancar el curso político: balance, prioridades del año y espacio para proponer iniciativas.\n\nHabrá un pequeño picoteo al terminar.', 'Euskadi', D(9), '18:30', 'Vitoria-Gasteiz · Palacio Europa', '80', D(-10), D(7), 'confirmada', 'sí', 'sí'],
+        ['ACT-029', 'Arranque de la Campaña 29N', 'Presentamos la campaña y repartimos tareas. Si te has apuntado en Participa, este es tu sitio; si no, también.', 'Euskadi', D(4), '19:00', 'Bilbao · Sede PP Bizkaia', '', '', '', 'confirmada', 'sí', 'no'],
         ['ACT-032', 'Formación: hablar en público', 'Taller práctico para perder el miedo al micrófono: estructura, voz y cómo responder preguntas difíciles.', 'Álava', D(3), '19:00', 'Vitoria-Gasteiz · Sede PP Álava', '20', D(-14), D(2), 'confirmada', 'sí', 'no'],
         ['ACT-033', 'Mesa informativa en la Universidad', 'Repartimos información sobre la campaña de vivienda joven en el campus de Leioa.', 'Bizkaia', D(2), '11:00', 'Leioa · Campus UPV/EHU', '12', D(-7), D(1), 'confirmada', 'sí', 'no'],
         ['ACT-034', 'Cena de Navidad NNGG Gipuzkoa', 'La cena de todos los años para cerrar el curso con los compañeros de Gipuzkoa.', 'Gipuzkoa', D(40), '21:00', 'Donostia · Restaurante del Puerto', '60', D(5), D(35), 'confirmada', 'sí', 'no'],
@@ -49,6 +57,8 @@ export function demoWorkbook(now: Date = new Date()): RawWorkbook {
     PROYECTOS: table(
       ['id', 'titulo', 'descripcion', 'tipo', 'territorio', 'estado', 'fecha_inicio', 'fecha_prevista', 'visible', 'destacado'],
       [
+        ['PRY-29N', 'Campaña 29N', 'La gran campaña de este curso. Queremos construirla entre todos: ideas, presencia en la calle y en redes, diseño y organización. Apúntate en lo que quieras y cuando quieras; cuanta más gente, mejor.', 'Campaña', 'Euskadi', 'en_preparacion', D(-10), D29N(), 'sí', 'sí'],
+        ['PRY-DEBATE', 'Debate', 'Todavía hay pocos detalles, pero ya puedes apuntarte para ayudar a organizarlo.', '', 'Euskadi', 'en_preparacion', '', '', 'sí', 'no'],
         ['PRY-001', 'Escuela de verano 2027', 'Estamos empezando a preparar la próxima escuela de verano. Todavía no hay programa, ni ponentes, ni sede cerrada: es el mejor momento para entrar y darle forma con nosotros.', 'Formación', 'Euskadi', 'en_preparacion', D(-7), D(270), 'sí', 'sí'],
         ['PRY-002', 'Vivienda joven', 'Estamos preparando una nueva campaña sobre vivienda joven: propuestas, materiales y acciones en la calle. Buscamos ideas antes de cerrar el mensaje.', 'Campaña', 'Euskadi', 'en_preparacion', D(-14), D(60), 'sí', 'sí'],
         ['PRY-003', 'Ciclo de cafés políticos en Álava', 'Queremos organizar un café político al mes en Vitoria-Gasteiz con invitados distintos. Falta definir temas, invitados y lugares.', 'Evento', 'Álava', 'en_preparacion', D(-3), D(30), 'sí', 'no'],
@@ -58,25 +68,32 @@ export function demoWorkbook(now: Date = new Date()): RawWorkbook {
       ],
     ),
     OPORTUNIDADES: table(
-      ['id', 'proyecto_id', 'nombre', 'descripcion', 'plazas', 'fecha_limite', 'estado', 'visible'],
+      ['id', 'proyecto_id', 'nombre', 'descripcion', 'fecha_limite', 'estado', 'visible'],
       [
-        ['OP-001', 'PRY-001', 'Ideas', 'Propón temas, formatos o ponentes para la escuela.', '', D(45), 'abierta', 'sí'],
-        ['OP-002', 'PRY-001', 'Contenidos', 'Ayuda a preparar las sesiones y materiales.', '', D(90), 'abierta', 'sí'],
-        ['OP-003', 'PRY-001', 'Comunicación', 'Redes sociales, fotos y vídeo durante la preparación y la escuela.', '3', D(120), 'abierta', 'sí'],
-        ['OP-004', 'PRY-001', 'Organización', 'Coordinación de horarios, sede y participantes.', '4', D(120), 'abierta', 'sí'],
-        ['OP-005', 'PRY-001', 'Logística', 'Transporte, alojamiento y material.', '5', D(150), 'abierta', 'sí'],
-        ['OP-006', 'PRY-002', 'Ideas', 'Propuestas concretas que debería defender la campaña.', '', D(20), 'abierta', 'sí'],
-        ['OP-007', 'PRY-002', 'Diseño', 'Carteles, piezas para redes y lonas.', '2', D(25), 'abierta', 'sí'],
-        ['OP-008', 'PRY-002', 'Redes sociales', 'Vídeos cortos y difusión.', '4', D(30), 'abierta', 'sí'],
-        ['OP-009', 'PRY-002', 'Organización', 'Coordinar acciones de calle en cada territorio.', '3', D(30), 'abierta', 'sí'],
-        ['OP-010', 'PRY-002', 'Logística', 'Mesas, material y desplazamientos.', '4', D(35), 'abierta', 'sí'],
-        ['OP-011', 'PRY-003', 'Proponer temas e invitados', '', '', D(15), 'abierta', 'sí'],
-        ['OP-012', 'PRY-003', 'Buscar lugares', 'Cafeterías o espacios donde podamos reunirnos.', '2', D(15), 'abierta', 'sí'],
-        ['OP-013', 'PRY-004', 'Mesas informativas', 'Necesitamos 4 personas para las mesas de octubre.', '4', D(10), 'abierta', 'sí'],
-        ['OP-014', 'PRY-004', 'Contenidos para campus', 'Folletos y argumentario universitario.', '2', D(25), 'cubierta', 'sí'],
-        ['OP-015', 'PRY-005', 'Redacción', 'Escribir y revisar los capítulos de la guía.', '3', D(40), 'abierta', 'sí'],
-        ['OP-016', 'PRY-005', 'Diseño', 'Maquetación de la guía.', '1', D(50), 'abierta', 'sí'],
-        ['OP-017', 'PRY-006', 'Redes sociales', 'Últimos vídeos de la campaña.', '2', D(12), 'abierta', 'sí'],
+        ['OP-29N-1', 'PRY-29N', 'Ideas y propuestas', 'Qué mensajes, acciones y formatos debería tener la campaña.', D29N(-1), 'abierta', 'sí'],
+        ['OP-29N-2', 'PRY-29N', 'Redes sociales', 'Vídeos, publicaciones y difusión durante toda la campaña.', '', 'abierta', 'sí'],
+        ['OP-29N-3', 'PRY-29N', 'Acciones en la calle', 'Mesas informativas y acciones en cada territorio.', '', 'abierta', 'sí'],
+        ['OP-29N-4', 'PRY-29N', 'Diseño', 'Cartelería, lonas y piezas gráficas.', '', 'abierta', 'sí'],
+        ['OP-29N-5', 'PRY-29N', 'Organización', 'Coordinar equipos, calendario y convocatorias.', '', 'abierta', 'sí'],
+        ['OP-29N-6', 'PRY-29N', 'Logística', 'Material, desplazamientos y montaje.', '', 'abierta', 'sí'],
+        ['OP-DEB-1', 'PRY-DEBATE', 'Organización', 'Formato, fechas, sede y equipos: todo está por decidir.', '', 'abierta', 'sí'],
+        ['OP-001', 'PRY-001', 'Ideas', 'Propón temas, formatos o ponentes para la escuela.', D(45), 'abierta', 'sí'],
+        ['OP-002', 'PRY-001', 'Contenidos', 'Ayuda a preparar las sesiones y materiales.', D(90), 'abierta', 'sí'],
+        ['OP-003', 'PRY-001', 'Comunicación', 'Redes sociales, fotos y vídeo durante la preparación y la escuela.', D(120), 'abierta', 'sí'],
+        ['OP-004', 'PRY-001', 'Organización', 'Coordinación de horarios, sede y participantes.', D(120), 'abierta', 'sí'],
+        ['OP-005', 'PRY-001', 'Logística', 'Transporte, alojamiento y material.', D(150), 'abierta', 'sí'],
+        ['OP-006', 'PRY-002', 'Ideas', 'Propuestas concretas que debería defender la campaña.', D(20), 'abierta', 'sí'],
+        ['OP-007', 'PRY-002', 'Diseño', 'Carteles, piezas para redes y lonas.', D(25), 'abierta', 'sí'],
+        ['OP-008', 'PRY-002', 'Redes sociales', 'Vídeos cortos y difusión.', D(30), 'abierta', 'sí'],
+        ['OP-009', 'PRY-002', 'Organización', 'Coordinar acciones de calle en cada territorio.', D(30), 'abierta', 'sí'],
+        ['OP-010', 'PRY-002', 'Logística', 'Mesas, material y desplazamientos.', D(35), 'abierta', 'sí'],
+        ['OP-011', 'PRY-003', 'Proponer temas e invitados', '', D(15), 'abierta', 'sí'],
+        ['OP-012', 'PRY-003', 'Buscar lugares', 'Cafeterías o espacios donde podamos reunirnos.', D(15), 'abierta', 'sí'],
+        ['OP-013', 'PRY-004', 'Mesas informativas', 'Mesas en Leioa, Sarriko y Deusto durante octubre.', D(10), 'abierta', 'sí'],
+        ['OP-014', 'PRY-004', 'Contenidos para campus', 'Folletos y argumentario universitario.', D(25), 'cerrada', 'sí'],
+        ['OP-015', 'PRY-005', 'Redacción', 'Escribir y revisar los capítulos de la guía.', D(40), 'abierta', 'sí'],
+        ['OP-016', 'PRY-005', 'Diseño', 'Maquetación de la guía.', D(50), 'abierta', 'sí'],
+        ['OP-017', 'PRY-006', 'Redes sociales', 'Últimos vídeos de la campaña.', D(12), 'abierta', 'sí'],
       ],
     ),
     DOCUMENTOS: table(
@@ -101,6 +118,7 @@ export function demoWorkbook(now: Date = new Date()): RawWorkbook {
       [
         ['inicio_titulo', 'Lo que estamos haciendo juntos.'],
         ['inicio_subtitulo', 'Qué viene, qué estamos preparando y dónde puedes echar una mano.'],
+        ['campana_principal', 'PRY-29N'],
         ['categorias_documentos', 'Organización, Argumentarios, Comunicación, Campañas, Formación, Material gráfico'],
       ],
     ),

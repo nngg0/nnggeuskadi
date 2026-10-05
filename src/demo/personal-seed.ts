@@ -19,10 +19,18 @@ export const DEMO_OTHER_REGISTRATIONS: Record<string, number> = {
   'ACT-040': 32,
   'ACT-042': 4,
   'ACT-030': 87,
+  'ACT-029': 38,
 }
 
 /** Personas ofrecidas por otros afiliados en cada oportunidad. */
 export const DEMO_OTHER_PARTICIPATIONS: Record<string, number> = {
+  'OP-DEB-1': 2,
+  'OP-29N-1': 14,
+  'OP-29N-2': 9,
+  'OP-29N-3': 21,
+  'OP-29N-4': 3,
+  'OP-29N-5': 6,
+  'OP-29N-6': 5,
   'OP-001': 6,
   'OP-002': 2,
   'OP-003': 2,

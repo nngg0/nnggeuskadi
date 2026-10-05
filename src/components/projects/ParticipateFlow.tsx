@@ -13,8 +13,6 @@ export interface OpportunityOption {
   id: string
   name: string
   description: string
-  capacity: number | null
-  remaining: number | null
   deadline: string | null
   isOpen: boolean
   chosen: boolean
@@ -25,7 +23,7 @@ interface Props {
   projectTitle: string
   options: OpportunityOption[]
   participating: boolean
-  tone?: 'light' | 'dark'
+  tone?: 'light' | 'dark' | 'brand'
   block?: boolean
 }
 
@@ -105,20 +103,27 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
           className={cn(
             'press flex min-h-14 items-center justify-between gap-3 rounded-[var(--radius-btn)] px-5 text-[0.95rem] font-bold',
             block && 'w-full',
-            tone === 'dark' ? 'bg-white/10 text-white hover:bg-white/15' : 'bg-success-50 text-success hover:bg-success-50/70',
+            tone === 'light' ? 'bg-success-50 text-success hover:bg-success-50/70' : 'bg-white/10 text-white hover:bg-white/15',
           )}
         >
           <span className="inline-flex items-center gap-2.5">
-            <span className={cn('flex size-6 items-center justify-center rounded-full', tone === 'dark' ? 'bg-sky text-night' : 'bg-success text-white')}>
+            <span className={cn('flex size-6 items-center justify-center rounded-full', tone === 'light' ? 'bg-success text-white' : 'bg-sky text-night')}>
               <Icon name="check" size={14} strokeWidth={3} />
             </span>
             Ya participas
           </span>
-          <span className={cn('text-xs font-semibold', tone === 'dark' ? 'text-white/60' : 'text-success/70')}>Editar</span>
+          <span className={cn('text-xs font-semibold', tone === 'light' ? 'text-success/70' : 'text-white/60')}>Editar</span>
         </button>
       ) : (
-        <Button ref={triggerRef} block={block} arrow onClick={openSheet} disabled={noOptions} variant={noOptions ? 'secondary' : 'primary'}>
-          {noOptions ? 'Sin huecos abiertos ahora' : 'Quiero participar'}
+        <Button
+          ref={triggerRef}
+          block={block}
+          arrow
+          onClick={openSheet}
+          disabled={noOptions}
+          variant={noOptions ? 'secondary' : tone === 'brand' ? 'onDark' : 'primary'}
+        >
+          {noOptions ? 'Participación cerrada' : 'Quiero participar'}
         </Button>
       )}
 
@@ -171,7 +176,7 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
             ) : (
               <div className="px-6 pb-6">
                 <p className="text-[0.95rem] leading-relaxed text-slate">
-                  Elige en qué te gustaría echar una mano. Puedes marcar varios ámbitos. Quien lo está preparando se pondrá en contacto contigo.
+                  Elige en qué te gustaría participar. Puedes marcar todos los ámbitos que quieras. Quien lo está preparando se pondrá en contacto contigo.
                 </p>
                 <fieldset className="mt-5 grid gap-2.5">
                   <legend className="sr-only">Ámbitos de colaboración</legend>
@@ -206,15 +211,7 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
                         <span className="min-w-0 flex-1">
                           <span className="flex flex-wrap items-baseline justify-between gap-x-3">
                             <span className="font-bold text-night">{o.name}</span>
-                            <span className="eyebrow !text-[0.6rem] text-slate">
-                              {disabled
-                                ? 'Cubierto'
-                                : o.capacity === null
-                                  ? 'Abierto'
-                                  : o.remaining === 1
-                                    ? 'Falta 1 persona'
-                                    : `Faltan ${o.remaining} personas`}
-                            </span>
+                            {disabled ? <span className="eyebrow !text-[0.6rem] text-slate">Cerrado</span> : null}
                           </span>
                           {o.description ? <span className="mt-1 block text-sm leading-relaxed text-slate">{o.description}</span> : null}
                           {o.deadline && !disabled ? (

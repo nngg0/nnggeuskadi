@@ -53,6 +53,6 @@ export function can(
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   afiliado: 'Afiliado',
-  direccion_euskadi: 'Dirección Euskadi',
+  direccion_euskadi: 'Dirección regional',
   direccion_provincial: 'Dirección provincial',
 }

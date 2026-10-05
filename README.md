@@ -35,10 +35,10 @@ Sin chat, foros, comentarios, seguidores ni gamificación: no sustituye a WhatsA
 
 | Sección | Qué permite |
 |---|---|
-| **Inicio** | Panel personal: tu próximo plan, *Próximamente* (lo de tu territorio y Euskadi primero), *En preparación* (iniciativas abiertas) y *Puedes participar en…* (huecos concretos). |
+| **Inicio** | Panel personal: tu próximo plan, el bloque de la **campaña principal**, *Próximamente* (lo de tu territorio y Euskadi primero), *En preparación* (iniciativas abiertas) y *Puedes participar en…* (ámbitos abiertos). |
 | **Calendario** | Lista de próximas actividades o vista mensual, filtro Todos/Euskadi/Álava/Bizkaia/Gipuzkoa, disponibilidad de plazas. |
-| **Actividad** | Ficha con fecha, hora, lugar, inscritos/plazas. Inscribirse y cancelar. Control de aforo, apertura y cierre (automático por fecha o manual), evento completo, cancelado o finalizado. |
-| **Participa** | Proyectos en preparación y en marcha con sus oportunidades (plazas, fecha límite, estado). «Quiero participar» → elegir uno o varios ámbitos → confirmación inmediata. |
+| **Actividad** | Ficha con fecha, hora, lugar, inscritos/plazas. Inscribirse y cancelar. Control de aforo, apertura y cierre (automático por fecha o manual), evento completo, cancelado o finalizado. **Añadir a mi calendario** (.ics para iPhone/Android/Outlook o Google Calendar). |
+| **Participa** | Bloque principal de campaña (p. ej. Campaña 29N) y proyectos en preparación y en marcha con sus ámbitos. Sin cupos: participa quien quiera y la organización cierra cada ámbito cuando lo decide. «Quiero participar» → elegir uno o varios ámbitos → confirmación inmediata. |
 | **Documentos** | Búsqueda instantánea (sin tildes), filtros por territorio y categoría, destacados, recientes, guardados. |
 | **Perfil** | Mi territorio, próximas actividades, histórico de inscripciones, participaciones, documentos guardados y configuración (nombre visible, preferencia de avisos, instalar la app, contraseña, salir). |
 | **Dirección** | En fichas de su territorio, la dirección ve quién se ha inscrito o se ha ofrecido (solo nombre visible) para poder contactar. |
@@ -89,7 +89,7 @@ npm run dev                     # http://localhost:3000
 
 Con `NEXT_PUBLIC_APP_MODE=demo` (valor por defecto) la app es **completamente navegable sin servicios externos**:
 
-- En `/login` eliges un usuario ficticio: afiliados de Álava, Bizkaia y Gipuzkoa, dirección provincial de Bizkaia y dirección de Euskadi.
+- En `/login` eliges un usuario ficticio: Adrián (dirección regional), Alba (afiliada de Álava), Pablo Folgado (afiliado de Bizkaia) y Miguel (dirección provincial de Bizkaia).
 - El contenido sale de `src/demo/content.ts`, escrito **con el mismo formato que el Sheet** y validado por el mismo código.
   Las fechas son relativas a hoy, así la demo nunca se queda desfasada.
 - Inscripciones, participaciones y guardados se guardan en una cookie del navegador (`src/demo/personal-store.ts`);

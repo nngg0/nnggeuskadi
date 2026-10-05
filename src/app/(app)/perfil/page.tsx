@@ -12,7 +12,7 @@ import { Eyebrow, SectionHeader } from '@/components/ui/Eyebrow'
 import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/States'
 import { signOut } from '@/lib/actions/auth'
-import { managedTerritories, ROLE_LABELS } from '@/lib/auth/permissions'
+import { ROLE_LABELS } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { isDemoMode } from '@/lib/config/mode'
 import { getContent } from '@/lib/content/source'
@@ -52,7 +52,6 @@ export default async function ProfilePage() {
   const savedDocs = savedIds
     .map((id) => content.documents.find((d) => d.id === id && d.visible))
     .filter((d): d is NonNullable<typeof d> => Boolean(d))
-  const managed = managedTerritories(user)
 
   return (
     <>
@@ -93,24 +92,6 @@ export default async function ProfilePage() {
       </nav>
 
       <Container className="space-y-12 py-8 md:py-10">
-        <section>
-          <Eyebrow>Mi territorio</Eyebrow>
-          <Card className="mt-3 flex items-center gap-4">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-electric-50 text-electric">
-              <Icon name="territory" size={24} />
-            </span>
-            <div className="flex-1">
-              <p className="text-lg font-extrabold text-night">{territoryName(user.territory)}</p>
-              <p className="text-sm text-slate">
-                Verás primero lo de {territoryName(user.territory)}
-                {user.territory !== 'euskadi' ? ' y de Euskadi' : ''}, pero puedes consultar todos los territorios.
-                {managed.length > 0 ? ` Gestionas: ${managed.map((t) => territoryName(t)).join(', ')}.` : ''}
-              </p>
-            </div>
-          </Card>
-          <p className="mt-2 px-1 text-xs text-slate">¿No es tu territorio? Escribe a tu dirección provincial para corregirlo.</p>
-        </section>
-
         <section id="proximas" className="scroll-mt-32">
           <SectionHeader eyebrow="Mis próximas actividades" title={upcoming.length ? 'Tus planes.' : undefined} />
           {upcoming.length > 0 ? (

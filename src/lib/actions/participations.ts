@@ -35,10 +35,10 @@ export async function saveParticipation(projectId: string, opportunityIds: strin
     for (const oppId of input.data.opportunityIds) {
       const opportunity = content.opportunities.find((o) => o.id === oppId && o.projectId === project.id && o.visible)
       if (!opportunity) return failure('Uno de los ámbitos elegidos no existe.')
-      // Quien ya estaba apuntado puede conservar su ámbito aunque se haya completado.
+      // Quien ya estaba apuntado conserva su ámbito aunque después se haya cerrado.
       if (previous.has(oppId)) continue
       const availability = opportunityAvailability(opportunity, counts.byOpportunity.get(oppId) ?? 0, today)
-      if (!availability.isOpen) return failure(`"${opportunity.name}" ya no admite más personas.`)
+      if (!availability.isOpen) return failure(`"${opportunity.name}" ya está cerrado.`)
     }
 
     await store.saveParticipation(user.id, {

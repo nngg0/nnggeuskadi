@@ -1,3 +1,3 @@
 id,titulo,descripcion,tipo,territorio,estado,fecha_inicio,fecha_prevista,visible,destacado
-PRY-001,Escuela de verano 2027,Estamos empezando a preparar la próxima escuela de verano.,Formación,Euskadi,en_preparacion,01/10/2026,02/07/2027,sí,sí
-PRY-002,Vivienda joven,Nueva campaña sobre vivienda joven. Buscamos ideas antes de cerrar el mensaje.,Campaña,Euskadi,en_preparacion,20/09/2026,04/12/2026,sí,no
+PRY-29N,Campaña 29N,"La gran campaña de este curso. Apúntate en lo que quieras.",Campaña,Euskadi,en_preparacion,25/09/2026,29/11/2026,sí,sí
+PRY-DEBATE,Debate,"Todavía hay pocos detalles, pero ya puedes apuntarte para ayudar a organizarlo.",,Euskadi,en_preparacion,,,sí,no

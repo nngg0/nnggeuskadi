@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Container, PageHeader } from '@/components/layout/PageHeader'
+import { CampaignBlock } from '@/components/projects/CampaignBlock'
 import { ProjectCard } from '@/components/projects/ProjectCard'
 import { SectionHeader } from '@/components/ui/Eyebrow'
 import { Icon } from '@/components/ui/Icon'
@@ -8,7 +9,8 @@ import { EmptyState } from '@/components/ui/States'
 import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
 import { requireUser } from '@/lib/auth/session'
 import { getContent } from '@/lib/content/source'
-import { sortProjectsForUser, visibleProjects } from '@/lib/domain/selectors'
+import { madridDate } from '@/lib/domain/dates'
+import { featuredProject, sortProjectsForUser, visibleProjects } from '@/lib/domain/selectors'
 import { matchesTerritoryFilter, parseTerritoryFilter } from '@/lib/domain/territories'
 import { projectViews } from '@/lib/view/projects'
 
@@ -22,14 +24,19 @@ export default async function ParticipaPage({ searchParams }: { searchParams: Se
   const content = await getContent()
   const territory = parseTerritoryFilter(Array.isArray(params.t) ? params.t[0] : params.t)
 
+  const campaign = featuredProject(content)
   const projects = sortProjectsForUser(
-    visibleProjects(content.projects).filter((p) => matchesTerritoryFilter(p.territory, territory)),
+    visibleProjects(content.projects).filter((p) => p.id !== campaign?.id && matchesTerritoryFilter(p.territory, territory)),
     user.territory,
   )
-  const views = await projectViews(projects, content.opportunities, user.id)
+  const [views, campaignViews] = await Promise.all([
+    projectViews(projects, content.opportunities, user.id),
+    projectViews(campaign ? [campaign] : [], content.opportunities, user.id),
+  ])
+  const campaignView = campaignViews[0] ?? null
   const preparing = views.filter((v) => v.project.status === 'en_preparacion')
   const running = views.filter((v) => v.project.status === 'en_marcha')
-  const mine = views.filter((v) => v.participation)
+  const mine = [...campaignViews, ...views].filter((v) => v.participation)
 
   return (
     <>
@@ -46,6 +53,8 @@ export default async function ParticipaPage({ searchParams }: { searchParams: Se
         Aquí no hay convocatorias cerradas: hay iniciativas a medio hacer. Elige dónde quieres aportar y quien lo prepara contará contigo.
       </PageHeader>
 
+      {campaignView ? <CampaignBlock view={campaignView} today={madridDate(new Date())} /> : null}
+
       <Container className="py-6 md:py-8">
         <TerritoryFilter value={territory} territories={content.territories} userTerritory={user.territory} />
 
@@ -58,7 +67,7 @@ export default async function ParticipaPage({ searchParams }: { searchParams: Se
               <Icon name="check" size={16} strokeWidth={3} />
             </span>
             <span className="flex-1 text-sm font-semibold">
-              Participas en {mine.length === 1 ? '1 iniciativa' : `${mine.length} iniciativas`} de esta lista
+              Participas en {mine.length === 1 ? '1 iniciativa' : `${mine.length} iniciativas`}
             </span>
             <Icon name="chevronRight" size={18} />
           </Link>
