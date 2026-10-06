@@ -1,6 +1,6 @@
 import type { TerritoryId } from '@/lib/domain/territories'
 import type { InterestId } from '@/lib/domain/interests'
-import type { ManagedPerson, Participation, Registration, UserSettings } from '@/lib/domain/types'
+import type { AccessRequest, ManagedPerson, Member, Participation, Registration, UserRole, UserSettings } from '@/lib/domain/types'
 
 /**
  * Acceso a los datos personales (inscripciones, participaciones, documentos guardados, perfil).
@@ -48,4 +48,10 @@ export interface PersonalStore {
   /* Gestión: solo dirección con permiso sobre el territorio (verificado también en base de datos). */
   eventRegistrants(eventId: string): Promise<ManagedPerson[]>
   projectParticipants(projectId: string): Promise<ManagedPerson[]>
+
+  /* Altas: solicitudes (solo Administración) y listado de miembros (dirección según territorio). */
+  listAccessRequests(): Promise<AccessRequest[]>
+  approveAccessRequest(id: string, role: UserRole): Promise<void>
+  rejectAccessRequest(id: string): Promise<void>
+  listMembers(): Promise<Member[]>
 }

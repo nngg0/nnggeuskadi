@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { can, managedTerritories } from '@/lib/auth/permissions'
+import { can, canListMembers, managedTerritories } from '@/lib/auth/permissions'
 
 describe('permisos', () => {
   const afiliado = { role: 'afiliado' as const, territory: 'alava' as const }
@@ -39,5 +39,28 @@ describe('administración', () => {
     expect(managedTerritories(admin)).toEqual(['euskadi', 'alava', 'bizkaia', 'gipuzkoa'])
     expect(can(admin, 'manage.viewPeople', { territory: 'alava' })).toBe(true)
     expect(can(admin, 'activity.register')).toBe(true)
+  })
+})
+
+describe('altas y listado de miembros', () => {
+  const admin = { role: 'administracion' as const, territory: 'euskadi' as const }
+  const regional = { role: 'direccion_euskadi' as const, territory: 'euskadi' as const }
+  const bizkaia = { role: 'direccion_provincial' as const, territory: 'bizkaia' as const }
+  const afiliado = { role: 'afiliado' as const, territory: 'alava' as const }
+
+  it('solo Administración aprueba solicitudes', () => {
+    expect(can(admin, 'members.approve')).toBe(true)
+    expect(can(regional, 'members.approve')).toBe(false)
+    expect(can(bizkaia, 'members.approve')).toBe(false)
+    expect(can(afiliado, 'members.approve')).toBe(false)
+  })
+
+  it('la dirección tiene listado de miembros; los afiliados no', () => {
+    expect(canListMembers(admin)).toBe(true)
+    expect(canListMembers(regional)).toBe(true)
+    expect(canListMembers(bizkaia)).toBe(true)
+    expect(managedTerritories(bizkaia)).toEqual(['bizkaia'])
+    expect(canListMembers(afiliado)).toBe(false)
+    expect(canListMembers(null)).toBe(false)
   })
 })

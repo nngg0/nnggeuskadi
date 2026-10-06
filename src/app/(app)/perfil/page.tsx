@@ -13,7 +13,7 @@ import { Eyebrow, SectionHeader } from '@/components/ui/Eyebrow'
 import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/States'
 import { signOut } from '@/lib/actions/auth'
-import { ROLE_LABELS } from '@/lib/auth/permissions'
+import { can, canListMembers, ROLE_LABELS } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { isDemoMode } from '@/lib/config/mode'
 import { getContent } from '@/lib/content/source'
@@ -51,6 +51,8 @@ export default async function ProfilePage() {
   const upcoming = views.filter((v) => v.state.kind === 'registered')
   const participatingProjects = content.projects.filter((p) => participations.some((x) => x.projectId === p.id))
   const pViews = await projectViews(participatingProjects, content.opportunities, user.id)
+  const isAdmin = can(user, 'members.approve')
+  const pendingRequests = isAdmin ? (await store.listAccessRequests()).length : 0
   const savedDocs = savedIds
     .map((id) => content.documents.find((d) => d.id === id && d.visible))
     .filter((d): d is NonNullable<typeof d> => Boolean(d))
@@ -94,6 +96,38 @@ export default async function ProfilePage() {
       </nav>
 
       <Container className="space-y-12 py-8 md:py-10">
+        {isAdmin || canListMembers(user) ? (
+          <section id="gestion" className="scroll-mt-32">
+            <SectionHeader eyebrow="Gestión" />
+            <div className="grid gap-3 md:grid-cols-2">
+              {isAdmin ? (
+                <Link href="/solicitudes" className="press flex items-center gap-4 rounded-[var(--radius-card)] border border-line bg-white p-5 hover:border-electric/40">
+                  <span className="flex size-11 items-center justify-center rounded-2xl bg-electric-50 text-electric">
+                    <Icon name="user" size={22} />
+                  </span>
+                  <span className="flex-1">
+                    <span className="block font-bold text-night">Solicitudes de acceso</span>
+                    <span className="text-sm text-slate">{pendingRequests === 0 ? 'Ninguna pendiente' : pendingRequests === 1 ? '1 pendiente' : `${pendingRequests} pendientes`}</span>
+                  </span>
+                  {pendingRequests > 0 ? <span className="flex size-7 items-center justify-center rounded-full bg-electric text-xs font-bold text-white">{pendingRequests}</span> : null}
+                </Link>
+              ) : null}
+              {canListMembers(user) ? (
+                <Link href="/miembros" className="press flex items-center gap-4 rounded-[var(--radius-card)] border border-line bg-white p-5 hover:border-electric/40">
+                  <span className="flex size-11 items-center justify-center rounded-2xl bg-electric-50 text-electric">
+                    <Icon name="users" size={22} />
+                  </span>
+                  <span className="flex-1">
+                    <span className="block font-bold text-night">Miembros</span>
+                    <span className="text-sm text-slate">Listado de afiliados con acceso</span>
+                  </span>
+                  <Icon name="chevronRight" size={20} className="text-slate" />
+                </Link>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
+
         <section id="intereses" className="scroll-mt-32">
           <SectionHeader eyebrow="Mis intereses" title="Lo que más te mueve." />
           <Card>

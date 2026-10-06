@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Icon } from '@/components/ui/Icon'
 import { signInDemo } from '@/lib/actions/auth'
@@ -71,12 +72,24 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
                 </li>
               ))}
             </ul>
+            <p className="mt-6 border-t border-white/10 pt-5 text-sm text-white/60">
+              ¿Aún no tienes cuenta?{' '}
+              <Link href="/solicitar-acceso" className="press font-bold text-sky hover:text-white">
+                Solicitar acceso
+              </Link>
+            </p>
           </>
         ) : (
           <>
             <h2 className="text-2xl font-extrabold tracking-[-0.02em]">Entrar</h2>
-            <p className="mt-2 mb-6 text-sm text-white/60">El acceso lo autoriza tu dirección provincial. No hay registro abierto.</p>
+            <p className="mt-2 mb-6 text-sm text-white/60">Solo para afiliados de NNGG Euskadi con acceso aprobado.</p>
             <LoginForm next={next} />
+            <div className="mt-6 border-t border-white/10 pt-5 text-sm text-white/60">
+              ¿Aún no tienes cuenta?{' '}
+              <Link href="/solicitar-acceso" className="press font-bold text-sky hover:text-white">
+                Solicitar acceso
+              </Link>
+            </div>
           </>
         )}
       </div>

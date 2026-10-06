@@ -2,7 +2,8 @@ import 'server-only'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { isTerritoryId, type TerritoryId } from '@/lib/domain/territories'
-import type { ManagedPerson } from '@/lib/domain/types'
+import { sanitizeInterests } from '@/lib/domain/interests'
+import { USER_ROLES, type ManagedPerson, type UserRole } from '@/lib/domain/types'
 import type { PersonalStore, RegisterOutcome } from './store'
 
 /*
@@ -175,5 +176,46 @@ export const supabasePersonalStore: PersonalStore = {
         opportunityIds: r.opportunity_ids,
       }),
     )
+  },
+
+  async listAccessRequests() {
+    const supabase = await createSupabaseServerClient()
+    const { data, error } = await supabase.rpc('list_access_requests')
+    if (error) fail('solicitudes de acceso', error)
+    return ((data ?? []) as { id: string; email: string; display_name: string; territory: string; created_at: string }[]).map((r) => ({
+      id: r.id,
+      email: r.email,
+      displayName: r.display_name,
+      territory: toTerritory(r.territory),
+      createdAt: r.created_at,
+    }))
+  },
+
+  async approveAccessRequest(id, role) {
+    const supabase = await createSupabaseServerClient()
+    const { error } = await supabase.rpc('approve_access_request', { p_id: id, p_role: role })
+    if (error) fail('aprobar solicitud', error)
+  },
+
+  async rejectAccessRequest(id) {
+    const supabase = await createSupabaseServerClient()
+    const { error } = await supabase.rpc('reject_access_request', { p_id: id })
+    if (error) fail('rechazar solicitud', error)
+  },
+
+  async listMembers() {
+    const supabase = await createSupabaseServerClient()
+    const { data, error } = await supabase.rpc('list_members')
+    if (error) fail('miembros', error)
+    return (
+      (data ?? []) as { display_name: string; email: string; territory: string; role: string; interests: string[]; created_at: string }[]
+    ).map((m) => ({
+      displayName: m.display_name,
+      email: m.email,
+      territory: toTerritory(m.territory),
+      role: ((USER_ROLES as readonly string[]).includes(m.role) ? m.role : 'afiliado') as UserRole,
+      interests: sanitizeInterests(m.interests),
+      createdAt: m.created_at,
+    }))
   },
 }

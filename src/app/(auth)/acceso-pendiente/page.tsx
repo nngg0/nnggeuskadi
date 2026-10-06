@@ -14,10 +14,10 @@ export default async function PendingPage() {
   return (
     <div className="mx-auto w-full max-w-md">
       <p className="eyebrow text-sky">Acceso pendiente</p>
-      <h1 className="display mt-3 text-4xl">Todavía no tienes acceso.</h1>
+      <h1 className="display mt-3 text-4xl">Tu solicitud está pendiente.</h1>
       <p className="mt-4 text-sm leading-relaxed text-white/65">
-        Has entrado como <strong className="text-white">{session.email}</strong>, pero este email aún no está autorizado como
-        afiliado. Pide a tu dirección provincial que te dé de alta y vuelve a intentarlo.
+        Has entrado como <strong className="text-white">{session.email}</strong>. Tu acceso todavía no se ha aprobado. En cuanto
+        lo aprueben podrás entrar con este mismo email y contraseña.
       </p>
       <form action={signOut} className="mt-8">
         <button type="submit" className={buttonClasses('onDark', 'md')}>

@@ -7,7 +7,7 @@ import { updateSupabaseSession } from '@/lib/supabase/proxy-session'
  * (requireUser / actionUser) y la base de datos aplica RLS.
  */
 
-const PUBLIC_PATHS = ['/login', '/recuperar', '/auth/', '/api/agregados', '/api/revalidar', '/offline']
+const PUBLIC_PATHS = ['/login', '/recuperar', '/solicitar-acceso', '/auth/', '/api/agregados', '/api/revalidar', '/offline']
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p.endsWith('/') ? p : `${p}/`))

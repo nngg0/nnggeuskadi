@@ -16,6 +16,8 @@ export type Permission =
   | 'document.save'
   | 'profile.edit'
   | 'manage.viewPeople'
+  /** Aprobar o rechazar solicitudes de acceso y asignar roles (solo Administración). */
+  | 'members.approve'
 
 const MEMBER: Permission[] = ['content.read', 'activity.register', 'project.participate', 'document.save', 'profile.edit']
 
@@ -24,7 +26,7 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   direccion_provincial: [...MEMBER, 'manage.viewPeople'],
   direccion_euskadi: [...MEMBER, 'manage.viewPeople'],
   // Administración de la intranet: de momento, los mismos permisos que la dirección regional.
-  administracion: [...MEMBER, 'manage.viewPeople'],
+  administracion: [...MEMBER, 'manage.viewPeople', 'members.approve'],
 }
 
 /** Territorios cuyos contenidos gestiona cada rol. */
@@ -52,6 +54,11 @@ export function can(
     return managedTerritories(user).includes(resource.territory)
   }
   return true
+}
+
+/** ¿Ve el listado de miembros de algún territorio? (dirección provincial, regional y Administración) */
+export function canListMembers(user: Pick<CurrentUser, 'role' | 'territory'> | null): boolean {
+  return user !== null && managedTerritories(user).length > 0
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {
