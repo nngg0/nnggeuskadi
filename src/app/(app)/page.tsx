@@ -9,6 +9,7 @@ import { ArrowLink } from '@/components/ui/Button'
 import { SectionHeader } from '@/components/ui/Eyebrow'
 import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/States'
+import { can } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { getContent } from '@/lib/content/source'
 import { formatRelativeDay, madridDate } from '@/lib/domain/dates'
@@ -48,6 +49,7 @@ export default async function HomePage() {
     store.participationCounts(content.projects.map((p) => p.id)),
   ])
   const campaignView = campaignViews[0] ?? null
+  const pendingRequests = can(user, 'members.approve') ? (await store.listAccessRequests()).length : 0
   // La campaña ya muestra sus ámbitos en su bloque: aquí, el resto.
   const opportunities = openOpportunities(content, counts.byOpportunity, user.territory, today)
     .filter((o) => o.project.id !== campaign?.id)
@@ -95,6 +97,20 @@ export default async function HomePage() {
           </nav>
         </Container>
       </section>
+
+      {pendingRequests > 0 ? (
+        <Link href="/solicitudes" className="press block bg-electric text-white hover:bg-electric-600">
+          <Container className="flex items-center gap-3 py-3 text-sm font-bold">
+            <Icon name="user" size={18} />
+            <span className="flex-1">
+              {pendingRequests === 1 ? '1 solicitud de acceso pendiente' : `${pendingRequests} solicitudes de acceso pendientes`}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              Revisar <Icon name="arrowRight" size={16} />
+            </span>
+          </Container>
+        </Link>
+      ) : null}
 
       {campaignView ? <CampaignBlock view={campaignView} today={today} /> : null}
 

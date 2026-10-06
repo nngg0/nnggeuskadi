@@ -8,7 +8,17 @@ import { parseWorkbook } from '@/lib/sheets/parse'
 import { demoWorkbook } from './content'
 import { findDemoUser } from './users'
 import { DEMO_SESSION_COOKIE } from './session'
-import { DEMO_INITIAL_STATE, DEMO_OTHER_PARTICIPATIONS, DEMO_OTHER_REGISTRATIONS, demoPeople } from './personal-seed'
+import {
+  DEMO_ACCESS_REQUESTS,
+  DEMO_EXTRA_MEMBERS,
+  DEMO_INITIAL_STATE,
+  DEMO_OTHER_PARTICIPATIONS,
+  DEMO_OTHER_REGISTRATIONS,
+  demoPeople,
+} from './personal-seed'
+import { DEMO_USERS } from './users'
+import { can, managedTerritories } from '@/lib/auth/permissions'
+import { USER_ROLES, type Member, type UserRole } from '@/lib/domain/types'
 
 /*
  * DATOS DEMO — almacén personal sin base de datos.
@@ -28,6 +38,8 @@ const stateSchema = z.object({
   n: z.string().max(80).optional(),
   st: z.object({ notifyNewInitiatives: z.boolean() }).optional(),
   i: z.array(z.string().max(20)).max(3).optional(),
+  // Solicitudes de acceso revisadas en la demo: id -> rol aprobado o 'rechazada'
+  ar: z.record(z.string().max(64), z.string().max(30)).default({}),
 })
 type DemoState = z.infer<typeof stateSchema>
 
@@ -41,6 +53,7 @@ function initialState(userId: string): DemoState {
     p: structuredClone(seed.participations),
     pt: Object.fromEntries(Object.keys(seed.participations).map((id) => [id, stamp])),
     s: [...seed.saved],
+    ar: {},
   }
 }
 
@@ -79,6 +92,10 @@ async function mutate(userId: string, fn: (s: DemoState) => void) {
   const state = await readState(userId)
   fn(state)
   await writeState(state)
+}
+
+async function currentDemoUser() {
+  return findDemoUser((await currentDemoUserId()) ?? undefined)
 }
 
 export const demoPersonalStore: PersonalStore = {
@@ -201,6 +218,51 @@ export const demoPersonalStore: PersonalStore = {
       people.unshift({ displayName: user.displayName, territory: user.territory, createdAt: new Date().toISOString(), opportunityIds: mine })
     }
     return people
+  },
+
+  async listAccessRequests() {
+    const user = await currentDemoUser()
+    if (!user || !can(user, 'members.approve')) return []
+    const reviewed = (await readState(user.id)).ar
+    return DEMO_ACCESS_REQUESTS.filter((r) => !reviewed[r.id])
+  },
+
+  async approveAccessRequest(id, role) {
+    const user = await currentDemoUser()
+    if (!user || !can(user, 'members.approve')) throw new Error('Sin permiso')
+    if (!DEMO_ACCESS_REQUESTS.some((r) => r.id === id)) throw new Error('Solicitud no encontrada')
+    await mutate(user.id, (s) => {
+      s.ar[id] = role
+    })
+  },
+
+  async rejectAccessRequest(id) {
+    const user = await currentDemoUser()
+    if (!user || !can(user, 'members.approve')) throw new Error('Sin permiso')
+    await mutate(user.id, (s) => {
+      s.ar[id] = 'rechazada'
+    })
+  },
+
+  async listMembers() {
+    const user = await currentDemoUser()
+    if (!user) return []
+    const scope = managedTerritories(user)
+    const reviewed = (await readState(user.id)).ar
+    const approved: Member[] = DEMO_ACCESS_REQUESTS.filter((r) => (USER_ROLES as readonly string[]).includes(reviewed[r.id] ?? '')).map(
+      (r) => ({ displayName: r.displayName, email: r.email, territory: r.territory, role: reviewed[r.id] as UserRole, interests: [], createdAt: r.createdAt }),
+    )
+    const users: Member[] = DEMO_USERS.map((u) => ({
+      displayName: u.displayName,
+      email: u.email,
+      territory: u.territory,
+      role: u.role,
+      interests: u.interests,
+      createdAt: '2026-09-01T10:00:00.000Z',
+    }))
+    return [...users, ...DEMO_EXTRA_MEMBERS, ...approved]
+      .filter((m) => scope.includes(m.territory))
+      .sort((a, b) => a.territory.localeCompare(b.territory) || a.displayName.localeCompare(b.displayName, 'es'))
   },
 }
 

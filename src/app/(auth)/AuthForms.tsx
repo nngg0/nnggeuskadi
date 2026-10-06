@@ -1,10 +1,30 @@
 'use client'
 
 import Link from 'next/link'
-import { useActionState } from 'react'
+import { useActionState, useState, useTransition, type FormEvent } from 'react'
+import { requestAccess } from '@/lib/actions/access'
 import { requestPasswordReset, signIn, updatePassword } from '@/lib/actions/auth'
+import { DEFAULT_TERRITORIES } from '@/lib/domain/territories'
 import { Button } from '@/components/ui/Button'
 import { Notice } from '@/components/ui/States'
+import type { ActionResult } from '@/lib/domain/types'
+
+/**
+ * Como useActionState, pero sin vaciar el formulario tras enviarlo: si hay un error,
+ * la persona no tiene que volver a escribirlo todo.
+ */
+function useKeepValuesAction(fn: (prev: ActionResult | null, formData: FormData) => Promise<ActionResult>) {
+  const [state, setState] = useState<ActionResult | null>(null)
+  const [pending, startTransition] = useTransition()
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    startTransition(async () => {
+      setState(await fn(null, formData))
+    })
+  }
+  return [state, onSubmit, pending] as const
+}
 
 const inputClass =
   'mt-2 h-14 w-full rounded-2xl border border-white/15 bg-white/[0.06] px-4 text-base font-semibold text-white placeholder:text-white/35 focus:border-electric focus:bg-white/10 focus:outline-none focus:ring-4 focus:ring-electric/30'
@@ -21,9 +41,9 @@ function Field({ label, ...props }: { label: string } & React.ComponentProps<'in
 }
 
 export function LoginForm({ next }: { next: string }) {
-  const [state, action, pending] = useActionState(signIn, null)
+  const [state, onSubmit, pending] = useKeepValuesAction(signIn)
   return (
-    <form action={action} className="grid gap-4">
+    <form onSubmit={onSubmit} className="grid gap-4">
       <input type="hidden" name="next" value={next} />
       <Field label="Email" id="email" name="email" type="email" autoComplete="email" required inputMode="email" />
       <Field label="Contraseña" id="password" name="password" type="password" autoComplete="current-password" required />
@@ -61,6 +81,60 @@ export function NewPasswordForm() {
       {state && !state.ok ? <Notice tone="danger">{state.message}</Notice> : null}
       <Button type="submit" block arrow disabled={pending}>
         {pending ? 'Guardando…' : 'Guardar contraseña'}
+      </Button>
+    </form>
+  )
+}
+
+export function RequestAccessForm() {
+  const [state, onSubmit, pending] = useKeepValuesAction(requestAccess)
+  if (state?.ok) {
+    return (
+      <div className="grid gap-5">
+        <Notice tone="success" icon="check">
+          {state.message}
+        </Notice>
+        <Link href="/login" className="press justify-self-start text-sm font-semibold text-sky hover:text-white">
+          Ir a la pantalla de entrada
+        </Link>
+      </div>
+    )
+  }
+  return (
+    <form onSubmit={onSubmit} className="grid gap-4">
+      <Field label="Nombre y apellido" id="displayName" name="displayName" autoComplete="name" required minLength={2} maxLength={80} />
+      <Field label="Email" id="email" name="email" type="email" autoComplete="email" required inputMode="email" />
+      <div>
+        <label htmlFor="territory" className="eyebrow !text-[0.62rem] text-white/60">
+          Territorio
+        </label>
+        <select
+          id="territory"
+          name="territory"
+          required
+          defaultValue=""
+          className="mt-2 h-14 w-full rounded-2xl border border-white/15 bg-night-2 px-4 text-base font-semibold text-white focus:border-electric focus:outline-none focus:ring-4 focus:ring-electric/30"
+        >
+          <option value="" disabled>
+            Elige tu territorio
+          </option>
+          {DEFAULT_TERRITORIES.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <Field label="Contraseña (mínimo 10 caracteres)" id="password" name="password" type="password" autoComplete="new-password" minLength={10} required />
+      <Field label="Repite la contraseña" id="confirm" name="confirm" type="password" autoComplete="new-password" minLength={10} required />
+      {/* Campo trampa para bots */}
+      <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor="website">No rellenar</label>
+        <input id="website" name="website" tabIndex={-1} autoComplete="off" />
+      </div>
+      {state && !state.ok ? <Notice tone="danger">{state.message}</Notice> : null}
+      <Button type="submit" block arrow disabled={pending} className="mt-2">
+        {pending ? 'Enviando…' : 'Solicitar acceso'}
       </Button>
     </form>
   )

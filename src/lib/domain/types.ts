@@ -142,4 +142,23 @@ export interface ManagedPerson {
   opportunityIds?: string[]
 }
 
+/** Solicitud de acceso pendiente de aprobación (solo la ve Administración). */
+export interface AccessRequest {
+  id: string
+  email: string
+  displayName: string
+  territory: TerritoryId
+  createdAt: string
+}
+
+/** Miembro en el listado de la dirección. */
+export interface Member {
+  displayName: string
+  email: string
+  territory: TerritoryId
+  role: UserRole
+  interests: InterestId[]
+  createdAt: string
+}
+
 export type ActionResult = { ok: true; message: string } | { ok: false; message: string }

@@ -43,6 +43,17 @@ export const DEMO_USERS: CurrentUser[] = [
   },
 ]
 
+// Cuenta de Administración para probar la aprobación de solicitudes.
+DEMO_USERS.push({
+  id: '00000000-0000-4000-8000-000000000006',
+  email: 'admin.demo@nngg.example',
+  displayName: 'Administración',
+  territory: 'euskadi',
+  role: 'administracion',
+  settings: { notifyNewInitiatives: true },
+  interests: [],
+})
+
 export function findDemoUser(id: string | undefined): CurrentUser | null {
   return DEMO_USERS.find((u) => u.id === id) ?? null
 }

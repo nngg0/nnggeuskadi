@@ -42,6 +42,8 @@ con los usuarios ficticios. **No uses demo como entorno real.**
 
 ## Seguridad en producción
 
+- Recomendado: en Supabase, **Authentication → Providers → Email → Prevent use of leaked passwords** (si tu plan lo incluye).
+
 - Las cabeceras de seguridad (`X-Frame-Options`, `HSTS`, `nosniff`, `noindex`…) se configuran en `next.config.ts`.
 - Rota `SUPABASE_SERVICE_ROLE_KEY` y la clave de la cuenta de servicio si alguien que las conocía deja la organización.
 - `npm run check:secrets` (también en CI) avisa si se ha versionado un secreto.

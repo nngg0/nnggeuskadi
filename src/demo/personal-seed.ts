@@ -1,5 +1,5 @@
 import type { TerritoryId } from '@/lib/domain/territories'
-import type { ManagedPerson } from '@/lib/domain/types'
+import type { AccessRequest, ManagedPerson, Member } from '@/lib/domain/types'
 
 /*
  * DATOS DEMO — actividad de "otros afiliados" (agregada) y estado inicial del usuario demo.
@@ -62,3 +62,16 @@ export function demoPeople(count: number, territory: TerritoryId, opportunityIds
     opportunityIds: opportunityIds ? [opportunityIds[i % opportunityIds.length] ?? ''] : undefined,
   }))
 }
+
+/** Solicitudes de acceso de ejemplo (solo las ve Administración). */
+export const DEMO_ACCESS_REQUESTS: AccessRequest[] = [
+  { id: '10000000-0000-4000-8000-000000000001', email: 'santiago.demo@nngg.example', displayName: 'Santiago López', territory: 'bizkaia', createdAt: '2026-10-05T18:20:00.000Z' },
+  { id: '10000000-0000-4000-8000-000000000002', email: 'josetxo.demo@nngg.example', displayName: 'Josetxo López', territory: 'alava', createdAt: '2026-10-06T08:05:00.000Z' },
+]
+
+/** Afiliados ficticios adicionales para el listado de miembros. */
+export const DEMO_EXTRA_MEMBERS: Member[] = [
+  { displayName: 'Leire Sanz', email: 'leire.demo@nngg.example', territory: 'bizkaia', role: 'afiliado', interests: ['vivienda', 'calle'], createdAt: '2026-09-12T10:00:00.000Z' },
+  { displayName: 'Unai Lasa', email: 'unai.demo@nngg.example', territory: 'gipuzkoa', role: 'afiliado', interests: ['economia'], createdAt: '2026-09-20T10:00:00.000Z' },
+  { displayName: 'Nerea Gil', email: 'nerea.demo@nngg.example', territory: 'alava', role: 'afiliado', interests: ['debate', 'justicia'], createdAt: '2026-09-28T10:00:00.000Z' },
+]

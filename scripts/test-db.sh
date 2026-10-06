@@ -9,4 +9,4 @@ trap 'psql "$DATABASE_URL" -qc "drop database if exists $DB" >/dev/null' EXIT
 TEST_URL="${DATABASE_URL%/*}/$DB"
 psql "$TEST_URL" -v ON_ERROR_STOP=1 -q -f supabase/tests/00_supabase_stub.sql
 for f in supabase/migrations/*.sql; do psql "$TEST_URL" -v ON_ERROR_STOP=1 -q -f "$f"; done
-psql "$TEST_URL" -v ON_ERROR_STOP=1 -q -f supabase/tests/10_rls_test.sql
+for f in supabase/tests/[1-9]*_test.sql; do psql "$TEST_URL" -v ON_ERROR_STOP=1 -q -f "$f"; done
