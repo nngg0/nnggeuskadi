@@ -1,3 +1,4 @@
+import type { InterestId } from './interests'
 import type { Territory, TerritoryId } from './territories'
 
 /* ------------------------------------------------------------------ */
@@ -101,7 +102,7 @@ export interface ContentBundle {
 /* Datos personales (Supabase). Nunca se escriben en Google Sheets.    */
 /* ------------------------------------------------------------------ */
 
-export const USER_ROLES = ['afiliado', 'direccion_euskadi', 'direccion_provincial'] as const
+export const USER_ROLES = ['afiliado', 'direccion_euskadi', 'direccion_provincial', 'administracion'] as const
 export type UserRole = (typeof USER_ROLES)[number]
 
 export interface UserSettings {
@@ -116,6 +117,8 @@ export interface CurrentUser {
   territory: TerritoryId
   role: UserRole
   settings: UserSettings
+  /** Hasta 3 temas de interés. */
+  interests: InterestId[]
 }
 
 export interface Registration {

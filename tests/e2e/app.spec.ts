@@ -259,3 +259,21 @@ test.describe('campaña principal y calendario', () => {
     expect([307, 401]).toContain(response.status())
   })
 })
+
+test.describe('intereses', () => {
+  test('cada persona elige como máximo 3 intereses y se guardan', async ({ page }) => {
+    await loginAs(page, /Pablo/)
+    await page.goto('/perfil#intereses')
+    const section = page.locator('#intereses')
+    await expect(section.getByText('1 de 3')).toBeVisible()
+    await section.getByText('Vivienda', { exact: true }).click()
+    await section.getByText('Debate y oratoria', { exact: true }).click()
+    await expect(section.getByText('3 de 3')).toBeVisible()
+    await expect(section.getByRole('checkbox', { name: 'Inmigración' })).toBeDisabled()
+    await section.getByRole('button', { name: 'Guardar intereses' }).click()
+    await expect(section.getByText('Intereses guardados.')).toBeVisible()
+    await page.reload()
+    await expect(page.locator('#intereses').getByText('3 de 3')).toBeVisible()
+    await expect(page.locator('#intereses').getByRole('checkbox', { name: 'Vivienda' })).toBeChecked()
+  })
+})

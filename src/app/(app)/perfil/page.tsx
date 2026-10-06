@@ -4,6 +4,7 @@ import { ActivityCard } from '@/components/activities/ActivityCard'
 import { RegistrationTag } from '@/components/activities/ActivityBits'
 import { DocumentRow } from '@/components/documents/DocumentRow'
 import { Container } from '@/components/layout/PageHeader'
+import { InterestsForm } from '@/components/profile/InterestsForm'
 import { ProfileForm } from '@/components/profile/ProfileForm'
 import { InstallButton } from '@/components/pwa/InstallButton'
 import { buttonClasses } from '@/components/ui/Button'
@@ -26,6 +27,7 @@ import { projectViews } from '@/lib/view/projects'
 export const metadata: Metadata = { title: 'Perfil' }
 
 const SECTIONS = [
+  { id: 'intereses', label: 'Intereses' },
   { id: 'proximas', label: 'Próximas' },
   { id: 'inscripciones', label: 'Inscripciones' },
   { id: 'participaciones', label: 'Participaciones' },
@@ -92,6 +94,13 @@ export default async function ProfilePage() {
       </nav>
 
       <Container className="space-y-12 py-8 md:py-10">
+        <section id="intereses" className="scroll-mt-32">
+          <SectionHeader eyebrow="Mis intereses" title="Lo que más te mueve." />
+          <Card>
+            <InterestsForm initial={user.interests} />
+          </Card>
+        </section>
+
         <section id="proximas" className="scroll-mt-32">
           <SectionHeader eyebrow="Mis próximas actividades" title={upcoming.length ? 'Tus planes.' : undefined} />
           {upcoming.length > 0 ? (

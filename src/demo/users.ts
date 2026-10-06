@@ -12,6 +12,7 @@ export const DEMO_USERS: CurrentUser[] = [
     territory: 'euskadi',
     role: 'direccion_euskadi',
     settings: { notifyNewInitiatives: true },
+    interests: ['organizacion', 'economia'],
   },
   {
     id: '00000000-0000-4000-8000-000000000001',
@@ -20,6 +21,7 @@ export const DEMO_USERS: CurrentUser[] = [
     territory: 'alava',
     role: 'afiliado',
     settings: { notifyNewInitiatives: true },
+    interests: ['debate', 'vivienda', 'calle'],
   },
   {
     id: '00000000-0000-4000-8000-000000000002',
@@ -28,6 +30,7 @@ export const DEMO_USERS: CurrentUser[] = [
     territory: 'bizkaia',
     role: 'afiliado',
     settings: { notifyNewInitiatives: false },
+    interests: ['seguridad'],
   },
   {
     id: '00000000-0000-4000-8000-000000000004',
@@ -36,6 +39,7 @@ export const DEMO_USERS: CurrentUser[] = [
     territory: 'bizkaia',
     role: 'direccion_provincial',
     settings: { notifyNewInitiatives: true },
+    interests: ['calle', 'organizacion'],
   },
 ]
 

@@ -32,3 +32,12 @@ describe('permisos', () => {
     expect(can(euskadi, 'manage.viewPeople')).toBe(false)
   })
 })
+
+describe('administración', () => {
+  it('tiene los permisos de la dirección regional', () => {
+    const admin = { role: 'administracion' as const, territory: 'euskadi' as const }
+    expect(managedTerritories(admin)).toEqual(['euskadi', 'alava', 'bizkaia', 'gipuzkoa'])
+    expect(can(admin, 'manage.viewPeople', { territory: 'alava' })).toBe(true)
+    expect(can(admin, 'activity.register')).toBe(true)
+  })
+})

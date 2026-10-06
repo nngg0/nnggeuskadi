@@ -1,4 +1,5 @@
 import type { TerritoryId } from '@/lib/domain/territories'
+import type { InterestId } from '@/lib/domain/interests'
 import type { ManagedPerson, Participation, Registration, UserSettings } from '@/lib/domain/types'
 
 /**
@@ -42,6 +43,7 @@ export interface PersonalStore {
   setDocumentSaved(userId: string, documentId: string, saved: boolean): Promise<void>
 
   updateProfile(userId: string, input: { displayName: string; settings: UserSettings }): Promise<void>
+  updateInterests(userId: string, interests: InterestId[]): Promise<void>
 
   /* Gestión: solo dirección con permiso sobre el territorio (verificado también en base de datos). */
   eventRegistrants(eventId: string): Promise<ManagedPerson[]>

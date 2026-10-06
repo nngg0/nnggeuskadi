@@ -17,7 +17,7 @@ import { createClient } from '@supabase/supabase-js'
 if (existsSync('.env.local')) process.loadEnvFile('.env.local')
 
 const TERRITORIES = ['euskadi', 'alava', 'bizkaia', 'gipuzkoa']
-const ROLES = ['afiliado', 'direccion_euskadi', 'direccion_provincial']
+const ROLES = ['afiliado', 'direccion_euskadi', 'direccion_provincial', 'administracion']
 
 const { values } = parseArgs({
   options: {
@@ -71,7 +71,7 @@ if (existing) {
   if (error) fail(`No se pudo actualizar el perfil: ${error.message}`)
   console.log(`✓ ${email} ya tenía cuenta: perfil actualizado (${values.role}, ${values.territory}).`)
 } else {
-  const { error } = await supabase.auth.admin.inviteUserByEmail(email, { redirectTo: `${site}/auth/callback` })
+  const { error } = await supabase.auth.admin.inviteUserByEmail(email, { redirectTo: `${site}/login` })
   if (error) fail(`No se pudo enviar la invitación: ${error.message}`)
   console.log(`✓ Invitación enviada a ${email}. Al aceptarla elegirá su contraseña.`)
 }

@@ -23,12 +23,15 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   afiliado: MEMBER,
   direccion_provincial: [...MEMBER, 'manage.viewPeople'],
   direccion_euskadi: [...MEMBER, 'manage.viewPeople'],
+  // Administración de la intranet: de momento, los mismos permisos que la dirección regional.
+  administracion: [...MEMBER, 'manage.viewPeople'],
 }
 
 /** Territorios cuyos contenidos gestiona cada rol. */
 export function managedTerritories(user: Pick<CurrentUser, 'role' | 'territory'>): TerritoryId[] {
   switch (user.role) {
     case 'direccion_euskadi':
+    case 'administracion':
       return ['euskadi', 'alava', 'bizkaia', 'gipuzkoa']
     case 'direccion_provincial':
       return user.territory === 'euskadi' ? [] : [user.territory]
@@ -54,5 +57,6 @@ export function can(
 export const ROLE_LABELS: Record<UserRole, string> = {
   afiliado: 'Afiliado',
   direccion_euskadi: 'Dirección regional',
+  administracion: 'Administración',
   direccion_provincial: 'Dirección provincial',
 }

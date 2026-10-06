@@ -70,6 +70,19 @@ do $$ begin
   end;
 end $$;
 update public.profiles set display_name = 'Ane R.' where id = auth.uid();
+update public.profiles set interests = array['debate', 'vivienda', 'calle'] where id = auth.uid();
+do $$ begin
+  begin
+    update public.profiles set interests = array['debate', 'vivienda', 'calle', 'seguridad'] where id = auth.uid();
+    raise exception 'no debe admitir más de 3 intereses';
+  exception when check_violation then null;
+  end;
+  begin
+    update public.profiles set interests = array['astrologia'] where id = auth.uid();
+    raise exception 'no debe admitir intereses desconocidos';
+  exception when check_violation then null;
+  end;
+end $$;
 
 -- Participación: propia sí, ajena no.
 insert into public.project_participations (project_id, user_id, territory, opportunity_ids)

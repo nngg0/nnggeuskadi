@@ -40,7 +40,7 @@ Sin chat, foros, comentarios, seguidores ni gamificación: no sustituye a WhatsA
 | **Actividad** | Ficha con fecha, hora, lugar, inscritos/plazas. Inscribirse y cancelar. Control de aforo, apertura y cierre (automático por fecha o manual), evento completo, cancelado o finalizado. **Añadir a mi calendario** (.ics para iPhone/Android/Outlook o Google Calendar). |
 | **Participa** | Bloque principal de campaña (p. ej. Campaña 29N) y proyectos en preparación y en marcha con sus ámbitos. Sin cupos: participa quien quiera y la organización cierra cada ámbito cuando lo decide. «Quiero participar» → elegir uno o varios ámbitos → confirmación inmediata. |
 | **Documentos** | Búsqueda instantánea (sin tildes), filtros por territorio y categoría, destacados, recientes, guardados. |
-| **Perfil** | Mi territorio, próximas actividades, histórico de inscripciones, participaciones, documentos guardados y configuración (nombre visible, preferencia de avisos, instalar la app, contraseña, salir). |
+| **Perfil** | Mis intereses (hasta 3 temas), próximas actividades, histórico de inscripciones, participaciones, documentos guardados y configuración (nombre visible, preferencia de avisos, instalar la app, contraseña, salir). |
 | **Dirección** | En fichas de su territorio, la dirección ve quién se ha inscrito o se ha ofrecido (solo nombre visible) para poder contactar. |
 | **PWA** | Instalable en móvil y escritorio, iconos, página sin conexión, aviso offline, preparada para notificaciones push. |
 

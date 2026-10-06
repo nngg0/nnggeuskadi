@@ -3,6 +3,7 @@ import { cache } from 'react'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { isDemoMode } from '@/lib/config/mode'
+import { sanitizeInterests } from '@/lib/domain/interests'
 import { isTerritoryId } from '@/lib/domain/territories'
 import { USER_ROLES, type CurrentUser, type UserRole } from '@/lib/domain/types'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -27,7 +28,12 @@ async function demoSession(): Promise<SessionState> {
   const overrides = await demoProfileOverrides(user.id)
   return {
     status: 'member',
-    user: { ...user, displayName: overrides.displayName ?? user.displayName, settings: overrides.settings ?? user.settings },
+    user: {
+      ...user,
+      displayName: overrides.displayName ?? user.displayName,
+      settings: overrides.settings ?? user.settings,
+      interests: overrides.interests ?? user.interests,
+    },
   }
 }
 
@@ -38,7 +44,7 @@ async function supabaseSession(): Promise<SessionState> {
   if (error || !data.user) return { status: 'anonymous' }
   const { data: profile } = await supabase
     .from('profiles')
-    .select('display_name, territory, role, settings')
+    .select('display_name, territory, role, settings, interests')
     .eq('id', data.user.id)
     .maybeSingle()
   if (!profile || !isTerritoryId(profile.territory) || !isRole(profile.role)) {
@@ -54,6 +60,7 @@ async function supabaseSession(): Promise<SessionState> {
       territory: profile.territory,
       role: profile.role,
       settings: { notifyNewInitiatives: settings.notifyNewInitiatives !== false },
+      interests: sanitizeInterests(profile.interests),
     },
   }
 }

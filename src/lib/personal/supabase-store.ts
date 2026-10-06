@@ -146,6 +146,12 @@ export const supabasePersonalStore: PersonalStore = {
     if (error) fail('perfil', error)
   },
 
+  async updateInterests(userId, interests) {
+    const supabase = await createSupabaseServerClient()
+    const { error } = await supabase.from('profiles').update({ interests }).eq('id', userId)
+    if (error) fail('intereses', error)
+  },
+
   async eventRegistrants(eventId) {
     const supabase = await createSupabaseServerClient()
     const { data, error } = await supabase.rpc('list_event_registrants', { p_event_id: eventId })
