@@ -101,7 +101,7 @@ export interface ContentBundle {
 /* Datos personales (Supabase). Nunca se escriben en Google Sheets.    */
 /* ------------------------------------------------------------------ */
 
-export const USER_ROLES = ['afiliado', 'direccion_euskadi', 'direccion_provincial'] as const
+export const USER_ROLES = ['afiliado', 'direccion_euskadi', 'direccion_provincial', 'administracion'] as const
 export type UserRole = (typeof USER_ROLES)[number]
 
 export interface UserSettings {

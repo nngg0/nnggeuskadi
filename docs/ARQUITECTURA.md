@@ -70,7 +70,8 @@ La misma regla (`getRegistrationState`) pinta la interfaz y decide en servidor: 
 |---|---|
 | `afiliado` | Consultar todo, inscribirse/cancelar, participar, guardar documentos, editar su nombre y ajustes |
 | `direccion_provincial` | Lo anterior + ver quién se ha inscrito/ofrecido **en su territorio** |
-| `direccion_euskadi` | Lo anterior + ver quién se ha inscrito/ofrecido en **todos** los territorios |
+| `direccion_euskadi` (Dirección regional) | Lo anterior + ver quién se ha inscrito/ofrecido en **todos** los territorios |
+| `administracion` | Administración de la intranet. De momento, los mismos permisos que la dirección regional |
 
 Para añadir un rol: `USER_ROLES` (`src/lib/domain/types.ts`), fila en `public.roles`, permisos en
 `permissions.ts` y, si gestiona datos, en `public.can_manage_territory()`.

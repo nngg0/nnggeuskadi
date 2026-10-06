@@ -43,7 +43,7 @@ de otros ni puede cambiarse el rol ni saltarse el aforo, y que la dirección sol
 | `territories` | euskadi, alava, bizkaia, gipuzkoa | Catálogo |
 | `roles` | afiliado, direccion_euskadi, direccion_provincial | Catálogo extensible |
 | `member_allowlist` | Emails autorizados con nombre, territorio y rol | Solo service role. Email en minúsculas |
-| `profiles` | 1:1 con `auth.users`: nombre visible, territorio, rol, ajustes | `provincial_needs_province` |
+| `profiles` | 1:1 con `auth.users`: nombre visible, territorio, rol (`afiliado`, `direccion_provincial`, `direccion_euskadi`, `administracion`), ajustes | `provincial_needs_province` |
 | `event_registrations` | Inscripción de un usuario a una actividad del Sheet | `unique (event_id, user_id)`, `answers jsonb` para preguntas futuras |
 | `project_participations` | Ofrecimiento a un proyecto con los ámbitos elegidos | `unique (project_id, user_id)`, `opportunity_ids text[]` (1–20) |
 | `saved_documents` | Documentos guardados | PK `(user_id, document_id)` |
@@ -84,7 +84,21 @@ El procedimiento exacto de autorización está por decidir; la arquitectura lo d
    npm run invite -- --email jon@ejemplo.org --name "Jon Arana" --territory bizkaia --role direccion_provincial
    ```
 2. El script añade el email a `member_allowlist` y Supabase envía la invitación.
-3. Al abrir el enlace, la persona llega a `/actualizar-clave` y elige contraseña.
+3. Al abrir el enlace, la persona vuelve a la app (`/login`), que recoge la sesión del enlace y la lleva a
+   `/actualizar-clave` para elegir contraseña.
+
+También se puede invitar desde el panel: añadir la fila en `member_allowlist` (Table Editor) y después
+**Authentication → Users → Add user → Send invitation**. O crear la cuenta con contraseña
+(**Create new user**, marcando *Auto Confirm User*) y que la persona la cambie en Perfil.
+
+### Envío de emails (importante)
+
+El servidor de correo que trae Supabase por defecto **solo envía a los miembros del equipo del proyecto**
+y tiene un límite muy bajo por hora. Para invitar a afiliados o que funcione «Recuperar acceso», configura
+un SMTP propio en **Authentication → Emails → SMTP Settings**, por ejemplo:
+
+- **Gmail** con una contraseña de aplicación (`smtp.gmail.com`, puerto 587). Sencillo para pocos envíos.
+- **Resend**, **Brevo** u otro proveedor, con el dominio de la organización. Mejor para producción.
 
 Si alguien consigue una cuenta sin estar en la lista, ve «Acceso pendiente» y no accede a nada (sin perfil, RLS no le devuelve datos).
 

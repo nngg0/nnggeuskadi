@@ -1,9 +1,11 @@
 import { Wordmark } from '@/components/layout/Wordmark'
+import { AuthHashHandler } from './AuthHashHandler'
 
 /** Pantallas públicas de acceso: zona de identidad a pantalla completa. */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex min-h-dvh flex-col overflow-hidden bg-night text-white">
+      <AuthHashHandler />
       <div aria-hidden className="pointer-events-none absolute -right-32 -top-32 size-[28rem] rounded-full bg-electric/30 blur-3xl" />
       <div aria-hidden className="pointer-events-none absolute -bottom-40 -left-24 size-96 rounded-full bg-electric/10 blur-3xl" />
       <header className="pt-safe relative mx-auto w-full max-w-5xl px-5 pt-6 sm:px-8">
