@@ -43,7 +43,7 @@ de otros ni puede cambiarse el rol ni saltarse el aforo, y que la dirección sol
 | `territories` | euskadi, alava, bizkaia, gipuzkoa | Catálogo |
 | `roles` | afiliado, direccion_euskadi, direccion_provincial | Catálogo extensible |
 | `member_allowlist` | Emails autorizados con nombre, territorio y rol | Solo service role. Email en minúsculas |
-| `profiles` | 1:1 con `auth.users`: nombre visible, territorio, rol (`afiliado`, `direccion_provincial`, `direccion_euskadi`, `administracion`), ajustes | `provincial_needs_province` |
+| `profiles` | 1:1 con `auth.users`: nombre visible, territorio, rol (`afiliado`, `direccion_provincial`, `direccion_euskadi`, `administracion`), ajustes e intereses (máx. 3) | `provincial_needs_province` |
 | `event_registrations` | Inscripción de un usuario a una actividad del Sheet | `unique (event_id, user_id)`, `answers jsonb` para preguntas futuras |
 | `project_participations` | Ofrecimiento a un proyecto con los ámbitos elegidos | `unique (project_id, user_id)`, `opportunity_ids text[]` (1–20) |
 | `saved_documents` | Documentos guardados | PK `(user_id, document_id)` |

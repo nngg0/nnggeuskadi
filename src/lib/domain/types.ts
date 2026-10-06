@@ -1,3 +1,4 @@
+import type { InterestId } from './interests'
 import type { Territory, TerritoryId } from './territories'
 
 /* ------------------------------------------------------------------ */
@@ -116,6 +117,8 @@ export interface CurrentUser {
   territory: TerritoryId
   role: UserRole
   settings: UserSettings
+  /** Hasta 3 temas de interés. */
+  interests: InterestId[]
 }
 
 export interface Registration {

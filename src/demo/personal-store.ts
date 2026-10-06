@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { z } from 'zod'
 import type { PersonalStore } from '@/lib/personal/store'
 import type { UserSettings } from '@/lib/domain/types'
+import { sanitizeInterests, type InterestId } from '@/lib/domain/interests'
 import { parseWorkbook } from '@/lib/sheets/parse'
 import { demoWorkbook } from './content'
 import { findDemoUser } from './users'
@@ -26,6 +27,7 @@ const stateSchema = z.object({
   s: z.array(z.string().max(64)).max(200),
   n: z.string().max(80).optional(),
   st: z.object({ notifyNewInitiatives: z.boolean() }).optional(),
+  i: z.array(z.string().max(20)).max(3).optional(),
 })
 type DemoState = z.infer<typeof stateSchema>
 
@@ -166,6 +168,12 @@ export const demoPersonalStore: PersonalStore = {
     })
   },
 
+  async updateInterests(userId, interests) {
+    await mutate(userId, (s) => {
+      s.i = interests
+    })
+  },
+
   async eventRegistrants(eventId) {
     const content = parseWorkbook(demoWorkbook())
     const activity = content.activities.find((a) => a.id === eventId)
@@ -197,7 +205,9 @@ export const demoPersonalStore: PersonalStore = {
 }
 
 /** Nombre y ajustes editados por el usuario demo (se superponen al usuario ficticio). */
-export async function demoProfileOverrides(userId: string): Promise<{ displayName?: string; settings?: UserSettings }> {
+export async function demoProfileOverrides(
+  userId: string,
+): Promise<{ displayName?: string; settings?: UserSettings; interests?: InterestId[] }> {
   const s = await readState(userId)
-  return { displayName: s.n, settings: s.st }
+  return { displayName: s.n, settings: s.st, interests: s.i ? sanitizeInterests(s.i) : undefined }
 }

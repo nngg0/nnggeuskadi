@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { can } from '@/lib/auth/permissions'
+import { INTEREST_IDS, MAX_INTERESTS } from '@/lib/domain/interests'
 import type { ActionResult } from '@/lib/domain/types'
 import { personalStore } from '@/lib/personal'
 import { actionUser, failure, NOT_AUTHENTICATED, success, UNEXPECTED } from './helpers'
@@ -35,6 +36,26 @@ export async function updateProfile(_prev: ActionResult | null, formData: FormDa
     return success('Cambios guardados.')
   } catch (error) {
     console.error('[perfil]', error)
+    return UNEXPECTED
+  }
+}
+
+const interestsSchema = z
+  .array(z.enum(INTEREST_IDS as [string, ...string[]]))
+  .max(MAX_INTERESTS, `Puedes elegir como máximo ${MAX_INTERESTS} intereses.`)
+
+export async function updateInterests(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
+  const user = await actionUser()
+  if (!user) return NOT_AUTHENTICATED
+  if (!can(user, 'profile.edit')) return failure('No tienes permiso para editar el perfil.')
+  const input = interestsSchema.safeParse([...new Set(formData.getAll('interests'))])
+  if (!input.success) return failure(input.error.issues[0]?.message ?? 'Intereses no válidos.')
+  try {
+    await personalStore().updateInterests(user.id, input.data as typeof user.interests)
+    revalidatePath('/perfil')
+    return success(input.data.length ? 'Intereses guardados.' : 'Has quitado tus intereses.')
+  } catch (error) {
+    console.error('[intereses]', error)
     return UNEXPECTED
   }
 }
