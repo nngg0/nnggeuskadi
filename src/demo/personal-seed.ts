@@ -65,8 +65,8 @@ export function demoPeople(count: number, territory: TerritoryId, opportunityIds
 
 /** Solicitudes de acceso de ejemplo (solo las ve Administración). */
 export const DEMO_ACCESS_REQUESTS: AccessRequest[] = [
-  { id: '10000000-0000-4000-8000-000000000001', email: 'santiago.lopez@usuarios.nnggeuskadi.vercel.app', displayName: 'Santiago López', territory: 'bizkaia', createdAt: '2026-10-05T18:20:00.000Z' },
-  { id: '10000000-0000-4000-8000-000000000002', email: 'josetxo_lopez@usuarios.nnggeuskadi.vercel.app', displayName: 'Josetxo López', territory: 'alava', createdAt: '2026-10-06T08:05:00.000Z' },
+  { id: '10000000-0000-4000-8000-000000000001', email: 'santiago.lopez@usuarios.nnggeuskadi.vercel.app', displayName: 'Santiago López', territory: null, createdAt: '2026-10-05T18:20:00.000Z' },
+  { id: '10000000-0000-4000-8000-000000000002', email: 'josetxo_lopez@usuarios.nnggeuskadi.vercel.app', displayName: 'Josetxo López', territory: null, createdAt: '2026-10-06T08:05:00.000Z' },
 ]
 
 /** Afiliados ficticios adicionales para el listado de miembros. */

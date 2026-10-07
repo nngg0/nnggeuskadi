@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useActionState, useState, useTransition, type FormEvent } from 'react'
 import { requestAccess } from '@/lib/actions/access'
 import { requestPasswordReset, signIn, updatePassword } from '@/lib/actions/auth'
-import { DEFAULT_TERRITORIES } from '@/lib/domain/territories'
 import { USERNAME_HINT, USERNAME_MAX, USERNAME_MIN } from '@/lib/auth/username'
 import { Button } from '@/components/ui/Button'
 import { Notice } from '@/components/ui/States'
@@ -112,7 +111,10 @@ export function RequestAccessForm() {
   }
   return (
     <form onSubmit={onSubmit} className="grid gap-4">
-      <Field label="Nombre y apellido" id="displayName" name="displayName" autoComplete="name" required minLength={2} maxLength={80} />
+      <div>
+        <Field label="Nombre" id="displayName" name="displayName" autoComplete="name" required minLength={2} maxLength={80} />
+        <p className="mt-2 text-xs text-white/50">Es el nombre que verá Administración y el que aparecerá en la intranet.</p>
+      </div>
       <div>
         <Field
           label="Nombre de usuario"
@@ -132,27 +134,6 @@ export function RequestAccessForm() {
         <p id="username-hint" className="mt-2 text-xs text-white/50">
           {USERNAME_HINT}
         </p>
-      </div>
-      <div>
-        <label htmlFor="territory" className="eyebrow !text-[0.62rem] text-white/60">
-          Territorio
-        </label>
-        <select
-          id="territory"
-          name="territory"
-          required
-          defaultValue=""
-          className="mt-2 h-14 w-full rounded-2xl border border-white/15 bg-night-2 px-4 text-base font-semibold text-white focus:border-electric focus:outline-none focus:ring-4 focus:ring-electric/30"
-        >
-          <option value="" disabled>
-            Elige tu territorio
-          </option>
-          {DEFAULT_TERRITORIES.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name}
-            </option>
-          ))}
-        </select>
       </div>
       <Field label="Contraseña (mínimo 10 caracteres)" id="password" name="password" type="password" autoComplete="new-password" minLength={10} required />
       <Field label="Repite la contraseña" id="confirm" name="confirm" type="password" autoComplete="new-password" minLength={10} required />

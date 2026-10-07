@@ -17,7 +17,7 @@ vi.mock('@/lib/supabase/admin', () => ({
 
 const { submitAccessRequest } = await import('@/lib/access/request-access')
 
-const input = { displayName: 'Ane Ruiz', username: 'ane.ruiz', territory: 'alava' as const, password: 'una-clave-larga' }
+const input = { displayName: 'Ane Ruiz', username: 'ane.ruiz', password: 'una-clave-larga' }
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -32,7 +32,7 @@ describe('solicitar acceso con nombre de usuario', () => {
     expect(createUser).toHaveBeenCalledWith(
       expect.objectContaining({ email: 'ane.ruiz@usuarios.nnggeuskadi.vercel.app', email_confirm: true }),
     )
-    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ user_id: 'u1', email: 'ane.ruiz@usuarios.nnggeuskadi.vercel.app' }))
+    expect(insert).toHaveBeenCalledWith({ user_id: 'u1', email: 'ane.ruiz@usuarios.nnggeuskadi.vercel.app', display_name: 'Ane Ruiz' })
   })
 
   it('avisa si el nombre de usuario ya existe', async () => {

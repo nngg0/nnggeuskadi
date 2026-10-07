@@ -31,11 +31,15 @@ export function RequestsList({ requests }: { requests: AccessRequest[] }) {
               <p className="text-lg font-extrabold tracking-[-0.02em] text-night">{r.displayName}</p>
               <p className="mt-0.5 break-all text-sm text-slate">{accountLabel(r.email)}</p>
               <p className="mt-2 text-xs font-semibold text-slate">
-                <span className="eyebrow !text-[0.6rem] text-electric">{territoryName(r.territory)}</span> · Pedido el{' '}
-                {formatInstant(r.createdAt)}
+                {r.territory ? (
+                  <>
+                    <span className="eyebrow !text-[0.6rem] text-electric">{territoryName(r.territory)}</span> ·{' '}
+                  </>
+                ) : null}
+                Pedido el {formatInstant(r.createdAt)}
               </p>
             </div>
-            <RequestActions id={r.id} name={r.displayName} />
+            <RequestActions id={r.id} name={r.displayName} territory={r.territory} />
           </Card>
         </li>
       ))}

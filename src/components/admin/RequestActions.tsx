@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { approveAccessRequest, rejectAccessRequest } from '@/lib/actions/access'
+import { DEFAULT_TERRITORIES, type TerritoryId } from '@/lib/domain/territories'
 import { USER_ROLES, type UserRole } from '@/lib/domain/types'
 import { Button } from '@/components/ui/Button'
 import { Notice } from '@/components/ui/States'
@@ -13,9 +14,13 @@ const LABELS: Record<UserRole, string> = {
   administracion: 'Administración',
 }
 
-/** Aprobar (eligiendo rol) o rechazar una solicitud de acceso. */
-export function RequestActions({ id, name }: { id: string; name: string }) {
+const selectClass =
+  'h-11 rounded-xl border border-line-strong bg-white px-3 text-sm font-semibold text-night focus:border-electric focus:outline-none'
+
+/** Aprobar (eligiendo territorio y rol) o rechazar una solicitud de acceso. */
+export function RequestActions({ id, name, territory: requested }: { id: string; name: string; territory: TerritoryId | null }) {
   const [role, setRole] = useState<UserRole>('afiliado')
+  const [territory, setTerritory] = useState<TerritoryId | ''>(requested ?? '')
   const [confirmReject, setConfirmReject] = useState(false)
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null)
   const [pending, startTransition] = useTransition()
@@ -36,12 +41,30 @@ export function RequestActions({ id, name }: { id: string; name: string }) {
   return (
     <div className="grid gap-3">
       <div className="flex flex-wrap items-end gap-2">
-        <label className="grid flex-1 gap-1.5">
+        <label className="grid min-w-32 flex-1 gap-1.5">
+          <span className="eyebrow !text-[0.6rem] text-slate">Territorio</span>
+          <select
+            value={territory}
+            onChange={(e) => setTerritory(e.target.value as TerritoryId)}
+            className={selectClass}
+            aria-label={`Territorio para ${name}`}
+          >
+            <option value="" disabled>
+              Elige…
+            </option>
+            {DEFAULT_TERRITORIES.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="grid min-w-32 flex-1 gap-1.5">
           <span className="eyebrow !text-[0.6rem] text-slate">Rol</span>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value as UserRole)}
-            className="h-11 rounded-xl border border-line-strong bg-white px-3 text-sm font-semibold text-night focus:border-electric focus:outline-none"
+            className={selectClass}
             aria-label={`Rol para ${name}`}
           >
             {USER_ROLES.map((r) => (
@@ -51,7 +74,11 @@ export function RequestActions({ id, name }: { id: string; name: string }) {
             ))}
           </select>
         </label>
-        <Button size="md" disabled={pending} onClick={() => run(() => approveAccessRequest(id, role))} aria-label={`Aprobar a ${name}`}>
+        <Button size="md" disabled={pending} onClick={() =>
+            territory
+              ? run(() => approveAccessRequest(id, role, territory))
+              : setResult({ ok: false, message: 'Elige su territorio.' })
+          } aria-label={`Aprobar a ${name}`}>
           {pending ? 'Guardando…' : 'Aprobar'}
         </Button>
       </div>

@@ -1,13 +1,11 @@
 import 'server-only'
 import { usernameToEmail } from '@/lib/auth/username'
 import { isDemoMode } from '@/lib/config/mode'
-import type { TerritoryId } from '@/lib/domain/territories'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 
 export interface AccessRequestInput {
   displayName: string
   username: string
-  territory: TerritoryId
   password: string
 }
 
@@ -54,7 +52,7 @@ export async function submitAccessRequest(input: AccessRequestInput): Promise<'p
     user_id: data.user.id,
     email,
     display_name: input.displayName,
-    territory: input.territory,
+    // El territorio lo elige Administración al aprobar.
   })
   if (insertError) {
     // Sin solicitud la cuenta quedaría huérfana: se deshace.

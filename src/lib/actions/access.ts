@@ -15,14 +15,13 @@ const requestSchema = z
     displayName: z
       .string()
       .trim()
-      .min(2, 'Escribe tu nombre y apellido.')
+      .min(2, 'Escribe tu nombre.')
       .max(80, 'El nombre es demasiado largo.')
       .refine((v) => !/[<>]/.test(v), 'El nombre contiene caracteres no permitidos.'),
     username: z
       .string()
       .transform(normalizeUsername)
       .pipe(z.string().regex(USERNAME_PATTERN, `Nombre de usuario no válido. ${USERNAME_HINT}`)),
-    territory: z.enum(TERRITORY_IDS, 'Elige tu territorio.'),
     password: z.string().min(10, 'La contraseña debe tener al menos 10 caracteres.').max(200),
     confirm: z.string(),
     // Campo trampa para bots: los humanos no lo ven ni lo rellenan.
@@ -35,7 +34,6 @@ export async function requestAccess(_prev: ActionResult | null, formData: FormDa
   const input = requestSchema.safeParse({
     displayName: formData.get('displayName'),
     username: formData.get('username') ?? '',
-    territory: formData.get('territory'),
     password: formData.get('password'),
     confirm: formData.get('confirm'),
     website: formData.get('website') ?? '',
@@ -58,15 +56,19 @@ export async function requestAccess(_prev: ActionResult | null, formData: FormDa
 const idSchema = z.uuid()
 const roleSchema = z.enum(USER_ROLES)
 
-export async function approveAccessRequest(id: string, role: string): Promise<ActionResult> {
+const territorySchema = z.enum(TERRITORY_IDS)
+
+export async function approveAccessRequest(id: string, role: string, territory: string): Promise<ActionResult> {
   const user = await actionUser()
   if (!user) return NOT_AUTHENTICATED
   if (!can(user, 'members.approve')) return failure('Solo Administración puede aprobar solicitudes.')
   const parsedId = idSchema.safeParse(id)
   const parsedRole = roleSchema.safeParse(role)
+  const parsedTerritory = territorySchema.safeParse(territory)
+  if (!parsedTerritory.success) return failure('Elige su territorio.')
   if (!parsedId.success || !parsedRole.success) return failure('Datos no válidos.')
   try {
-    await personalStore().approveAccessRequest(parsedId.data, parsedRole.data)
+    await personalStore().approveAccessRequest(parsedId.data, parsedRole.data, parsedTerritory.data)
     revalidatePath('/', 'layout')
     return success('Solicitud aprobada. Ya puede entrar.')
   } catch (error) {

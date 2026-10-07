@@ -14,8 +14,8 @@ export default function RequestAccessPage() {
       <p className="eyebrow mt-6 text-sky">Solicitar acceso</p>
       <h1 className="display mt-3 text-4xl">Únete a la intranet.</h1>
       <p className="mb-8 mt-3 text-sm leading-relaxed text-white/60">
-        Para afiliados de NNGG Euskadi. Deja tus datos y elige una contraseña: cuando revisemos tu solicitud podrás entrar con
-        ellos.
+        Para afiliados de NNGG Euskadi. Escribe tu nombre, elige un nombre de usuario y una contraseña: cuando
+        revisemos tu solicitud podrás entrar con ellos.
       </p>
       <RequestAccessForm />
     </div>

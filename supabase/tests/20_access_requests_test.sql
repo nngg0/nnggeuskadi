@@ -17,9 +17,12 @@ insert into auth.users (id, email) values
   -- solicitantes (sin perfil)
   ('00000000-0000-0000-0000-0000000000d1', 'nuevo.bizkaia@example.org'),
   ('00000000-0000-0000-0000-0000000000d3', 'futuro.director@example.org'),
-  ('00000000-0000-0000-0000-0000000000d4', 'spam@example.org');
+  ('00000000-0000-0000-0000-0000000000d4', 'spam@example.org'),
+  ('00000000-0000-0000-0000-0000000000d5', 'sin.territorio@usuarios.nnggeuskadi.vercel.app');
 insert into public.access_requests (id, user_id, email, display_name, territory) values
   ('00000000-0000-0000-0000-00000000e001', '00000000-0000-0000-0000-0000000000d1', 'nuevo.bizkaia@example.org', 'Nuevo Bizkaia', 'bizkaia'),
+  -- Las solicitudes nuevas no traen territorio: lo elige Administración al aprobar.
+  ('00000000-0000-0000-0000-00000000e005', '00000000-0000-0000-0000-0000000000d5', 'sin.territorio@usuarios.nnggeuskadi.vercel.app', 'Sin Territorio', null),
   ('00000000-0000-0000-0000-00000000e003', '00000000-0000-0000-0000-0000000000d3', 'futuro.director@example.org', 'Futuro Director', 'bizkaia'),
   ('00000000-0000-0000-0000-00000000e004', '00000000-0000-0000-0000-0000000000d4', 'spam@example.org', 'Spam', 'gipuzkoa');
 
@@ -74,12 +77,18 @@ end $$;
 -- Administración: ve las solicitudes, aprueba con rol y rechaza.
 set local request.jwt.claim.sub = '00000000-0000-0000-0000-0000000000a1';
 do $$ begin
-  assert (select count(*) from public.list_access_requests()) = 3, 'admin ve todas las pendientes';
+  assert (select count(*) from public.list_access_requests()) = 4, 'admin ve todas las pendientes';
+  begin
+    perform public.approve_access_request('00000000-0000-0000-0000-00000000e005');
+    raise exception 'sin territorio no se aprueba';
+  exception when invalid_parameter_value then null;
+  end;
+  perform public.approve_access_request('00000000-0000-0000-0000-00000000e005', 'afiliado', 'gipuzkoa');
   perform public.approve_access_request('00000000-0000-0000-0000-00000000e001');
-  perform public.approve_access_request('00000000-0000-0000-0000-00000000e003', 'direccion_provincial');
+  perform public.approve_access_request('00000000-0000-0000-0000-00000000e003', 'direccion_provincial', 'alava');
   perform public.reject_access_request('00000000-0000-0000-0000-00000000e004');
   assert (select count(*) from public.list_access_requests()) = 0, 'no quedan pendientes';
-  assert (select count(*) from public.list_members()) = 7, 'los aprobados aparecen en el listado';
+  assert (select count(*) from public.list_members()) = 8, 'los aprobados aparecen en el listado';
   begin
     perform public.approve_access_request('00000000-0000-0000-0000-00000000e001');
     raise exception 'no se aprueba dos veces';
@@ -92,6 +101,9 @@ do $$ begin
   assert (select role from public.profiles where id = '00000000-0000-0000-0000-0000000000d1') = 'afiliado', 'afiliado por defecto';
   assert (select role from public.profiles where id = '00000000-0000-0000-0000-0000000000d3') = 'direccion_provincial', 'rol asignado';
   assert (select role from public.member_allowlist where email = 'futuro.director@example.org') = 'direccion_provincial', 'y en la lista de alta';
+  assert (select territory from public.profiles where id = '00000000-0000-0000-0000-0000000000d3') = 'alava', 'el territorio elegido al aprobar manda';
+  assert (select territory from public.profiles where id = '00000000-0000-0000-0000-0000000000d5') = 'gipuzkoa', 'territorio asignado al aprobar';
+  assert (select territory from public.access_requests where id = '00000000-0000-0000-0000-00000000e005') = 'gipuzkoa', 'y queda en la solicitud';
   assert not exists (select 1 from auth.users where id = '00000000-0000-0000-0000-0000000000d4'), 'rechazar borra la cuenta';
   assert not exists (select 1 from public.access_requests where id = '00000000-0000-0000-0000-00000000e004'), 'y la solicitud';
 end $$;

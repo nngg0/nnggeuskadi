@@ -51,7 +51,7 @@ export interface PersonalStore {
 
   /* Altas: solicitudes (solo Administración) y listado de miembros (dirección según territorio). */
   listAccessRequests(): Promise<AccessRequest[]>
-  approveAccessRequest(id: string, role: UserRole): Promise<void>
+  approveAccessRequest(id: string, role: UserRole, territory: TerritoryId): Promise<void>
   rejectAccessRequest(id: string): Promise<void>
   listMembers(): Promise<Member[]>
 }
