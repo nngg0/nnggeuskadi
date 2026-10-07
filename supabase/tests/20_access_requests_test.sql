@@ -83,6 +83,11 @@ do $$ begin
     raise exception 'sin territorio no se aprueba';
   exception when invalid_parameter_value then null;
   end;
+  begin
+    perform public.approve_access_request('00000000-0000-0000-0000-00000000e005', 'afiliado', 'euskadi');
+    raise exception 'Euskadi no es una provincia';
+  exception when invalid_parameter_value then null;
+  end;
   perform public.approve_access_request('00000000-0000-0000-0000-00000000e005', 'afiliado', 'gipuzkoa');
   perform public.approve_access_request('00000000-0000-0000-0000-00000000e001');
   perform public.approve_access_request('00000000-0000-0000-0000-00000000e003', 'direccion_provincial', 'alava');

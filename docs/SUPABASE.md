@@ -82,7 +82,7 @@ Todas con UUID/timestamps, claves foráneas con `on delete cascade` hacia el usu
    contraseña. El usuario se guarda en Supabase Auth como `usuario@usuarios.nnggeuskadi.vercel.app`, una dirección que
    nunca recibe correo. Se crea su cuenta en Supabase **sin perfil**, así que no ve nada; si intenta entrar, ve «Tu solicitud está
    pendiente». Se guarda en `access_requests`.
-2. **Solo Administración** la revisa en `/solicitudes` (aviso en Inicio y en Perfil → Gestión): aprueba eligiendo territorio
+2. **Solo Administración** la revisa en `/solicitudes` (aviso en Inicio y en Perfil → Gestión): aprueba eligiendo provincia
    y rol, o rechaza. Aprobar añade el email a `member_allowlist` y crea el perfil; rechazar borra la cuenta creada.
 3. La dirección ve el listado de miembros en `/miembros`: la provincial, su territorio; la regional y Administración, todos.
 

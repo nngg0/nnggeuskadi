@@ -1,5 +1,6 @@
 -- =====================================================================
--- "Solicitar acceso" ya no pide territorio: lo elige Administración al aprobar, junto con el rol.
+-- "Solicitar acceso" ya no pide territorio: Administración elige la provincia al aprobar, junto con el rol.
+-- Euskadi no es una opción: cada afiliado pertenece a Álava, Bizkaia o Gipuzkoa.
 -- Compatible con la versión anterior: p_territory es opcional y, si falta, se usa el de la solicitud.
 -- =====================================================================
 
@@ -22,8 +23,8 @@ begin
     raise exception 'Solicitud no encontrada o ya revisada' using errcode = 'P0002';
   end if;
   v_territory := coalesce(p_territory, req.territory);
-  if v_territory is null then
-    raise exception 'missing_territory: elige el territorio' using errcode = '22023';
+  if v_territory is null or v_territory not in ('alava', 'bizkaia', 'gipuzkoa') then
+    raise exception 'missing_province: elige Álava, Bizkaia o Gipuzkoa' using errcode = '22023';
   end if;
 
   insert into public.member_allowlist (email, display_name, territory, role)

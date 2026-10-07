@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { submitAccessRequest } from '@/lib/access/request-access'
 import { can } from '@/lib/auth/permissions'
 import { normalizeUsername, USERNAME_HINT, USERNAME_PATTERN } from '@/lib/auth/username'
-import { TERRITORY_IDS } from '@/lib/domain/territories'
+import { PROVINCE_IDS } from '@/lib/domain/territories'
 import { USER_ROLES, type ActionResult } from '@/lib/domain/types'
 import { personalStore } from '@/lib/personal'
 import { actionUser, failure, NOT_AUTHENTICATED, success, UNEXPECTED } from './helpers'
@@ -56,7 +56,7 @@ export async function requestAccess(_prev: ActionResult | null, formData: FormDa
 const idSchema = z.uuid()
 const roleSchema = z.enum(USER_ROLES)
 
-const territorySchema = z.enum(TERRITORY_IDS)
+const territorySchema = z.enum(PROVINCE_IDS)
 
 export async function approveAccessRequest(id: string, role: string, territory: string): Promise<ActionResult> {
   const user = await actionUser()
@@ -65,7 +65,7 @@ export async function approveAccessRequest(id: string, role: string, territory: 
   const parsedId = idSchema.safeParse(id)
   const parsedRole = roleSchema.safeParse(role)
   const parsedTerritory = territorySchema.safeParse(territory)
-  if (!parsedTerritory.success) return failure('Elige su territorio.')
+  if (!parsedTerritory.success) return failure('Elige su provincia: Álava, Bizkaia o Gipuzkoa.')
   if (!parsedId.success || !parsedRole.success) return failure('Datos no válidos.')
   try {
     await personalStore().approveAccessRequest(parsedId.data, parsedRole.data, parsedTerritory.data)
