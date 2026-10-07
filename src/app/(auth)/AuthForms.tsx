@@ -5,6 +5,7 @@ import { useActionState, useState, useTransition, type FormEvent } from 'react'
 import { requestAccess } from '@/lib/actions/access'
 import { requestPasswordReset, signIn, updatePassword } from '@/lib/actions/auth'
 import { DEFAULT_TERRITORIES } from '@/lib/domain/territories'
+import { USERNAME_HINT, USERNAME_MAX, USERNAME_MIN } from '@/lib/auth/username'
 import { Button } from '@/components/ui/Button'
 import { Notice } from '@/components/ui/States'
 import type { ActionResult } from '@/lib/domain/types'
@@ -45,7 +46,16 @@ export function LoginForm({ next }: { next: string }) {
   return (
     <form onSubmit={onSubmit} className="grid gap-4">
       <input type="hidden" name="next" value={next} />
-      <Field label="Email" id="email" name="email" type="email" autoComplete="email" required inputMode="email" />
+      <Field
+        label="Usuario"
+        id="username"
+        name="username"
+        autoComplete="username"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        required
+      />
       <Field label="Contraseña" id="password" name="password" type="password" autoComplete="current-password" required />
       {state && !state.ok ? <Notice tone="danger">{state.message}</Notice> : null}
       <Button type="submit" block arrow disabled={pending} className="mt-2">
@@ -103,7 +113,26 @@ export function RequestAccessForm() {
   return (
     <form onSubmit={onSubmit} className="grid gap-4">
       <Field label="Nombre y apellido" id="displayName" name="displayName" autoComplete="name" required minLength={2} maxLength={80} />
-      <Field label="Email" id="email" name="email" type="email" autoComplete="email" required inputMode="email" />
+      <div>
+        <Field
+          label="Nombre de usuario"
+          id="username"
+          name="username"
+          autoComplete="username"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          required
+          minLength={USERNAME_MIN}
+          maxLength={USERNAME_MAX}
+          pattern="[a-z0-9._\-]+"
+          title={USERNAME_HINT}
+          aria-describedby="username-hint"
+        />
+        <p id="username-hint" className="mt-2 text-xs text-white/50">
+          {USERNAME_HINT}
+        </p>
+      </div>
       <div>
         <label htmlFor="territory" className="eyebrow !text-[0.62rem] text-white/60">
           Territorio

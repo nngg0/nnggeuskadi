@@ -13,8 +13,11 @@ export default function RecoverPage() {
       </Link>
       <p className="eyebrow mt-6 text-sky">Recuperar acceso</p>
       <h1 className="display mt-3 text-4xl">Te enviamos un enlace.</h1>
-      <p className="mb-8 mt-3 text-sm leading-relaxed text-white/60">
+      <p className="mt-3 text-sm leading-relaxed text-white/60">
         Escribe el email con el que te dieron de alta. Si eres afiliado, recibirás un enlace para crear una nueva contraseña.
+      </p>
+      <p className="mb-8 mt-3 text-sm leading-relaxed text-white/60">
+        ¿Entras con nombre de usuario? Esas cuentas no reciben correo: pide a Administración que te restablezca la contraseña.
       </p>
       <RecoverForm />
     </div>
