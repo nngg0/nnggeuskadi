@@ -42,7 +42,7 @@ Sin chat, foros, comentarios, seguidores ni gamificación: no sustituye a WhatsA
 | **Documentos** | Búsqueda instantánea (sin tildes), filtros por territorio y categoría, destacados, recientes, guardados. |
 | **Perfil** | Mis intereses (hasta 3 temas), próximas actividades, histórico de inscripciones, participaciones, documentos guardados y configuración (nombre visible, preferencia de avisos, instalar la app, contraseña, salir). |
 | **Dirección** | En fichas de su territorio, la dirección ve quién se ha inscrito o se ha ofrecido (solo nombre visible) para poder contactar. Listado de **Miembros**: la provincial, su territorio; la regional, todos. |
-| **Altas** | «Solicitar acceso» en la pantalla de entrada (nombre, email, territorio y contraseña). **Administración** aprueba, eligiendo rol, o rechaza en Solicitudes. |
+| **Altas** | «Solicitar acceso» en la pantalla de entrada (nombre, nombre de usuario y contraseña). **Administración** aprueba, eligiendo territorio y rol, o rechaza en Solicitudes. |
 | **PWA** | Instalable en móvil y escritorio, iconos, página sin conexión, aviso offline, preparada para notificaciones push. |
 
 ## Stack
