@@ -2,6 +2,10 @@ export const TERRITORY_IDS = ['euskadi', 'alava', 'bizkaia', 'gipuzkoa'] as cons
 
 export type TerritoryId = (typeof TERRITORY_IDS)[number]
 
+/** Cada afiliado pertenece a una provincia: Euskadi no es un territorio de afiliación. */
+export const PROVINCE_IDS = ['alava', 'bizkaia', 'gipuzkoa'] as const satisfies readonly TerritoryId[]
+export type ProvinceId = (typeof PROVINCE_IDS)[number]
+
 export interface Territory {
   id: TerritoryId
   name: string

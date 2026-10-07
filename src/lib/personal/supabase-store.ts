@@ -182,18 +182,18 @@ export const supabasePersonalStore: PersonalStore = {
     const supabase = await createSupabaseServerClient()
     const { data, error } = await supabase.rpc('list_access_requests')
     if (error) fail('solicitudes de acceso', error)
-    return ((data ?? []) as { id: string; email: string; display_name: string; territory: string; created_at: string }[]).map((r) => ({
+    return ((data ?? []) as { id: string; email: string; display_name: string; territory: string | null; created_at: string }[]).map((r) => ({
       id: r.id,
       email: r.email,
       displayName: r.display_name,
-      territory: toTerritory(r.territory),
+      territory: r.territory ? toTerritory(r.territory) : null,
       createdAt: r.created_at,
     }))
   },
 
-  async approveAccessRequest(id, role) {
+  async approveAccessRequest(id, role, territory) {
     const supabase = await createSupabaseServerClient()
-    const { error } = await supabase.rpc('approve_access_request', { p_id: id, p_role: role })
+    const { error } = await supabase.rpc('approve_access_request', { p_id: id, p_role: role, p_territory: territory })
     if (error) fail('aprobar solicitud', error)
   },
 

@@ -5,6 +5,7 @@ import { EmptyState } from '@/components/ui/States'
 import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
 import { canListMembers, managedTerritories, ROLE_LABELS } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
+import { usernameFromEmail } from '@/lib/auth/username'
 import { getContent } from '@/lib/content/source'
 import { formatFullDate, madridDate } from '@/lib/domain/dates'
 import { interestLabel } from '@/lib/domain/interests'
@@ -54,9 +55,13 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
                     {m.displayName}
                     <span className="eyebrow ml-2 !text-[0.58rem] text-electric">{territoryName(m.territory)}</span>
                   </p>
-                  <a href={`mailto:${m.email}`} className="block truncate text-sm text-slate hover:text-electric">
-                    {m.email}
-                  </a>
+                  {usernameFromEmail(m.email) ? (
+                    <p className="truncate text-sm text-slate">{usernameFromEmail(m.email)}</p>
+                  ) : (
+                    <a href={`mailto:${m.email}`} className="block truncate text-sm text-slate hover:text-electric">
+                      {m.email}
+                    </a>
+                  )}
                   {m.interests.length > 0 ? (
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {m.interests.map((i) => (

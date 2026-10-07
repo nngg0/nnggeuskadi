@@ -4,6 +4,7 @@ import { z } from 'zod'
 import type { PersonalStore } from '@/lib/personal/store'
 import type { UserSettings } from '@/lib/domain/types'
 import { sanitizeInterests, type InterestId } from '@/lib/domain/interests'
+import { parseTerritory } from '@/lib/domain/territories'
 import { parseWorkbook } from '@/lib/sheets/parse'
 import { demoWorkbook } from './content'
 import { findDemoUser } from './users'
@@ -40,6 +41,8 @@ const stateSchema = z.object({
   i: z.array(z.string().max(20)).max(3).optional(),
   // Solicitudes de acceso revisadas en la demo: id -> rol aprobado o 'rechazada'
   ar: z.record(z.string().max(64), z.string().max(30)).default({}),
+  // Territorio elegido al aprobar: id -> territorio
+  at: z.record(z.string().max(64), z.string().max(30)).default({}),
 })
 type DemoState = z.infer<typeof stateSchema>
 
@@ -54,6 +57,7 @@ function initialState(userId: string): DemoState {
     pt: Object.fromEntries(Object.keys(seed.participations).map((id) => [id, stamp])),
     s: [...seed.saved],
     ar: {},
+    at: {},
   }
 }
 
@@ -227,12 +231,13 @@ export const demoPersonalStore: PersonalStore = {
     return DEMO_ACCESS_REQUESTS.filter((r) => !reviewed[r.id])
   },
 
-  async approveAccessRequest(id, role) {
+  async approveAccessRequest(id, role, territory) {
     const user = await currentDemoUser()
     if (!user || !can(user, 'members.approve')) throw new Error('Sin permiso')
     if (!DEMO_ACCESS_REQUESTS.some((r) => r.id === id)) throw new Error('Solicitud no encontrada')
     await mutate(user.id, (s) => {
       s.ar[id] = role
+      s.at[id] = territory
     })
   },
 
@@ -248,9 +253,16 @@ export const demoPersonalStore: PersonalStore = {
     const user = await currentDemoUser()
     if (!user) return []
     const scope = managedTerritories(user)
-    const reviewed = (await readState(user.id)).ar
+    const { ar: reviewed, at: territories } = await readState(user.id)
     const approved: Member[] = DEMO_ACCESS_REQUESTS.filter((r) => (USER_ROLES as readonly string[]).includes(reviewed[r.id] ?? '')).map(
-      (r) => ({ displayName: r.displayName, email: r.email, territory: r.territory, role: reviewed[r.id] as UserRole, interests: [], createdAt: r.createdAt }),
+      (r) => ({
+        displayName: r.displayName,
+        email: r.email,
+        territory: parseTerritory(territories[r.id]) ?? r.territory ?? 'euskadi',
+        role: reviewed[r.id] as UserRole,
+        interests: [],
+        createdAt: r.createdAt,
+      }),
     )
     const users: Member[] = DEMO_USERS.map((u) => ({
       displayName: u.displayName,
