@@ -78,7 +78,7 @@ export default async function ProfilePage() {
               { n: savedDocs.length, l: 'Guardados' },
             ].map((s) => (
               <div key={s.l} className="rounded-2xl border border-white/10 px-4 py-3">
-                <dd className="text-2xl font-extrabold tracking-[-0.03em]">{s.n}</dd>
+                <dd className="font-display text-3xl">{s.n}</dd>
                 <dt className="eyebrow !text-[0.58rem] text-white/55">{s.l}</dt>
               </div>
             ))}
@@ -182,7 +182,7 @@ export default async function ProfilePage() {
                 <li key={v.project.id}>
                   <Link href={`/participa/${encodeURIComponent(v.project.id)}`} className="press block rounded-[var(--radius-card)] border border-line bg-card p-5 hover:border-electric/40">
                     <span className="eyebrow !text-[0.6rem] text-electric">{territoryName(v.project.territory)}</span>
-                    <span className="mt-1.5 block text-lg font-extrabold tracking-[-0.02em] text-ink">{v.project.title}</span>
+                    <span className="mt-1.5 block font-label text-lg font-semibold text-ink">{v.project.title}</span>
                     <span className="mt-3 flex flex-wrap gap-1.5">
                       {v.opportunities
                         .filter((o) => o.chosen)

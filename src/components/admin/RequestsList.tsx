@@ -28,7 +28,7 @@ export function RequestsList({ requests }: { requests: AccessRequest[] }) {
         <li key={r.id}>
           <Card className="grid gap-4">
             <div>
-              <p className="text-lg font-extrabold tracking-[-0.02em] text-ink">{r.displayName}</p>
+              <p className="font-label text-lg font-semibold text-ink">{r.displayName}</p>
               <p className="mt-0.5 break-all text-sm text-slate">{accountLabel(r.email)}</p>
               <p className="mt-2 text-xs font-semibold text-slate">
                 {r.territory ? (

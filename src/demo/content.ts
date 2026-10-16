@@ -57,7 +57,7 @@ export function demoWorkbook(now: Date = new Date()): RawWorkbook {
     PROYECTOS: table(
       ['id', 'titulo', 'descripcion', 'tipo', 'territorio', 'estado', 'fecha_inicio', 'fecha_prevista', 'visible', 'destacado'],
       [
-        ['PRY-29N', 'Campaña 29N', 'La gran campaña de este curso. Queremos construirla entre todos: ideas, presencia en la calle y en redes, diseño y organización. Apúntate en lo que quieras y cuando quieras; cuanta más gente, mejor.', 'Campaña', 'Euskadi', 'en_preparacion', D(-10), D29N(), 'sí', 'sí'],
+        ['PRY-29N', 'Campaña 29N', 'La gran campaña de este curso. Queremos construirla entre todos: redes, ideas, calle, coordinación y voto por correo. Apúntate en lo que quieras y cuando quieras; cuanta más gente, mejor.', 'Campaña', 'Euskadi', 'en_preparacion', D(-10), D29N(), 'sí', 'sí'],
         ['PRY-DEBATE', 'Debate', 'Todavía hay pocos detalles, pero ya puedes apuntarte para ayudar a organizarlo.', '', 'Euskadi', 'en_preparacion', '', '', 'sí', 'no'],
         ['PRY-001', 'Escuela de verano 2027', 'Estamos empezando a preparar la próxima escuela de verano. Todavía no hay programa, ni ponentes, ni sede cerrada: es el mejor momento para entrar y darle forma con nosotros.', 'Formación', 'Euskadi', 'en_preparacion', D(-7), D(270), 'sí', 'sí'],
         ['PRY-002', 'Vivienda joven', 'Estamos preparando una nueva campaña sobre vivienda joven: propuestas, materiales y acciones en la calle. Buscamos ideas antes de cerrar el mensaje.', 'Campaña', 'Euskadi', 'en_preparacion', D(-14), D(60), 'sí', 'sí'],

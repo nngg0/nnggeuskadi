@@ -15,7 +15,7 @@ export function NewProjectForm({ territories, today }: { territories: { id: Terr
   const [nextKey, setNextKey] = useState(1)
 
   return (
-    <form onSubmit={(e) => submitKeepingValues(e, action)} className="grid gap-5">
+    <form action={action} onSubmit={(e) => submitKeepingValues(e, action)} className="grid gap-5">
       <Field id="titulo" label="Título">
         <input id="titulo" name="titulo" required minLength={3} maxLength={160} className={`${inputClass} h-12`} />
       </Field>

@@ -51,7 +51,7 @@ Sin chat, foros, comentarios, seguidores ni gamificación: no sustituye a WhatsA
 **Next.js 16** (App Router, Server Components, Server Actions) · **React 19** · **TypeScript** estricto ·
 **Tailwind CSS 4** · **Supabase** (Auth + Postgres + RLS) · **Google Sheets API** · **zod** · **Vitest** · **Playwright**.
 
-Sin dependencias de UI ni de iconos: componentes e iconos propios. Siempre en modo oscuro. Montserrat para el texto y Oswald (condensada) para los titulares, servidas localmente. La bandera de España separa las secciones como franja fina.
+Sin dependencias de UI ni de iconos: componentes e iconos propios. Siempre en modo oscuro. Tipografías de la plantilla de NNGG: Anton para titulares (en mayúsculas) y cifras grandes, Archivo SemiBold para subtítulos y etiquetas, y Arial para el texto. Anton y Archivo se sirven localmente. La bandera de España separa las secciones como franja fina.
 Las decisiones técnicas están razonadas en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md#decisiones-técnicas).
 
 ## Arquitectura

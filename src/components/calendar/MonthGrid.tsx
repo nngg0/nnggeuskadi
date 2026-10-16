@@ -41,7 +41,7 @@ export function MonthGrid({
         >
           <Icon name="chevronLeft" size={22} />
         </Link>
-        <h2 className="text-lg font-extrabold first-letter:uppercase tracking-[-0.02em] text-ink">{formatMonthYear(month)}</h2>
+        <h2 className="font-label text-lg font-semibold first-letter:uppercase text-ink">{formatMonthYear(month)}</h2>
         <Link
           href={hrefFor({ mes: shiftMonth(month, 1), dia: null })}
           className="press flex size-10 items-center justify-center rounded-full text-ink hover:bg-mist"

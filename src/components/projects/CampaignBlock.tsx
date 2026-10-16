@@ -12,7 +12,7 @@ function CalendarTile({ date }: { date: string }) {
   return (
     <div className="w-24 shrink-0 overflow-hidden rounded-2xl bg-white text-center text-night shadow-xl shadow-black/30 sm:w-28">
       <p className="eyebrow bg-flag-red py-1.5 !text-[0.62rem] text-white">{formatMonthShort(date)}</p>
-      <p className="font-display text-5xl font-semibold leading-none sm:text-6xl">
+      <p className="font-display text-5xl leading-none sm:text-6xl">
         <span className="block pt-2">{Number(date.slice(8, 10))}</span>
       </p>
       <p className="eyebrow pb-2 pt-1 !text-[0.58rem] text-night/60">{formatWeekdayShort(date)}</p>
@@ -38,12 +38,12 @@ export function CampaignBlock({ view, today }: { view: ProjectView; today: strin
             <dl className="mt-4 flex flex-wrap gap-x-7 gap-y-3">
               {days !== null && days >= 0 ? (
                 <div>
-                  <dd className="font-display text-4xl font-semibold leading-none sm:text-5xl">{days}</dd>
+                  <dd className="font-display text-4xl leading-none sm:text-5xl">{days}</dd>
                   <dt className="eyebrow mt-1 text-white/70">{days === 1 ? 'día' : 'días'}</dt>
                 </div>
               ) : null}
               <div>
-                <dd className="font-display text-4xl font-semibold leading-none sm:text-5xl">{view.participantCount}</dd>
+                <dd className="font-display text-4xl leading-none sm:text-5xl">{view.participantCount}</dd>
                 <dt className="eyebrow mt-1 text-white/70">{view.participantCount === 1 ? 'persona participa' : 'personas participan'}</dt>
               </div>
             </dl>

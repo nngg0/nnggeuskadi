@@ -83,7 +83,7 @@ export default async function ProjectPage({ params }: { params: Params }) {
       <Container className="-mt-5 grid gap-5 pb-10 lg:grid-cols-[1fr_24rem] lg:items-start">
         <Card className="order-2 lg:order-1">
           <Eyebrow>Oportunidades</Eyebrow>
-          <h2 className="mt-2 text-xl font-extrabold tracking-[-0.02em] text-ink">Dónde puedes participar</h2>
+          <h2 className="mt-2 font-label text-xl font-semibold text-ink">Dónde puedes participar</h2>
           {view.opportunities.length === 0 ? (
             <p className="mt-4 text-sm text-slate">Todavía no se han definido ámbitos de colaboración. Vuelve pronto.</p>
           ) : (

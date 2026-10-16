@@ -351,6 +351,8 @@ test.describe('alta de actividades y proyectos', () => {
   test('el servidor rechaza crear fuera de su provincia aunque se manipule el formulario', async ({ page }) => {
     await loginAs(page, /Miguel/)
     await page.goto('/calendario/nueva')
+    // Esperar a que la página esté hidratada: si no, React descarta la opción añadida a mano.
+    await page.waitForLoadState('networkidle')
     await page.getByLabel('Territorio').evaluate((select: HTMLSelectElement) => {
       select.add(new Option('Álava', 'alava'))
       select.value = 'alava'

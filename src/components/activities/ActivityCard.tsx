@@ -24,7 +24,7 @@ export function ActivityCard({ view, className }: { view: ActivityView; classNam
           <TerritoryLabel territory={activity.territory} />
           <RegistrationTag state={state} />
         </div>
-        <h3 className={cn('mt-2 text-[1.08rem] font-bold leading-snug tracking-[-0.01em] text-ink', state.kind === 'cancelled' && 'line-through')}>
+        <h3 className={cn('mt-2 font-label text-[1.08rem] font-semibold leading-snug text-ink', state.kind === 'cancelled' && 'line-through')}>
           {activity.title}
         </h3>
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">

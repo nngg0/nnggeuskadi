@@ -10,7 +10,7 @@ import { Field, inputClass, submitKeepingValues, TerritorySelect } from './field
 export function NewActivityForm({ territories, today }: { territories: { id: TerritoryId; name: string }[]; today: string }) {
   const [state, action, pending] = useActionState(createActivity, null)
   return (
-    <form onSubmit={(e) => submitKeepingValues(e, action)} className="grid gap-5">
+    <form action={action} onSubmit={(e) => submitKeepingValues(e, action)} className="grid gap-5">
       <Field id="titulo" label="Título">
         <input id="titulo" name="titulo" required minLength={3} maxLength={160} className={`${inputClass} h-12`} />
       </Field>

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
-import '@fontsource-variable/montserrat'
-import '@fontsource-variable/oswald'
+import '@fontsource/anton/400.css'
+import '@fontsource/archivo/600.css'
 import './globals.css'
 import { ServiceWorkerRegister } from '@/components/pwa/ServiceWorkerRegister'
 import { OfflineBanner } from '@/components/pwa/OfflineBanner'
