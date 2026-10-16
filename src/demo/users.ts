@@ -7,7 +7,7 @@ import type { CurrentUser } from '@/lib/domain/types'
 export const DEMO_USERS: CurrentUser[] = [
   {
     id: '00000000-0000-4000-8000-000000000005',
-    email: 'adrian.demo@nngg.example',
+    email: 'adrian@usuarios.nnggeuskadi.vercel.app',
     displayName: 'Adrián',
     territory: 'euskadi',
     role: 'direccion_euskadi',
@@ -16,7 +16,7 @@ export const DEMO_USERS: CurrentUser[] = [
   },
   {
     id: '00000000-0000-4000-8000-000000000001',
-    email: 'alba.demo@nngg.example',
+    email: 'alba@usuarios.nnggeuskadi.vercel.app',
     displayName: 'Alba',
     territory: 'alava',
     role: 'afiliado',
@@ -25,7 +25,7 @@ export const DEMO_USERS: CurrentUser[] = [
   },
   {
     id: '00000000-0000-4000-8000-000000000002',
-    email: 'pablo.demo@nngg.example',
+    email: 'pablo.folgado@usuarios.nnggeuskadi.vercel.app',
     displayName: 'Pablo Folgado',
     territory: 'bizkaia',
     role: 'afiliado',
@@ -34,7 +34,7 @@ export const DEMO_USERS: CurrentUser[] = [
   },
   {
     id: '00000000-0000-4000-8000-000000000004',
-    email: 'miguel.demo@nngg.example',
+    email: 'miguel@usuarios.nnggeuskadi.vercel.app',
     displayName: 'Miguel',
     territory: 'bizkaia',
     role: 'direccion_provincial',
@@ -46,7 +46,7 @@ export const DEMO_USERS: CurrentUser[] = [
 // Cuenta de Administración para probar la aprobación de solicitudes.
 DEMO_USERS.push({
   id: '00000000-0000-4000-8000-000000000006',
-  email: 'admin.demo@nngg.example',
+  email: 'administracion@usuarios.nnggeuskadi.vercel.app',
   displayName: 'Administración',
   territory: 'euskadi',
   role: 'administracion',

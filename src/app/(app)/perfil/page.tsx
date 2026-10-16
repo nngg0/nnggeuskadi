@@ -15,6 +15,7 @@ import { EmptyState } from '@/components/ui/States'
 import { signOut } from '@/lib/actions/auth'
 import { can, canListMembers, ROLE_LABELS } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
+import { accountLabel } from '@/lib/auth/username'
 import { isDemoMode } from '@/lib/config/mode'
 import { getContent } from '@/lib/content/source'
 import { formatMonthShort } from '@/lib/domain/dates'
@@ -226,7 +227,7 @@ export default async function ProfilePage() {
             <Card className="grid content-start gap-6">
               <div>
                 <p className="eyebrow !text-[0.62rem] text-slate">Cuenta</p>
-                <p className="mt-1 font-semibold text-night">{user.email}</p>
+                <p className="mt-1 font-semibold text-night">{accountLabel(user.email)}</p>
               </div>
               <div>
                 <p className="eyebrow mb-2 !text-[0.62rem] text-slate">App en tu móvil</p>

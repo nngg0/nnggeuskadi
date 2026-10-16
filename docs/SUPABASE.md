@@ -78,15 +78,16 @@ Todas con UUID/timestamps, claves foráneas con `on delete cascade` hacia el usu
 
 ### Solicitar acceso (recomendado, sin servidor de correo)
 
-1. La persona entra en `/solicitar-acceso` (enlace en la pantalla de entrada) y deja nombre, email, territorio y una
-   contraseña. Se crea su cuenta en Supabase **sin perfil**, así que no ve nada; si intenta entrar, ve «Tu solicitud está
+1. La persona entra en `/solicitar-acceso` (enlace en la pantalla de entrada) y deja nombre, nombre de usuario y una
+   contraseña. El usuario se guarda en Supabase Auth como `usuario@usuarios.nnggeuskadi.vercel.app`, una dirección que
+   nunca recibe correo. Se crea su cuenta en Supabase **sin perfil**, así que no ve nada; si intenta entrar, ve «Tu solicitud está
    pendiente». Se guarda en `access_requests`.
-2. **Solo Administración** la revisa en `/solicitudes` (aviso en Inicio y en Perfil → Gestión): aprueba eligiendo rol o
-   rechaza. Aprobar añade el email a `member_allowlist` y crea el perfil; rechazar borra la cuenta creada.
+2. **Solo Administración** la revisa en `/solicitudes` (aviso en Inicio y en Perfil → Gestión): aprueba eligiendo provincia
+   y rol, o rechaza. Aprobar añade el email a `member_allowlist` y crea el perfil; rechazar borra la cuenta creada.
 3. La dirección ve el listado de miembros en `/miembros`: la provincial, su territorio; la regional y Administración, todos.
 
-El email no se verifica (no hay SMTP): aprueba solo a quien conozcas. Si el email ya estaba autorizado, la persona entra
-directamente.
+Nadie verifica los datos (no hay SMTP): aprueba solo a quien conozcas. Las cuentas con usuario no pueden recuperar la
+contraseña por correo: se la restablece Administración.
 
 ### Otras formas de dar de alta
 

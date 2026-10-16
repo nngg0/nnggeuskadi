@@ -147,7 +147,8 @@ export interface AccessRequest {
   id: string
   email: string
   displayName: string
-  territory: TerritoryId
+  /** Las solicitudes nuevas no traen territorio: lo elige Administración al aprobar. */
+  territory: TerritoryId | null
   createdAt: string
 }
 

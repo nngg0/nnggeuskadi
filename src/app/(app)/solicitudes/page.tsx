@@ -17,7 +17,7 @@ export default async function AccessRequestsPage() {
   return (
     <>
       <PageHeader eyebrow="Administración" title="Solicitudes de acceso.">
-        Personas que han pedido entrar en la intranet. Aprueba solo a quien conozcas: el email no está verificado.
+        Personas que han pedido entrar en la intranet. Aprueba solo a quien conozcas: nadie verifica sus datos.
       </PageHeader>
       <Container className="py-6 md:py-8">
         <RequestsList requests={requests} />
