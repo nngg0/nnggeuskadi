@@ -42,6 +42,7 @@ Sin chat, foros, comentarios, seguidores ni gamificación: no sustituye a WhatsA
 | **Documentos** | Búsqueda instantánea (sin tildes), filtros por territorio y categoría, destacados, recientes, guardados. |
 | **Perfil** | Mis intereses (hasta 3 temas), próximas actividades, histórico de inscripciones, participaciones, documentos guardados y configuración (nombre visible, preferencia de avisos, instalar la app, contraseña, salir). |
 | **Dirección** | En fichas de su territorio, la dirección ve quién se ha inscrito o se ha ofrecido (solo nombre visible) para poder contactar. Listado de **Miembros**: la provincial, su territorio; la regional, todos. |
+| **Crear (+)** | En Calendario y Participa, Administración, la dirección regional y las provinciales (solo en su provincia) crean actividades y proyectos con sus ámbitos. Se guardan como filas nuevas del Sheet; el permiso se comprueba en servidor. |
 | **Altas** | «Solicitar acceso» en la pantalla de entrada (nombre, nombre de usuario y contraseña). **Administración** aprueba, eligiendo provincia (Álava, Bizkaia o Gipuzkoa) y rol, o rechaza en Solicitudes. |
 | **PWA** | Instalable en móvil y escritorio, iconos, página sin conexión, aviso offline, preparada para notificaciones push. |
 
@@ -115,7 +116,7 @@ Todas documentadas en [`.env.example`](.env.example). Las `NEXT_PUBLIC_*` son vi
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | sí | | Clave pública (protegida por RLS) |
 | `SUPABASE_SERVICE_ROLE_KEY` | sí | **sí** | Inscripción con aforo, agregados, alta de afiliados |
 | `GOOGLE_SHEETS_SPREADSHEET_ID` | sí | | Id del Sheet |
-| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | sí | | Cuenta de servicio con acceso de lectura |
+| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | sí | | Cuenta de servicio con acceso de edición al Sheet |
 | `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` | sí | **sí** | Clave privada de la cuenta de servicio |
 | `SHEETS_REVALIDATE_SECONDS` | | | Caché del Sheet (60 s) |
 | `INTERNAL_API_TOKEN` | | **sí** | Protege `/api/agregados` y `/api/revalidar` |

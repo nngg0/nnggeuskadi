@@ -18,15 +18,17 @@ export type Permission =
   | 'manage.viewPeople'
   /** Aprobar o rechazar solicitudes de acceso y asignar roles (solo Administración). */
   | 'members.approve'
+  /** Crear actividades y proyectos (filas nuevas del Sheet) en los territorios que gestiona. */
+  | 'content.create'
 
 const MEMBER: Permission[] = ['content.read', 'activity.register', 'project.participate', 'document.save', 'profile.edit']
 
 const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   afiliado: MEMBER,
-  direccion_provincial: [...MEMBER, 'manage.viewPeople'],
-  direccion_euskadi: [...MEMBER, 'manage.viewPeople'],
-  // Administración de la intranet: de momento, los mismos permisos que la dirección regional.
-  administracion: [...MEMBER, 'manage.viewPeople', 'members.approve'],
+  direccion_provincial: [...MEMBER, 'manage.viewPeople', 'content.create'],
+  direccion_euskadi: [...MEMBER, 'manage.viewPeople', 'content.create'],
+  // Administración de la intranet: los permisos de la dirección regional y, además, las altas.
+  administracion: [...MEMBER, 'manage.viewPeople', 'content.create', 'members.approve'],
 }
 
 /** Territorios cuyos contenidos gestiona cada rol. */
@@ -49,11 +51,17 @@ export function can(
 ): boolean {
   if (!user) return false
   if (!ROLE_PERMISSIONS[user.role]?.includes(permission)) return false
-  if (permission === 'manage.viewPeople') {
+  if (permission === 'manage.viewPeople' || permission === 'content.create') {
     if (!resource) return false
     return managedTerritories(user).includes(resource.territory)
   }
   return true
+}
+
+/** Territorios en los que puede crear actividades y proyectos (vacío = no ve el botón «+»). */
+export function creatableTerritories(user: Pick<CurrentUser, 'role' | 'territory'> | null): TerritoryId[] {
+  if (!user || !ROLE_PERMISSIONS[user.role]?.includes('content.create')) return []
+  return managedTerritories(user)
 }
 
 /** ¿Ve el listado de miembros de algún territorio? (dirección provincial, regional y Administración) */

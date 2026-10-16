@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ActivityCard } from '@/components/activities/ActivityCard'
 import { MonthGrid } from '@/components/calendar/MonthGrid'
+import { CreateButton } from '@/components/content/CreateButton'
 import { Container, PageHeader } from '@/components/layout/PageHeader'
 import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/States'
 import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
+import { creatableTerritories } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { cn } from '@/lib/cn'
 import { getContent } from '@/lib/content/source'
@@ -69,7 +71,11 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
 
   return (
     <>
-      <PageHeader eyebrow="Calendario" title="Lo que viene.">
+      <PageHeader
+        eyebrow="Calendario"
+        title="Lo que viene."
+        action={creatableTerritories(user).length > 0 ? <CreateButton href="/calendario/nueva" label="Nueva actividad" /> : null}
+      >
         Todas las actividades de NNGG Euskadi. Las de tu territorio están marcadas en el filtro.
       </PageHeader>
 

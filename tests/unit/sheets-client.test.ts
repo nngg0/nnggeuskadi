@@ -1,6 +1,6 @@
 import { generateKeyPairSync, createVerify } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
-import { buildServiceAccountJwt } from '@/lib/sheets/client'
+import { buildServiceAccountJwt, WRITE_SCOPE } from '@/lib/sheets/client'
 
 describe('cliente de Google Sheets', () => {
   it('firma un JWT RS256 válido de solo lectura para la cuenta de servicio', () => {
@@ -19,5 +19,13 @@ describe('cliente de Google Sheets', () => {
       scope: 'https://www.googleapis.com/auth/spreadsheets.readonly',
       exp: 1_800_003_600,
     })
+  })
+
+  it('solo pide permiso de escritura cuando se le indica', () => {
+    const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 })
+    const pem = privateKey.export({ type: 'pkcs8', format: 'pem' }).toString()
+    const jwt = buildServiceAccountJwt('bot@proyecto.iam.gserviceaccount.com', pem, 1_800_000_000, WRITE_SCOPE)
+    const payload = JSON.parse(Buffer.from(jwt.split('.')[1]!, 'base64url').toString())
+    expect(payload.scope).toBe('https://www.googleapis.com/auth/spreadsheets')
   })
 })

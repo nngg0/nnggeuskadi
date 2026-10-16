@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { can, canListMembers, managedTerritories } from '@/lib/auth/permissions'
+import { can, canListMembers, creatableTerritories, managedTerritories } from '@/lib/auth/permissions'
 
 describe('permisos', () => {
   const afiliado = { role: 'afiliado' as const, territory: 'alava' as const }
@@ -62,5 +62,33 @@ describe('altas y listado de miembros', () => {
     expect(managedTerritories(bizkaia)).toEqual(['bizkaia'])
     expect(canListMembers(afiliado)).toBe(false)
     expect(canListMembers(null)).toBe(false)
+  })
+})
+
+describe('alta de actividades y proyectos', () => {
+  const admin = { role: 'administracion' as const, territory: 'euskadi' as const }
+  const regional = { role: 'direccion_euskadi' as const, territory: 'euskadi' as const }
+  const bizkaia = { role: 'direccion_provincial' as const, territory: 'bizkaia' as const }
+  const afiliado = { role: 'afiliado' as const, territory: 'alava' as const }
+
+  it('Administración y la dirección regional crean en cualquier territorio', () => {
+    for (const user of [admin, regional]) {
+      expect(creatableTerritories(user)).toEqual(['euskadi', 'alava', 'bizkaia', 'gipuzkoa'])
+      expect(can(user, 'content.create', { territory: 'gipuzkoa' })).toBe(true)
+    }
+  })
+
+  it('la dirección provincial solo crea en su provincia', () => {
+    expect(creatableTerritories(bizkaia)).toEqual(['bizkaia'])
+    expect(can(bizkaia, 'content.create', { territory: 'bizkaia' })).toBe(true)
+    expect(can(bizkaia, 'content.create', { territory: 'alava' })).toBe(false)
+    expect(can(bizkaia, 'content.create', { territory: 'euskadi' })).toBe(false)
+  })
+
+  it('un afiliado no crea nada y sin territorio no hay permiso', () => {
+    expect(creatableTerritories(afiliado)).toEqual([])
+    expect(can(afiliado, 'content.create', { territory: 'alava' })).toBe(false)
+    expect(can(admin, 'content.create')).toBe(false)
+    expect(creatableTerritories(null)).toEqual([])
   })
 })

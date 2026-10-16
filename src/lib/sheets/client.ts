@@ -1,38 +1,49 @@
 import 'server-only'
 import { createSign } from 'node:crypto'
 import { sheetsEnv } from '@/lib/config/env'
-import { SHEET_NAMES, type RawWorkbook, type SheetName } from './columns'
+import { SHEET_NAMES, type RawTable, type RawWorkbook, type SheetName } from './columns'
 
 /*
- * Cliente mínimo de la API de Google Sheets (solo lectura) mediante una cuenta de servicio.
+ * Cliente mínimo de la API de Google Sheets mediante una cuenta de servicio.
  * Se implementa con fetch + firma JWT de Node para no añadir la dependencia "googleapis".
+ * La lectura usa un token de solo lectura; el permiso de escritura solo se pide al añadir filas
+ * (alta de actividades y proyectos desde la web).
  */
 
 export const SHEETS_CACHE_TAG = 'sheets'
-const SCOPE = 'https://www.googleapis.com/auth/spreadsheets.readonly'
+export const READ_SCOPE = 'https://www.googleapis.com/auth/spreadsheets.readonly'
+export const WRITE_SCOPE = 'https://www.googleapis.com/auth/spreadsheets'
+type Scope = typeof READ_SCOPE | typeof WRITE_SCOPE
 const TOKEN_URL = 'https://oauth2.googleapis.com/token'
+const API = 'https://sheets.googleapis.com/v4/spreadsheets'
 
-let cachedToken: { value: string; expiresAt: number } | null = null
+const cachedTokens = new Map<Scope, { value: string; expiresAt: number }>()
 
 function base64url(input: string | Buffer): string {
   return Buffer.from(input).toString('base64url')
 }
 
-export function buildServiceAccountJwt(clientEmail: string, privateKey: string, nowSeconds: number): string {
+export function buildServiceAccountJwt(
+  clientEmail: string,
+  privateKey: string,
+  nowSeconds: number,
+  scope: Scope = READ_SCOPE,
+): string {
   const header = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
   const claims = base64url(
-    JSON.stringify({ iss: clientEmail, scope: SCOPE, aud: TOKEN_URL, iat: nowSeconds, exp: nowSeconds + 3600 }),
+    JSON.stringify({ iss: clientEmail, scope, aud: TOKEN_URL, iat: nowSeconds, exp: nowSeconds + 3600 }),
   )
   const signer = createSign('RSA-SHA256')
   signer.update(`${header}.${claims}`)
   return `${header}.${claims}.${signer.sign(privateKey).toString('base64url')}`
 }
 
-async function accessToken(): Promise<string> {
+async function accessToken(scope: Scope = READ_SCOPE): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
+  const cachedToken = cachedTokens.get(scope)
   if (cachedToken && cachedToken.expiresAt - 60 > now) return cachedToken.value
   const env = sheetsEnv()
-  const assertion = buildServiceAccountJwt(env.clientEmail, env.privateKey, now)
+  const assertion = buildServiceAccountJwt(env.clientEmail, env.privateKey, now, scope)
   const res = await fetch(TOKEN_URL, {
     method: 'POST',
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
@@ -42,7 +53,7 @@ async function accessToken(): Promise<string> {
   if (!res.ok) throw new Error(`Google OAuth respondió ${res.status}`)
   const json = (await res.json()) as { access_token?: string; expires_in?: number }
   if (!json.access_token) throw new Error('Google OAuth no devolvió access_token')
-  cachedToken = { value: json.access_token, expiresAt: now + (json.expires_in ?? 3600) }
+  cachedTokens.set(scope, { value: json.access_token, expiresAt: now + (json.expires_in ?? 3600) })
   return json.access_token
 }
 
@@ -55,7 +66,7 @@ export async function fetchWorkbook(): Promise<RawWorkbook> {
   const env = sheetsEnv()
   const params = new URLSearchParams({ valueRenderOption: 'FORMATTED_VALUE', majorDimension: 'ROWS' })
   for (const name of SHEET_NAMES) params.append('ranges', `${name}!A1:Z2000`)
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(env.spreadsheetId)}/values:batchGet?${params}`
+  const url = `${API}/${encodeURIComponent(env.spreadsheetId)}/values:batchGet?${params}`
   const res = await fetch(url, {
     headers: { authorization: `Bearer ${await accessToken()}` },
     next: { revalidate: env.revalidateSeconds, tags: [SHEETS_CACHE_TAG] },
@@ -65,7 +76,41 @@ export async function fetchWorkbook(): Promise<RawWorkbook> {
   const workbook: RawWorkbook = {}
   ;(json.valueRanges ?? []).forEach((range, index) => {
     const name = SHEET_NAMES[index] as SheetName
-    workbook[name] = (range.values ?? []).map((row) => row.map((cell) => (cell == null ? '' : String(cell))))
+    workbook[name] = toTable(range.values)
   })
   return workbook
+}
+
+function toTable(values: unknown[][] | undefined): RawTable {
+  return (values ?? []).map((row) => row.map((cell) => (cell == null ? '' : String(cell))))
+}
+
+/** Lee una hoja sin caché (antes de escribir, para conocer cabeceras e ids actuales). */
+export async function fetchSheetFresh(sheet: SheetName): Promise<RawTable> {
+  const env = sheetsEnv()
+  const range = encodeURIComponent(`${sheet}!A1:Z2000`)
+  const res = await fetch(`${API}/${encodeURIComponent(env.spreadsheetId)}/values/${range}?valueRenderOption=FORMATTED_VALUE`, {
+    headers: { authorization: `Bearer ${await accessToken(WRITE_SCOPE)}` },
+    cache: 'no-store',
+  })
+  if (!res.ok) throw new Error(`Google Sheets respondió ${res.status} al leer ${sheet}`)
+  return toTable(((await res.json()) as { values?: unknown[][] }).values)
+}
+
+/**
+ * Añade filas al final de una hoja. valueInputOption=RAW guarda el texto tal cual:
+ * nada de lo que escriba un usuario se interpreta como fórmula ni se reformatea.
+ */
+export async function appendSheetRows(sheet: SheetName, rows: string[][]): Promise<void> {
+  if (rows.length === 0) return
+  const env = sheetsEnv()
+  const range = encodeURIComponent(`${sheet}!A1`)
+  const params = new URLSearchParams({ valueInputOption: 'RAW', insertDataOption: 'INSERT_ROWS' })
+  const res = await fetch(`${API}/${encodeURIComponent(env.spreadsheetId)}/values/${range}:append?${params}`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${await accessToken(WRITE_SCOPE)}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ majorDimension: 'ROWS', values: rows }),
+    cache: 'no-store',
+  })
+  if (!res.ok) throw new Error(`Google Sheets respondió ${res.status} al escribir en ${sheet}`)
 }
