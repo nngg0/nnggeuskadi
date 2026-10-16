@@ -8,10 +8,10 @@ type Size = 'lg' | 'md' | 'sm'
 
 const VARIANTS: Record<Variant, string> = {
   primary: 'bg-electric text-white hover:bg-electric-600 disabled:bg-line-strong disabled:text-white',
-  secondary: 'bg-white text-ink border border-line-strong hover:border-ink/40 disabled:text-slate',
+  secondary: 'bg-card text-ink border border-line-strong hover:border-ink/40 disabled:text-slate',
   ghost: 'text-electric hover:bg-electric-50',
-  onDark: 'bg-white text-night hover:bg-electric-50',
-  danger: 'bg-white text-danger border border-danger/30 hover:bg-danger-50',
+  onDark: 'bg-white text-night hover:bg-sky',
+  danger: 'bg-card text-danger border border-danger/30 hover:bg-danger-50',
 }
 
 const SIZES: Record<Size, string> = {

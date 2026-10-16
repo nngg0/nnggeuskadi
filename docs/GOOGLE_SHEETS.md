@@ -91,8 +91,8 @@ compartido con la organización), `fecha`, `destacado`, `visible`.
 
 | clave | valor |
 |---|---|
-| `inicio_titulo` | Titular de Inicio |
-| `inicio_subtitulo` | Subtítulo de Inicio |
+| `inicio_titulo` | (Ya no se muestra: Inicio saluda con «Hola, nombre») |
+| `inicio_subtitulo` | (Ya no se muestra) |
 | `categorias_documentos` | Orden de categorías, separadas por comas |
 | `campana_principal` | id del proyecto que se muestra como **bloque principal** en Inicio y Participa (p. ej. `PRY-29N`). Vacío = sin bloque |
 

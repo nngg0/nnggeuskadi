@@ -16,7 +16,7 @@ import { featuredProject, sortProjectsForUser, visibleProjects } from '@/lib/dom
 import { matchesTerritoryFilter, parseTerritoryFilter } from '@/lib/domain/territories'
 import { projectViews } from '@/lib/view/projects'
 
-export const metadata: Metadata = { title: 'Participa' }
+export const metadata: Metadata = { title: 'Proyectos' }
 
 type Search = Promise<Record<string, string | string[] | undefined>>
 
@@ -43,7 +43,7 @@ export default async function ParticipaPage({ searchParams }: { searchParams: Se
   return (
     <>
       <PageHeader
-        eyebrow="Participa"
+        eyebrow="Proyectos"
         action={creatableTerritories(user).length > 0 ? <CreateButton href="/participa/nuevo" label="Nuevo proyecto" /> : null}
         title={
           <>

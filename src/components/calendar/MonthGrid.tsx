@@ -31,20 +31,20 @@ export function MonthGrid({
   }
 
   return (
-    <div className="rounded-[var(--radius-card)] border border-line bg-white p-4 sm:p-6">
+    <div className="rounded-[var(--radius-card)] border border-line bg-card p-4 sm:p-6">
       <div className="mb-4 flex items-center justify-between">
         <Link
           href={hrefFor({ mes: shiftMonth(month, -1), dia: null })}
-          className="press flex size-10 items-center justify-center rounded-full text-night hover:bg-mist"
+          className="press flex size-10 items-center justify-center rounded-full text-ink hover:bg-mist"
           aria-label="Mes anterior"
           scroll={false}
         >
           <Icon name="chevronLeft" size={22} />
         </Link>
-        <h2 className="text-lg font-extrabold first-letter:uppercase tracking-[-0.02em] text-night">{formatMonthYear(month)}</h2>
+        <h2 className="text-lg font-extrabold first-letter:uppercase tracking-[-0.02em] text-ink">{formatMonthYear(month)}</h2>
         <Link
           href={hrefFor({ mes: shiftMonth(month, 1), dia: null })}
-          className="press flex size-10 items-center justify-center rounded-full text-night hover:bg-mist"
+          className="press flex size-10 items-center justify-center rounded-full text-ink hover:bg-mist"
           aria-label="Mes siguiente"
           scroll={false}
         >
@@ -82,7 +82,7 @@ export function MonthGrid({
           )
           const classes = cn(
             'flex aspect-square flex-col items-center justify-center gap-1 rounded-xl transition-colors',
-            selected ? 'bg-night text-white' : items.length ? 'text-night hover:bg-electric-50' : 'text-slate/70',
+            selected ? 'bg-electric text-white' : items.length ? 'text-ink hover:bg-electric-50' : 'text-slate/70',
             isToday && !selected && 'ring-2 ring-inset ring-electric',
             mine && !selected && 'bg-success-50',
           )

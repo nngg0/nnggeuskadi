@@ -2,7 +2,7 @@ import { startTransition, type FormEvent, type ReactNode } from 'react'
 import type { TerritoryId } from '@/lib/domain/territories'
 
 export const inputClass =
-  'mt-2 w-full rounded-xl border border-line-strong bg-white px-4 font-semibold text-night placeholder:font-normal placeholder:text-slate/70 focus:border-electric focus:outline-none focus:ring-4 focus:ring-electric/15'
+  'mt-2 w-full rounded-xl border border-line-strong bg-card px-4 font-semibold text-ink placeholder:font-normal placeholder:text-slate/70 focus:border-electric focus:outline-none focus:ring-4 focus:ring-electric/15'
 
 export function Field({ id, label, hint, children }: { id: string; label: string; hint?: string; children: ReactNode }) {
   return (

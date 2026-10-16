@@ -34,7 +34,7 @@ export function SaveDocumentButton({ documentId, saved, title }: { documentId: s
       title={error ? 'No se ha podido guardar. Inténtalo de nuevo.' : optimistic ? 'Guardado' : 'Guardar'}
       className={cn(
         'press flex size-11 shrink-0 items-center justify-center rounded-full border transition-colors',
-        optimistic ? 'border-electric bg-electric text-white' : 'border-line-strong bg-white text-slate hover:text-electric',
+        optimistic ? 'border-electric bg-electric text-white' : 'border-line-strong bg-card text-slate hover:text-electric',
         error && 'border-danger text-danger',
       )}
     >

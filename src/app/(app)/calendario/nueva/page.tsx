@@ -10,7 +10,7 @@ import { getContent } from '@/lib/content/source'
 import { madridDate } from '@/lib/domain/dates'
 import { territoryName } from '@/lib/domain/territories'
 
-export const metadata: Metadata = { title: 'Nueva actividad' }
+export const metadata: Metadata = { title: 'Nuevo acto' }
 
 export default async function NewActivityPage() {
   const user = await requireUser()
@@ -23,14 +23,14 @@ export default async function NewActivityPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Calendario · Nueva actividad" title="Programa un acto.">
-        Se añade como fila nueva en la pestaña ACTIVIDADES del Sheet y aparece en el calendario al momento.
+      <PageHeader eyebrow="Actos · Nuevo acto" title="Programa un acto.">
+        Se añade como fila nueva en la pestaña ACTIVIDADES del Sheet y aparece en Actos al momento.
       </PageHeader>
       <Container className="py-6 md:py-8">
         <div className="max-w-2xl">
           <Link href="/calendario" className="press mb-6 inline-flex items-center gap-2 text-sm font-bold text-electric hover:text-electric-600">
             <Icon name="arrowLeft" size={18} />
-            Volver al calendario
+            Volver a Actos
           </Link>
           <NewActivityForm territories={territories} today={madridDate(new Date())} />
         </div>

@@ -12,7 +12,7 @@ export function ActivityCard({ view, className }: { view: ActivityView; classNam
     <Link
       href={`/actividades/${encodeURIComponent(activity.id)}`}
       className={cn(
-        'press group flex gap-4 rounded-[var(--radius-card)] border bg-white p-5 hover:border-electric/40 sm:p-6',
+        'press group flex gap-4 rounded-[var(--radius-card)] border bg-card p-5 hover:border-electric/40 sm:p-6',
         view.isRegistered && !muted ? 'border-success/35' : 'border-line',
         muted && 'opacity-75',
         className,
@@ -24,7 +24,7 @@ export function ActivityCard({ view, className }: { view: ActivityView; classNam
           <TerritoryLabel territory={activity.territory} />
           <RegistrationTag state={state} />
         </div>
-        <h3 className={cn('mt-2 text-[1.08rem] font-bold leading-snug tracking-[-0.01em] text-night', state.kind === 'cancelled' && 'line-through')}>
+        <h3 className={cn('mt-2 text-[1.08rem] font-bold leading-snug tracking-[-0.01em] text-ink', state.kind === 'cancelled' && 'line-through')}>
           {activity.title}
         </h3>
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">

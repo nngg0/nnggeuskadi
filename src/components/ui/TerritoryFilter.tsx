@@ -54,7 +54,7 @@ export function TerritoryFilter({
             onClick={() => select(o.id)}
             className={cn(
               'press eyebrow relative shrink-0 rounded-full border px-4 py-2.5 !text-[0.68rem]',
-              active ? 'border-night bg-night text-white' : 'border-line-strong bg-white text-slate hover:border-night/40 hover:text-night',
+              active ? 'border-electric bg-electric text-white' : 'border-line-strong bg-card text-slate hover:border-ink/40 hover:text-ink',
             )}
           >
             {o.name}

@@ -43,7 +43,7 @@ export function DocumentSearch({ initial }: { initial: string }) {
         placeholder="Buscar argumentario, manual, plantilla…"
         autoComplete="off"
         maxLength={100}
-        className="h-14 w-full rounded-2xl border border-line-strong bg-white pl-12 pr-12 text-[0.95rem] font-medium text-night placeholder:text-slate/70 focus:border-electric focus:outline-none focus:ring-4 focus:ring-electric/15"
+        className="h-14 w-full rounded-2xl border border-line-strong bg-card pl-12 pr-12 text-[0.95rem] font-medium text-ink placeholder:text-slate/70 focus:border-electric focus:outline-none focus:ring-4 focus:ring-electric/15"
       />
       {pending ? (
         <span className="absolute right-4 top-1/2 size-4 -translate-y-1/2 animate-spin rounded-full border-2 border-electric border-t-transparent" aria-label="Buscando" />

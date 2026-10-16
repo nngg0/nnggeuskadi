@@ -25,7 +25,7 @@ export function SectionHeader({
       <div>
         <Eyebrow tone={dark ? 'sky' : 'electric'}>{eyebrow}</Eyebrow>
         {title ? (
-          <h2 className={cn('display mt-2 text-[1.75rem] sm:text-[2.1rem]', dark ? 'text-white' : 'text-night')}>{title}</h2>
+          <h2 className={cn('display mt-2 text-[1.75rem] sm:text-[2.1rem]', dark ? 'text-white' : 'text-ink')}>{title}</h2>
         ) : null}
       </div>
       {action ? <div className="shrink-0 pb-1">{action}</div> : null}

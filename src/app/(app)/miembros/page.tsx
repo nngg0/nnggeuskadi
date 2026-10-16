@@ -47,11 +47,11 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
             Cuando se apruebe el acceso de afiliados de este territorio aparecerán aquí.
           </EmptyState>
         ) : (
-          <ul className="divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line bg-white">
+          <ul className="divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line bg-card">
             {visible.map((m) => (
               <li key={m.email} className="grid gap-2 px-5 py-4 sm:grid-cols-[1fr_auto] sm:items-center">
                 <div className="min-w-0">
-                  <p className="font-bold text-night">
+                  <p className="font-bold text-ink">
                     {m.displayName}
                     <span className="eyebrow ml-2 !text-[0.58rem] text-electric">{territoryName(m.territory)}</span>
                   </p>
@@ -73,7 +73,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
                   ) : null}
                 </div>
                 <div className="text-xs text-slate sm:text-right">
-                  <p className="font-semibold text-night">{ROLE_LABELS[m.role]}</p>
+                  <p className="font-semibold text-ink">{ROLE_LABELS[m.role]}</p>
                   <p>Desde el {formatFullDate(madridDate(new Date(m.createdAt)))}</p>
                 </div>
               </li>

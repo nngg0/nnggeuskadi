@@ -23,14 +23,14 @@ export default async function NewProjectPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Participa · Nuevo proyecto" title="Abre una iniciativa.">
+      <PageHeader eyebrow="Proyectos · Nuevo proyecto" title="Abre una iniciativa.">
         Se guarda en la pestaña PROYECTOS del Sheet y cada ámbito en OPORTUNIDADES. Los afiliados podrán apuntarse en cuanto lo crees.
       </PageHeader>
       <Container className="py-6 md:py-8">
         <div className="max-w-2xl">
           <Link href="/participa" className="press mb-6 inline-flex items-center gap-2 text-sm font-bold text-electric hover:text-electric-600">
             <Icon name="arrowLeft" size={18} />
-            Volver a Participa
+            Volver a Proyectos
           </Link>
           <NewProjectForm territories={territories} today={madridDate(new Date())} />
         </div>

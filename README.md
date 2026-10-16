@@ -35,14 +35,14 @@ Sin chat, foros, comentarios, seguidores ni gamificación: no sustituye a WhatsA
 
 | Sección | Qué permite |
 |---|---|
-| **Inicio** | Panel personal: tu próximo plan, el bloque de la **campaña principal**, *Próximamente* (lo de tu territorio y Euskadi primero), *En preparación* (iniciativas abiertas) y *Puedes participar en…* (ámbitos abiertos). |
-| **Calendario** | Lista de próximas actividades o vista mensual, filtro Todos/Euskadi/Álava/Bizkaia/Gipuzkoa, disponibilidad de plazas. |
+| **Inicio** | «NNGG Euskadi · Hola, nombre», justo debajo la **campaña** (fecha en calendario, días que faltan, personas que participan y «Quiero participar»), los **cinco actos más próximos** con «Ver calendario completo» y el panel *Esto todavía lo estamos preparando*. |
+| **Actos** | Lista de próximos actos (los ya pasados, al final y en gris) o vista mensual, filtro Todos/Euskadi/Álava/Bizkaia/Gipuzkoa, disponibilidad de plazas. |
 | **Actividad** | Ficha con fecha, hora, lugar, inscritos/plazas. Inscribirse y cancelar. Control de aforo, apertura y cierre (automático por fecha o manual), evento completo, cancelado o finalizado. **Añadir a mi calendario** (.ics para iPhone/Android/Outlook o Google Calendar). |
-| **Participa** | Bloque principal de campaña (p. ej. Campaña 29N) y proyectos en preparación y en marcha con sus ámbitos. Sin cupos: participa quien quiera y la organización cierra cada ámbito cuando lo decide. «Quiero participar» → elegir uno o varios ámbitos → confirmación inmediata. |
+| **Proyectos** | Bloque principal de campaña (p. ej. Campaña 29N) y proyectos en preparación y en marcha con sus ámbitos. Sin cupos: participa quien quiera y la organización cierra cada ámbito cuando lo decide. «Quiero participar» → elegir uno o varios ámbitos → confirmación inmediata. |
 | **Documentos** | Búsqueda instantánea (sin tildes), filtros por territorio y categoría, destacados, recientes, guardados. |
 | **Perfil** | Mis intereses (hasta 3 temas), próximas actividades, histórico de inscripciones, participaciones, documentos guardados y configuración (nombre visible, preferencia de avisos, instalar la app, contraseña, salir). |
 | **Dirección** | En fichas de su territorio, la dirección ve quién se ha inscrito o se ha ofrecido (solo nombre visible) para poder contactar. Listado de **Miembros**: la provincial, su territorio; la regional, todos. |
-| **Crear (+)** | En Calendario y Participa, Administración, la dirección regional y las provinciales (solo en su provincia) crean actividades y proyectos con sus ámbitos. Se guardan como filas nuevas del Sheet; el permiso se comprueba en servidor. |
+| **Crear (+)** | En Actos y Proyectos, Administración, la dirección regional y las provinciales (solo en su provincia) crean actividades y proyectos con sus ámbitos. Se guardan como filas nuevas del Sheet; el permiso se comprueba en servidor. |
 | **Altas** | «Solicitar acceso» en la pantalla de entrada (nombre, nombre de usuario y contraseña). **Administración** aprueba, eligiendo provincia (Álava, Bizkaia o Gipuzkoa) y rol, o rechaza en Solicitudes. |
 | **PWA** | Instalable en móvil y escritorio, iconos, página sin conexión, aviso offline, preparada para notificaciones push. |
 
@@ -51,7 +51,7 @@ Sin chat, foros, comentarios, seguidores ni gamificación: no sustituye a WhatsA
 **Next.js 16** (App Router, Server Components, Server Actions) · **React 19** · **TypeScript** estricto ·
 **Tailwind CSS 4** · **Supabase** (Auth + Postgres + RLS) · **Google Sheets API** · **zod** · **Vitest** · **Playwright**.
 
-Sin dependencias de UI ni de iconos: componentes e iconos propios. Tipografía Montserrat servida localmente.
+Sin dependencias de UI ni de iconos: componentes e iconos propios. Siempre en modo oscuro. Montserrat para el texto y Oswald (condensada) para los titulares, servidas localmente. La bandera de España separa las secciones como franja fina.
 Las decisiones técnicas están razonadas en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md#decisiones-técnicas).
 
 ## Arquitectura

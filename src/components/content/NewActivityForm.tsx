@@ -45,7 +45,7 @@ export function NewActivityForm({ territories, today }: { territories: { id: Ter
       </Field>
       {state && !state.ok ? <Notice tone="danger">{state.message}</Notice> : null}
       <Button type="submit" variant="primary" size="md" disabled={pending} className="justify-self-start">
-        {pending ? 'Creando…' : 'Crear actividad'}
+        {pending ? 'Creando…' : 'Crear acto'}
       </Button>
     </form>
   )

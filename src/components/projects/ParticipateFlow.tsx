@@ -107,7 +107,7 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
           )}
         >
           <span className="inline-flex items-center gap-2.5">
-            <span className={cn('flex size-6 items-center justify-center rounded-full', tone === 'light' ? 'bg-success text-white' : 'bg-sky text-night')}>
+            <span className={cn('flex size-6 items-center justify-center rounded-full', tone === 'light' ? 'bg-success text-white' : 'bg-sky text-ink')}>
               <Icon name="check" size={14} strokeWidth={3} />
             </span>
             Ya participas
@@ -136,12 +136,12 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
             aria-modal="true"
             aria-labelledby={`participa-${projectId}`}
             tabIndex={-1}
-            className="pb-safe relative max-h-[92dvh] w-full max-w-lg animate-sheet overflow-y-auto rounded-t-[1.75rem] bg-white text-ink outline-none sm:animate-rise sm:rounded-[1.75rem]"
+            className="pb-safe relative max-h-[92dvh] w-full max-w-lg animate-sheet overflow-y-auto rounded-t-[1.75rem] bg-card text-ink outline-none sm:animate-rise sm:rounded-[1.75rem]"
           >
-            <div className="sticky top-0 z-10 flex items-start justify-between gap-4 bg-white px-6 pb-3 pt-6">
+            <div className="sticky top-0 z-10 flex items-start justify-between gap-4 bg-card px-6 pb-3 pt-6">
               <div>
                 <p className="eyebrow text-electric">Quiero participar</p>
-                <h2 id={`participa-${projectId}`} className="display mt-2 text-2xl text-night">
+                <h2 id={`participa-${projectId}`} className="display mt-2 text-2xl text-ink">
                   {projectTitle}
                 </h2>
               </div>
@@ -160,7 +160,7 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
                 <span className="mx-auto flex size-16 animate-pop items-center justify-center rounded-full bg-electric text-white">
                   <Icon name={result.withdrawn ? 'check' : 'participa'} size={30} strokeWidth={2.2} />
                 </span>
-                <p className="display mt-5 text-2xl text-night">{result.withdrawn ? 'Hecho.' : '¡Cuenta contigo!'}</p>
+                <p className="display mt-5 text-2xl text-ink">{result.withdrawn ? 'Hecho.' : '¡Cuenta contigo!'}</p>
                 <p className="mx-auto mt-2 max-w-xs text-[0.95rem] leading-relaxed text-slate">{result.message}</p>
                 <div className="mt-6 grid gap-2">
                   {!result.withdrawn ? (
@@ -203,14 +203,14 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
                           aria-hidden
                           className={cn(
                             'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-lg border-2 transition-colors',
-                            checked ? 'border-electric bg-electric text-white' : 'border-line-strong bg-white',
+                            checked ? 'border-electric bg-electric text-white' : 'border-line-strong bg-card',
                           )}
                         >
                           {checked ? <Icon name="check" size={15} strokeWidth={3} /> : null}
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="flex flex-wrap items-baseline justify-between gap-x-3">
-                            <span className="font-bold text-night">{o.name}</span>
+                            <span className="font-bold text-ink">{o.name}</span>
                             {disabled ? <span className="eyebrow !text-[0.6rem] text-slate">Cerrado</span> : null}
                           </span>
                           {o.description ? <span className="mt-1 block text-sm leading-relaxed text-slate">{o.description}</span> : null}
@@ -229,7 +229,7 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
                   </div>
                 ) : null}
 
-                <div className="sticky bottom-0 -mx-6 mt-6 bg-white px-6 pb-2 pt-3">
+                <div className="sticky bottom-0 -mx-6 mt-6 bg-card px-6 pb-2 pt-3">
                   <Button block arrow onClick={submit} disabled={pending || selected.size === 0} aria-busy={pending}>
                     {pending
                       ? 'Enviando…'

@@ -83,7 +83,7 @@ export default async function ProjectPage({ params }: { params: Params }) {
       <Container className="-mt-5 grid gap-5 pb-10 lg:grid-cols-[1fr_24rem] lg:items-start">
         <Card className="order-2 lg:order-1">
           <Eyebrow>Oportunidades</Eyebrow>
-          <h2 className="mt-2 text-xl font-extrabold tracking-[-0.02em] text-night">Dónde puedes participar</h2>
+          <h2 className="mt-2 text-xl font-extrabold tracking-[-0.02em] text-ink">Dónde puedes participar</h2>
           {view.opportunities.length === 0 ? (
             <p className="mt-4 text-sm text-slate">Todavía no se han definido ámbitos de colaboración. Vuelve pronto.</p>
           ) : (
@@ -94,7 +94,7 @@ export default async function ProjectPage({ params }: { params: Params }) {
                   className={cn('rounded-2xl border p-4 sm:p-5', chosen ? 'border-electric bg-electric-50' : 'border-line', !availability.isOpen && !chosen && 'opacity-60')}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-[1.05rem] font-bold text-night">{opportunity.name}</span>
+                    <span className="text-[1.05rem] font-bold text-ink">{opportunity.name}</span>
                     {chosen ? (
                       <Tag tone="electric">
                         <Icon name="check" size={12} strokeWidth={3} /> Te has ofrecido

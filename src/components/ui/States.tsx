@@ -22,7 +22,7 @@ export function EmptyState({
       <span className="mb-4 inline-flex size-11 items-center justify-center rounded-full bg-electric-50 text-electric">
         <Icon name={icon} size={22} />
       </span>
-      <p className="eyebrow text-night">{title}</p>
+      <p className="eyebrow text-ink">{title}</p>
       {children ? <p className="mt-2 max-w-md text-[0.95rem] leading-relaxed text-slate">{children}</p> : null}
       {action ? (
         <ButtonLink href={action.href} variant="secondary" size="md" arrow className="mt-5">
@@ -54,7 +54,7 @@ export function Skeleton({ className }: { className?: string }) {
 
 export function CardSkeleton() {
   return (
-    <div className="rounded-[var(--radius-card)] border border-line bg-white p-6">
+    <div className="rounded-[var(--radius-card)] border border-line bg-card p-6">
       <Skeleton className="h-3 w-24" />
       <Skeleton className="mt-4 h-6 w-3/4" />
       <Skeleton className="mt-3 h-4 w-1/2" />

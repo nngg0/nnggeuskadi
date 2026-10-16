@@ -30,7 +30,6 @@ export const DEMO_OTHER_PARTICIPATIONS: Record<string, number> = {
   'OP-29N-3': 21,
   'OP-29N-4': 3,
   'OP-29N-5': 6,
-  'OP-29N-6': 5,
   'OP-001': 6,
   'OP-002': 2,
   'OP-003': 2,

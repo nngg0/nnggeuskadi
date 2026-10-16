@@ -89,7 +89,7 @@ export default async function ProfilePage() {
       <nav aria-label="Secciones del perfil" className="sticky top-14 z-30 border-b border-line bg-mist/95 backdrop-blur md:top-16">
         <Container className="scrollbar-none flex gap-1 overflow-x-auto py-2">
           {SECTIONS.map((s) => (
-            <a key={s.id} href={`#${s.id}`} className="press shrink-0 rounded-full px-3.5 py-2 text-xs font-bold text-slate hover:bg-white hover:text-night">
+            <a key={s.id} href={`#${s.id}`} className="press shrink-0 rounded-full px-3.5 py-2 text-xs font-bold text-slate hover:bg-card hover:text-ink">
               {s.label}
             </a>
           ))}
@@ -102,24 +102,24 @@ export default async function ProfilePage() {
             <SectionHeader eyebrow="Gestión" />
             <div className="grid gap-3 md:grid-cols-2">
               {isAdmin ? (
-                <Link href="/solicitudes" className="press flex items-center gap-4 rounded-[var(--radius-card)] border border-line bg-white p-5 hover:border-electric/40">
+                <Link href="/solicitudes" className="press flex items-center gap-4 rounded-[var(--radius-card)] border border-line bg-card p-5 hover:border-electric/40">
                   <span className="flex size-11 items-center justify-center rounded-2xl bg-electric-50 text-electric">
                     <Icon name="user" size={22} />
                   </span>
                   <span className="flex-1">
-                    <span className="block font-bold text-night">Solicitudes de acceso</span>
+                    <span className="block font-bold text-ink">Solicitudes de acceso</span>
                     <span className="text-sm text-slate">{pendingRequests === 0 ? 'Ninguna pendiente' : pendingRequests === 1 ? '1 pendiente' : `${pendingRequests} pendientes`}</span>
                   </span>
                   {pendingRequests > 0 ? <span className="flex size-7 items-center justify-center rounded-full bg-electric text-xs font-bold text-white">{pendingRequests}</span> : null}
                 </Link>
               ) : null}
               {canListMembers(user) ? (
-                <Link href="/miembros" className="press flex items-center gap-4 rounded-[var(--radius-card)] border border-line bg-white p-5 hover:border-electric/40">
+                <Link href="/miembros" className="press flex items-center gap-4 rounded-[var(--radius-card)] border border-line bg-card p-5 hover:border-electric/40">
                   <span className="flex size-11 items-center justify-center rounded-2xl bg-electric-50 text-electric">
                     <Icon name="users" size={22} />
                   </span>
                   <span className="flex-1">
-                    <span className="block font-bold text-night">Miembros</span>
+                    <span className="block font-bold text-ink">Miembros</span>
                     <span className="text-sm text-slate">Listado de afiliados con acceso</span>
                   </span>
                   <Icon name="chevronRight" size={20} className="text-slate" />
@@ -154,14 +154,14 @@ export default async function ProfilePage() {
         <section id="inscripciones" className="scroll-mt-32">
           <SectionHeader eyebrow="Mis inscripciones" />
           {views.length > 0 ? (
-            <ul className="divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line bg-white">
+            <ul className="divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line bg-card">
               {views.map((v) => (
                 <li key={v.activity.id}>
                   <Link href={`/actividades/${encodeURIComponent(v.activity.id)}`} className="press flex items-center gap-4 px-5 py-4 hover:bg-mist/50">
-                    <span className="w-14 shrink-0 text-sm font-extrabold uppercase text-night">
+                    <span className="w-14 shrink-0 text-sm font-extrabold uppercase text-ink">
                       {Number(v.activity.date.slice(8, 10))} {formatMonthShort(v.activity.date)}
                     </span>
-                    <span className="min-w-0 flex-1 truncate font-semibold text-night">{v.activity.title}</span>
+                    <span className="min-w-0 flex-1 truncate font-semibold text-ink">{v.activity.title}</span>
                     <RegistrationTag state={v.state} />
                   </Link>
                 </li>
@@ -180,9 +180,9 @@ export default async function ProfilePage() {
             <ul className="grid gap-3 md:grid-cols-2">
               {pViews.map((v) => (
                 <li key={v.project.id}>
-                  <Link href={`/participa/${encodeURIComponent(v.project.id)}`} className="press block rounded-[var(--radius-card)] border border-line bg-white p-5 hover:border-electric/40">
+                  <Link href={`/participa/${encodeURIComponent(v.project.id)}`} className="press block rounded-[var(--radius-card)] border border-line bg-card p-5 hover:border-electric/40">
                     <span className="eyebrow !text-[0.6rem] text-electric">{territoryName(v.project.territory)}</span>
-                    <span className="mt-1.5 block text-lg font-extrabold tracking-[-0.02em] text-night">{v.project.title}</span>
+                    <span className="mt-1.5 block text-lg font-extrabold tracking-[-0.02em] text-ink">{v.project.title}</span>
                     <span className="mt-3 flex flex-wrap gap-1.5">
                       {v.opportunities
                         .filter((o) => o.chosen)
@@ -227,7 +227,7 @@ export default async function ProfilePage() {
             <Card className="grid content-start gap-6">
               <div>
                 <p className="eyebrow !text-[0.62rem] text-slate">Cuenta</p>
-                <p className="mt-1 font-semibold text-night">{accountLabel(user.email)}</p>
+                <p className="mt-1 font-semibold text-ink">{accountLabel(user.email)}</p>
               </div>
               <div>
                 <p className="eyebrow mb-2 !text-[0.62rem] text-slate">App en tu móvil</p>
