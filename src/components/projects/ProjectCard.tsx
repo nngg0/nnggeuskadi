@@ -48,7 +48,7 @@ export function ProjectCard({ view, tone = 'light', className }: { view: Project
       </div>
 
       <Link href={`/participa/${encodeURIComponent(project.id)}`} className="group mt-3 block">
-        <h3 className={cn('display text-[1.7rem] sm:text-[1.9rem]', dark ? 'text-white' : 'text-ink')}>
+        <h3 className={'display text-[1.7rem] sm:text-[1.9rem]'}>
           {project.title}
           <Icon name="arrowRight" size={22} className={cn('ml-2 inline align-[-2px] opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100', dark ? 'text-sky' : 'text-electric')} />
         </h3>

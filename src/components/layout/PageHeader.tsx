@@ -24,7 +24,7 @@ export function PageHeader({
           <Eyebrow tone="sky">{eyebrow}</Eyebrow>
           {action}
         </div>
-        <h1 className="display mt-3 text-[2.35rem] sm:text-5xl">{title}</h1>
+        <h1 className="display mt-3 text-[2.6rem] sm:text-[3.35rem]">{title}</h1>
         {children ? <div className="mt-4 max-w-2xl text-[0.95rem] leading-relaxed text-white/70">{children}</div> : null}
       </div>
     </section>

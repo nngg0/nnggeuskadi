@@ -32,18 +32,18 @@ export function CampaignBlock({ view, today }: { view: ProjectView; today: strin
         <div className="mt-3 flex items-start gap-5 sm:gap-7">
           {project.expectedDate ? <CalendarTile date={project.expectedDate} /> : null}
           <div className="min-w-0">
-            <h2 id="campana-titulo" className="display text-[2.9rem] sm:text-6xl md:text-7xl">
+            <h2 id="campana-titulo" className="display text-[2.9rem] !text-white sm:text-6xl md:text-7xl">
               {project.title}
             </h2>
             <dl className="mt-4 flex flex-wrap gap-x-7 gap-y-3">
               {days !== null && days >= 0 ? (
                 <div>
-                  <dd className="font-display text-4xl leading-none sm:text-5xl">{days}</dd>
+                  <dd className="font-display text-4xl leading-none text-sky sm:text-5xl">{days}</dd>
                   <dt className="eyebrow mt-1 text-white/70">{days === 1 ? 'día' : 'días'}</dt>
                 </div>
               ) : null}
               <div>
-                <dd className="font-display text-4xl leading-none sm:text-5xl">{view.participantCount}</dd>
+                <dd className="font-display text-4xl leading-none text-sky sm:text-5xl">{view.participantCount}</dd>
                 <dt className="eyebrow mt-1 text-white/70">{view.participantCount === 1 ? 'persona participa' : 'personas participan'}</dt>
               </div>
             </dl>

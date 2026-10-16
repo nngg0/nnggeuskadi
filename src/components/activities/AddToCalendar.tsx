@@ -1,26 +1,36 @@
+import { siteUrl } from '@/lib/config/env'
+import { cn } from '@/lib/cn'
 import { googleCalendarUrl } from '@/lib/domain/ics'
 import type { Activity } from '@/lib/domain/types'
 import { buttonClasses } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 
-/** Añadir la actividad al calendario del móvil (.ics) o a Google Calendar. */
-export function AddToCalendar({ activity, url }: { activity: Activity; url: string }) {
+/**
+ * Añadir el acto al calendario del iPhone (.ics, que también abren Android y Outlook) o a Google Calendar.
+ * `compact` es la versión de las tarjetas de lista.
+ */
+export function AddToCalendar({ activity, compact = false, className }: { activity: Activity; compact?: boolean; className?: string }) {
+  const path = `/actividades/${encodeURIComponent(activity.id)}`
+  const size = compact ? 'sm' : 'md'
   return (
-    <div>
+    <div className={cn('grid grid-cols-2 gap-2', className)}>
       <a
-        href={`/actividades/${encodeURIComponent(activity.id)}/ics`}
-        className={buttonClasses('secondary', 'md', true)}
+        href={`${path}/ics`}
+        aria-label={`Añadir «${activity.title}» al calendario del iPhone`}
+        className={cn(buttonClasses('secondary', size, true), '!justify-center')}
       >
-        <span>Añadir a mi calendario</span>
-        <Icon name="calendar" size={18} />
+        <Icon name="calendar" size={compact ? 16 : 18} className="shrink-0" />
+        <span className="truncate">iPhone</span>
       </a>
       <a
-        href={googleCalendarUrl(activity, url)}
+        href={googleCalendarUrl(activity, `${siteUrl()}${path}`)}
         target="_blank"
         rel="noopener noreferrer"
-        className="press mt-2 inline-flex w-full items-center justify-center gap-1.5 text-xs font-semibold text-slate hover:text-electric"
+        aria-label={`Añadir «${activity.title}» a Google Calendar`}
+        className={cn(buttonClasses('secondary', size, true), '!justify-center')}
       >
-        o añadir a Google Calendar <Icon name="external" size={13} />
+        <Icon name="external" size={compact ? 15 : 17} className="shrink-0" />
+        <span className="truncate">{compact ? 'Google' : 'Google Calendar'}</span>
       </a>
     </div>
   )

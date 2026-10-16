@@ -122,7 +122,7 @@ test.describe('filtros y documentos', () => {
     await page.goto('/calendario')
     await page.getByRole('radio', { name: /Gipuzkoa/ }).click()
     await expect(page).toHaveURL(/t=gipuzkoa/)
-    const cards = page.locator('main a[href^="/actividades/"]')
+    const cards = page.locator('main article')
     await expect(cards.first()).toBeVisible()
     for (const text of await cards.allInnerTexts()) expect(text.toUpperCase()).toContain('GIPUZKOA')
   })
@@ -230,13 +230,25 @@ test.describe('campaña principal y calendario', () => {
   test('añadir una actividad al calendario descarga un evento .ics', async ({ page }) => {
     await loginAs(page, /Alba/)
     await page.goto('/actividades/ACT-031')
-    const link = page.getByRole('link', { name: 'Añadir a mi calendario' })
+    const link = page.getByRole('link', { name: 'Añadir «Encuentro NNGG Euskadi» al calendario del iPhone' })
     await expect(link).toBeVisible()
     const response = await page.request.get((await link.getAttribute('href'))!)
     expect(response.headers()['content-type']).toContain('text/calendar')
     const body = await response.text()
     expect(body).toContain('SUMMARY:Encuentro NNGG Euskadi')
-    await expect(page.getByRole('link', { name: /Google Calendar/ })).toHaveAttribute('href', /calendar\.google\.com/)
+    await expect(page.getByRole('link', { name: 'Añadir «Encuentro NNGG Euskadi» a Google Calendar' })).toHaveAttribute('href', /calendar\.google\.com/)
+  })
+
+  test('las tarjetas de actos próximos llevan iPhone y Google Calendar; las pasadas no', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/calendario')
+    const card = page.locator('article', { hasText: 'Encuentro NNGG Euskadi' })
+    await expect(card.getByRole('link', { name: /al calendario del iPhone/ })).toHaveAttribute('href', '/actividades/ACT-031/ics')
+    await expect(card.getByRole('link', { name: /a Google Calendar/ })).toHaveAttribute('href', /calendar\.google\.com/)
+    await expect(page.locator('#pasados').getByRole('link', { name: /iPhone|Google Calendar/ })).toHaveCount(0)
+    // El resto de la tarjeta sigue abriendo la ficha.
+    await card.getByRole('heading').click()
+    await expect(page).toHaveURL('/actividades/ACT-031')
   })
 
   test('el .ics exige sesión', async ({ request }) => {
@@ -404,7 +416,7 @@ test.describe('inicio, actos y proyectos', () => {
     const campaign = page.locator('#campana')
     await expect(campaign.getByText(/personas participan/)).toBeVisible()
     await expect(campaign.getByText(/^días?$/)).toBeVisible()
-    await expect(page.locator('#proximamente').locator('a[href^="/actividades/"]')).toHaveCount(5)
+    await expect(page.locator('#proximamente').locator('h3 a[href^="/actividades/"]')).toHaveCount(5)
     await expect(page.locator('#proximamente').getByRole('link', { name: 'Ver calendario completo' }).first()).toBeVisible()
     const preparing = page.locator('#en-preparacion')
     await expect(preparing.getByRole('heading', { name: 'Esto todavía lo estamos preparando.' })).toBeVisible()
@@ -448,9 +460,17 @@ test.describe('inicio, actos y proyectos', () => {
     await expect(past.getByText('Asamblea de inicio de curso')).toBeVisible()
     await expect(past.locator('.grayscale')).toHaveCount(1)
     // La sección de pasados es lo último de la lista.
-    const order = await page.locator('main a[href^="/actividades/"]').evaluateAll((links) =>
+    const order = await page.locator('main h3 a[href^="/actividades/"]').evaluateAll((links) =>
       links.map((l) => l.textContent ?? ''),
     )
     expect(order.at(-1)).toContain('Asamblea de inicio de curso')
   })
+})
+
+test('Proyectos: «Lo que está entre manos» y el texto de la campaña', async ({ page }) => {
+  await loginAs(page, /Alba/)
+  await page.goto('/participa')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Lo que está entre manos')
+  await expect(page.getByText('Elige de qué proyecto quieres formar parte.')).toBeVisible()
+  await expect(page.locator('#campana').getByText('¡POR FIN! Esta campaña la construimos entre todos.', { exact: false })).toBeVisible()
 })

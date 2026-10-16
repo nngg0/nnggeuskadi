@@ -45,15 +45,9 @@ export default async function ParticipaPage({ searchParams }: { searchParams: Se
       <PageHeader
         eyebrow="Proyectos"
         action={creatableTerritories(user).length > 0 ? <CreateButton href="/participa/nuevo" label="Nuevo proyecto" /> : null}
-        title={
-          <>
-            Lo que todavía
-            <br />
-            estamos construyendo.
-          </>
-        }
+        title="Lo que está entre manos"
       >
-        Aquí no hay convocatorias cerradas: hay iniciativas a medio hacer. Elige dónde quieres aportar y quien lo prepara contará contigo.
+        Elige de qué proyecto quieres formar parte.
       </PageHeader>
 
       {campaignView ? <CampaignBlock view={campaignView} today={madridDate(new Date())} /> : null}

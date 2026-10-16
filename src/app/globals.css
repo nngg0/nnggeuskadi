@@ -12,30 +12,32 @@
   --font-label: 'Archivo', Arial, Helvetica, sans-serif;
 
   /* Siempre en modo oscuro. "night" = zonas de identidad; "mist" = fondo de página; "card" = tarjetas. */
-  --color-night: #05080f;
-  --color-night-2: #0e1526;
-  --color-night-3: #1a2440;
-  --color-mist: #0a0f1a;
-  --color-card: #111829;
+  --color-night: #0c1d3d;
+  --color-night-2: #132a55;
+  --color-night-3: #1c3769;
+  --color-mist: #112650;
+  --color-card: #19336a;
   --color-brand: #1e4a90;
+  /* Titulares: el azul #1E4A90 de la plantilla, aclarado para que se lea sobre fondo oscuro. */
+  --color-title: #7fa3e0;
   --color-electric: #3d6dff;
   --color-electric-600: #2b58e6;
-  --color-electric-50: #16224a;
+  --color-electric-50: #1f3e7c;
   --color-sky: #8db6ff;
-  --color-line: #1f2940;
-  --color-line-strong: #2d3a57;
-  --color-slate: #97a3bb;
-  --color-ink: #eef2f9;
+  --color-line: #264478;
+  --color-line-strong: #33548e;
+  --color-slate: #aab9d8;
+  --color-ink: #f2f5fb;
   --color-success: #3cc98f;
-  --color-success-50: #0f2a21;
+  --color-success-50: #123a3a;
   --color-warning: #f2a93b;
-  --color-warning-50: #2d2211;
+  --color-warning-50: #3a3524;
   --color-danger: #ff6474;
-  --color-danger-50: #2f141a;
+  --color-danger-50: #3c2440;
 
-  /* Bandera de España: franja separadora discreta. */
-  --color-flag-red: #c60b1e;
-  --color-flag-yellow: #ffc400;
+  /* Bandera de España: banderita entre secciones (tonos del folleto). */
+  --color-flag-red: #b3342b;
+  --color-flag-yellow: #ecbb3a;
 
   --radius-card: 1.5rem;
   --radius-btn: 0.9rem;
@@ -106,19 +108,10 @@
   .display {
     font-family: var(--font-display);
     font-weight: 400;
+    color: var(--color-title);
     letter-spacing: 0.005em;
     line-height: 1;
     text-transform: uppercase;
-  }
-  /* Franja de la bandera de España (rojo · amarillo · rojo, 1:2:1). */
-  .flag-stripe {
-    height: 3px;
-    background: linear-gradient(
-      to bottom,
-      var(--color-flag-red) 0 25%,
-      var(--color-flag-yellow) 25% 75%,
-      var(--color-flag-red) 75% 100%
-    );
   }
   .press {
     transition: transform 140ms var(--ease-out-soft), background-color 160ms, border-color 160ms, color 160ms, box-shadow 160ms;
