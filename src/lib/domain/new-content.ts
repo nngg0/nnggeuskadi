@@ -1,0 +1,150 @@
+import { z } from 'zod'
+import { isIsoDate, isTime } from './dates'
+import { TERRITORY_IDS, type TerritoryId } from './territories'
+
+/*
+ * Alta de actividades y proyectos desde la web.
+ * Reglas puras: validación del formulario, ids nuevos y filas con el formato del Sheet.
+ * El permiso (quién y en qué territorio) se comprueba en la acción con `can(user, 'content.create', …)`.
+ */
+
+export const NEW_ACTIVITY_STATUSES = ['confirmada', 'borrador'] as const
+export const NEW_PROJECT_STATUSES = ['en_preparacion', 'en_marcha'] as const
+export const MAX_NEW_OPPORTUNITIES = 12
+
+const text = (max: number) => z.string().trim().max(max, `Máximo ${max} caracteres.`)
+const optionalIsoDate = z
+  .string()
+  .trim()
+  .refine((v) => v === '' || isIsoDate(v), 'Fecha no válida.')
+  .transform((v) => v || null)
+
+const territory = z.enum(TERRITORY_IDS, { message: 'Elige un territorio.' })
+
+export function newActivitySchema(today: string) {
+  return z
+    .object({
+      titulo: text(160).min(3, 'Escribe un título.'),
+      descripcion: text(4000),
+      territorio: territory,
+      fecha: z
+        .string()
+        .trim()
+        .refine(isIsoDate, 'Elige la fecha.')
+        .refine((v) => v >= today, 'La fecha no puede ser anterior a hoy.'),
+      hora: z
+        .string()
+        .trim()
+        .refine((v) => v === '' || isTime(v), 'Hora no válida.')
+        .transform((v) => v || null),
+      lugar: text(200),
+      plazas: z
+        .string()
+        .trim()
+        .refine((v) => v === '' || (/^\d+$/.test(v) && Number(v) >= 1 && Number(v) <= 100000), 'Plazas: un número entre 1 y 100000, o vacío.')
+        .transform((v) => (v ? Number(v) : null)),
+      inscripcion_fin: optionalIsoDate,
+      estado: z.enum(NEW_ACTIVITY_STATUSES).default('confirmada'),
+    })
+    .refine((v) => !v.inscripcion_fin || v.inscripcion_fin <= v.fecha, {
+      message: 'El cierre de inscripción no puede ser posterior a la actividad.',
+      path: ['inscripcion_fin'],
+    })
+}
+export type NewActivityInput = z.output<ReturnType<typeof newActivitySchema>>
+
+export function newProjectSchema(today: string) {
+  return z.object({
+    titulo: text(160).min(3, 'Escribe un título.'),
+    descripcion: text(4000),
+    tipo: text(40),
+    territorio: territory,
+    estado: z.enum(NEW_PROJECT_STATUSES).default('en_preparacion'),
+    fecha_prevista: optionalIsoDate.refine((v) => !v || v >= today, 'La fecha prevista no puede ser anterior a hoy.'),
+    ambitos: z
+      .array(z.object({ nombre: text(80).min(2, 'Cada ámbito necesita un nombre.'), descripcion: text(1000) }))
+      .min(1, 'Añade al menos un ámbito en el que se pueda participar.')
+      .max(MAX_NEW_OPPORTUNITIES, `Máximo ${MAX_NEW_OPPORTUNITIES} ámbitos.`),
+  })
+}
+export type NewProjectInput = z.output<ReturnType<typeof newProjectSchema>>
+
+/** Ámbitos del formulario (campos repetidos), descartando las filas totalmente vacías. */
+export function opportunitiesFromForm(names: unknown[], descriptions: unknown[]): { nombre: string; descripcion: string }[] {
+  return names
+    .map((name, i) => ({ nombre: String(name ?? ''), descripcion: String(descriptions[i] ?? '') }))
+    .filter((o) => o.nombre.trim() !== '' || o.descripcion.trim() !== '')
+}
+
+/** Siguiente id libre con el patrón del Sheet: ACT-031 → ACT-032. Ignora ids con otro formato. */
+export function nextId(prefix: string, existing: Iterable<string>): string {
+  const taken = new Set([...existing].map((id) => id.trim().toUpperCase()))
+  const pattern = new RegExp(`^${prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\d+)$`, 'i')
+  let max = 0
+  for (const id of taken) {
+    const m = pattern.exec(id)
+    if (m) max = Math.max(max, Number(m[1]))
+  }
+  let n = max + 1
+  while (taken.has(`${prefix}${String(n).padStart(3, '0')}`.toUpperCase())) n++
+  return `${prefix}${String(n).padStart(3, '0')}`
+}
+
+/** YYYY-MM-DD → DD/MM/YYYY, el formato habitual del Sheet. */
+export function sheetDate(iso: string | null): string {
+  if (!iso) return ''
+  const [y, m, d] = iso.split('-')
+  return `${d}/${m}/${y}`
+}
+
+const TERRITORY_LABEL: Record<TerritoryId, string> = { euskadi: 'Euskadi', alava: 'Álava', bizkaia: 'Bizkaia', gipuzkoa: 'Gipuzkoa' }
+
+export type SheetRecord = Record<string, string>
+
+export function activityRecord(id: string, input: NewActivityInput): SheetRecord {
+  return {
+    id,
+    titulo: input.titulo,
+    descripcion: input.descripcion,
+    territorio: TERRITORY_LABEL[input.territorio],
+    fecha: sheetDate(input.fecha),
+    hora: input.hora ?? '',
+    lugar: input.lugar,
+    plazas: input.plazas ? String(input.plazas) : '',
+    inscripcion_inicio: '',
+    inscripcion_fin: sheetDate(input.inscripcion_fin),
+    estado: input.estado,
+    visible: 'sí',
+    destacado: 'no',
+  }
+}
+
+export function projectRecords(
+  ids: { project: string; opportunities: string[] },
+  input: NewProjectInput,
+  today: string,
+): { project: SheetRecord; opportunities: SheetRecord[] } {
+  return {
+    project: {
+      id: ids.project,
+      titulo: input.titulo,
+      descripcion: input.descripcion,
+      tipo: input.tipo,
+      territorio: TERRITORY_LABEL[input.territorio],
+      estado: input.estado,
+      fecha_inicio: sheetDate(today),
+      fecha_prevista: sheetDate(input.fecha_prevista),
+      visible: 'sí',
+      destacado: 'no',
+    },
+    opportunities: input.ambitos.map((o, i) => ({
+      id: ids.opportunities[i]!,
+      proyecto_id: ids.project,
+      nombre: o.nombre,
+      descripcion: o.descripcion,
+      fecha_limite: '',
+      estado: 'abierta',
+      visible: 'sí',
+    })),
+  }
+}

@@ -1,32 +1,41 @@
 @import 'tailwindcss';
 
 /*
- * Sistema visual NNGG Euskadi — inspirado en el ecosistema Debate NNGG:
- * zonas de identidad en azul noche + blanco + azul eléctrico,
- * zonas de información en gris azulado claro + tarjetas blancas + texto azul noche.
+ * Sistema visual NNGG Euskadi — siempre en modo oscuro:
+ * zonas de identidad casi negras + blanco + azul eléctrico, tarjetas azul noche,
+ * titulares condensados y la bandera de España como franja fina entre secciones.
  */
 @theme {
-  --font-sans: 'Montserrat Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Tipografías de la plantilla de NNGG: Anton (titulares y cifras), Archivo SemiBold (subtítulos y etiquetas), Arial (texto). */
+  --font-sans: Arial, Helvetica, 'Liberation Sans', Arimo, sans-serif;
+  --font-display: 'Anton', 'Arial Narrow', Impact, sans-serif;
+  --font-label: 'Archivo', Arial, Helvetica, sans-serif;
 
-  --color-night: #071330;
-  --color-night-2: #0e2049;
-  --color-night-3: #1a2f63;
-  --color-brand: #1e4b8f;
-  --color-electric: #1e5bff;
-  --color-electric-600: #1447d6;
-  --color-electric-50: #ebf1ff;
-  --color-sky: #7fb2ff;
-  --color-mist: #eef2f8;
-  --color-line: #dbe3ef;
-  --color-line-strong: #c3cfe1;
-  --color-slate: #586a8a;
-  --color-ink: #0b1a3a;
-  --color-success: #0f7a55;
-  --color-success-50: #e7f6ef;
-  --color-warning: #a35a00;
-  --color-warning-50: #fff4e2;
-  --color-danger: #c22a3a;
-  --color-danger-50: #fdecee;
+  /* Siempre en modo oscuro. "night" = zonas de identidad; "mist" = fondo de página; "card" = tarjetas. */
+  --color-night: #05080f;
+  --color-night-2: #0e1526;
+  --color-night-3: #1a2440;
+  --color-mist: #0a0f1a;
+  --color-card: #111829;
+  --color-brand: #1e4a90;
+  --color-electric: #3d6dff;
+  --color-electric-600: #2b58e6;
+  --color-electric-50: #16224a;
+  --color-sky: #8db6ff;
+  --color-line: #1f2940;
+  --color-line-strong: #2d3a57;
+  --color-slate: #97a3bb;
+  --color-ink: #eef2f9;
+  --color-success: #3cc98f;
+  --color-success-50: #0f2a21;
+  --color-warning: #f2a93b;
+  --color-warning-50: #2d2211;
+  --color-danger: #ff6474;
+  --color-danger-50: #2f141a;
+
+  /* Bandera de España: franja separadora discreta. */
+  --color-flag-red: #c60b1e;
+  --color-flag-yellow: #ffc400;
 
   --radius-card: 1.5rem;
   --radius-btn: 0.9rem;
@@ -62,6 +71,10 @@
     -webkit-tap-highlight-color: transparent;
     text-size-adjust: 100%;
   }
+  html {
+    color-scheme: dark;
+    background: var(--color-mist);
+  }
   body {
     background: var(--color-mist);
     color: var(--color-ink);
@@ -83,16 +96,29 @@
 @layer components {
   /* Rótulo: mayúsculas, tracking amplio, pequeño. */
   .eyebrow {
+    font-family: var(--font-label);
     font-size: 0.6875rem;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0.16em;
     text-transform: uppercase;
   }
   /* Titular editorial: muy grande, compacto. */
   .display {
-    font-weight: 800;
-    letter-spacing: -0.035em;
-    line-height: 0.98;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 0.005em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  /* Franja de la bandera de España (rojo · amarillo · rojo, 1:2:1). */
+  .flag-stripe {
+    height: 3px;
+    background: linear-gradient(
+      to bottom,
+      var(--color-flag-red) 0 25%,
+      var(--color-flag-yellow) 25% 75%,
+      var(--color-flag-red) 75% 100%
+    );
   }
   .press {
     transition: transform 140ms var(--ease-out-soft), background-color 160ms, border-color 160ms, color 160ms, box-shadow 160ms;

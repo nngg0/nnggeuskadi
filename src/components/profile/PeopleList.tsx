@@ -22,7 +22,7 @@ export function PeopleList({
     <Card className="border-night/15">
       <div className="flex items-baseline justify-between gap-3">
         <Eyebrow>{title}</Eyebrow>
-        <span className="text-sm font-bold text-night">{people.length}</span>
+        <span className="text-sm font-bold text-ink">{people.length}</span>
       </div>
       <p className="mt-2 text-xs text-slate">{note}</p>
       {people.length === 0 ? (
@@ -31,7 +31,7 @@ export function PeopleList({
         <ul className="mt-4 divide-y divide-line">
           {people.map((p, i) => (
             <li key={`${p.displayName}-${i}`} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2.5 text-sm">
-              <span className="font-semibold text-night">{p.displayName}</span>
+              <span className="font-semibold text-ink">{p.displayName}</span>
               <span className="flex flex-wrap items-center gap-2 text-xs text-slate">
                 {p.opportunityIds?.map((id) => (
                   <span key={id} className="rounded-full bg-electric-50 px-2 py-0.5 font-semibold text-electric">

@@ -85,13 +85,13 @@ export default async function ActivityPage({ params }: { params: Params }) {
               {activity.registrationOpensAt ? (
                 <p>
                   <span className="eyebrow block !text-[0.6rem]">Inscripción desde</span>
-                  <span className="font-semibold text-night">{formatInstant(activity.registrationOpensAt)}</span>
+                  <span className="font-semibold text-ink">{formatInstant(activity.registrationOpensAt)}</span>
                 </p>
               ) : null}
               {activity.registrationClosesAt ? (
                 <p>
                   <span className="eyebrow block !text-[0.6rem]">Inscripción hasta</span>
-                  <span className="font-semibold text-night">{formatInstant(activity.registrationClosesAt)}</span>
+                  <span className="font-semibold text-ink">{formatInstant(activity.registrationClosesAt)}</span>
                 </p>
               ) : null}
             </div>

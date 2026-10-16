@@ -29,7 +29,7 @@ import { CONFIG_KEYS, type RawTable, type RawWorkbook, type SheetName } from './
 
 const MAX_TEXT = 4000
 
-function normalizeHeader(value: string): string {
+export function normalizeHeader(value: string): string {
   return stripAccents(value).trim().toLowerCase().replace(/[\s-]+/g, '_')
 }
 

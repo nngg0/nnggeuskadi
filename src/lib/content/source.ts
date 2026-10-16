@@ -5,6 +5,7 @@ import type { ContentBundle } from '@/lib/domain/types'
 import { fetchWorkbook } from '@/lib/sheets/client'
 import { parseWorkbook } from '@/lib/sheets/parse'
 import { demoWorkbook } from '@/demo/content'
+import { withDemoRecords } from '@/demo/content-store'
 
 /**
  * Contenido organizativo (actividades, proyectos, oportunidades, documentos, configuración).
@@ -12,7 +13,7 @@ import { demoWorkbook } from '@/demo/content'
  * `cache` evita repetir la carga dentro de una misma petición.
  */
 export const getContent = cache(async (): Promise<ContentBundle> => {
-  const workbook = contentSource() === 'sheets' ? await fetchWorkbook() : demoWorkbook()
+  const workbook = contentSource() === 'sheets' ? await fetchWorkbook() : await withDemoRecords(demoWorkbook())
   const content = parseWorkbook(workbook)
   if (content.issues.length > 0) {
     // Las filas inválidas se descartan; se informa en el log del servidor para corregir el Sheet.

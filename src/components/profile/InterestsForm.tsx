@@ -23,7 +23,7 @@ export function InterestsForm({ initial }: { initial: InterestId[] }) {
       <fieldset>
         <legend className="text-sm text-slate">
           Elige hasta {MAX_INTERESTS} temas. Nos ayuda a saber en qué te gustaría participar.
-          <span className={cn('ml-2 font-bold', full ? 'text-electric' : 'text-night')}>
+          <span className={cn('ml-2 font-bold', full ? 'text-electric' : 'text-ink')}>
             {selected.length} de {MAX_INTERESTS}
           </span>
         </legend>
@@ -36,7 +36,7 @@ export function InterestsForm({ initial }: { initial: InterestId[] }) {
                 key={id}
                 className={cn(
                   'press inline-flex cursor-pointer items-center gap-2 rounded-full border-2 px-4 py-2.5 text-sm font-semibold transition-colors',
-                  checked ? 'border-electric bg-electric text-white' : 'border-line-strong bg-white text-night hover:border-night/40',
+                  checked ? 'border-electric bg-electric text-white' : 'border-line-strong bg-card text-ink hover:border-ink/40',
                   disabled && 'cursor-not-allowed opacity-40 hover:border-line-strong',
                 )}
               >

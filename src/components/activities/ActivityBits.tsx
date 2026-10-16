@@ -11,12 +11,12 @@ export function DateBlock({ date, className, tone = 'night' }: { date: string; c
   const tones = {
     night: 'bg-night text-white',
     electric: 'bg-electric text-white',
-    light: 'bg-mist text-night',
+    light: 'bg-mist text-ink',
   }
   return (
     <div className={cn('flex w-16 shrink-0 flex-col items-center justify-center rounded-2xl py-2.5', tones[tone], className)}>
       <span className="eyebrow !text-[0.58rem] opacity-70">{formatWeekdayShort(date)}</span>
-      <span className="text-[1.65rem] font-extrabold leading-none tracking-[-0.04em]">{Number(date.slice(8, 10))}</span>
+      <span className="font-display text-[1.75rem] leading-none">{Number(date.slice(8, 10))}</span>
       <span className="eyebrow mt-0.5 !text-[0.58rem] opacity-70">{formatMonthShort(date)}</span>
     </div>
   )
@@ -48,7 +48,7 @@ export function CapacityMeter({ count, capacity, compact = false }: { count: num
         <span className="inline-flex items-center gap-1.5 text-slate">
           <Icon name="users" size={16} className="text-electric" />
           <span>
-            <strong className="font-bold text-night">{count}</strong> {count === 1 ? 'inscrito' : 'inscritos'} · {capacity} plazas
+            <strong className="font-bold text-ink">{count}</strong> {count === 1 ? 'inscrito' : 'inscritos'} · {capacity} plazas
           </span>
         </span>
         {!compact && !full && capacity - count <= Math.max(3, capacity * 0.15) ? (

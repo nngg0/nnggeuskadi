@@ -43,7 +43,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
         {isDemoMode ? (
           <>
             <p className="eyebrow text-sky">Modo demo</p>
-            <h2 className="mt-2 text-2xl font-extrabold tracking-[-0.02em]">Entra como…</h2>
+            <h2 className="mt-2 font-label text-2xl font-semibold">Entra como…</h2>
             <p className="mt-2 text-sm text-white/60">
               Datos de ejemplo, sin servicios externos. Prueba distintos territorios y roles.
             </p>
@@ -81,7 +81,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
           </>
         ) : (
           <>
-            <h2 className="text-2xl font-extrabold tracking-[-0.02em]">Entrar</h2>
+            <h2 className="font-label text-2xl font-semibold">Entrar</h2>
             <p className="mt-2 mb-6 text-sm text-white/60">Solo para afiliados de NNGG Euskadi con acceso aprobado.</p>
             <LoginForm next={next} />
             <div className="mt-6 border-t border-white/10 pt-5 text-sm text-white/60">

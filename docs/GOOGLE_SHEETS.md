@@ -19,13 +19,25 @@ El Sheet es el pequeño CMS de la organización: quien lo edita cambia lo que ve
 1. En <https://console.cloud.google.com>: crea un proyecto → **APIs y servicios** → habilita **Google Sheets API**.
 2. **Credenciales → Crear credenciales → Cuenta de servicio**. No necesita roles.
 3. En la cuenta de servicio → **Claves → Añadir clave → JSON**. Descarga el archivo (¡no lo subas a GitHub!).
-4. **Comparte el Sheet** con el email de la cuenta de servicio (`...@...iam.gserviceaccount.com`) como **Lector**.
+4. **Comparte el Sheet** con el email de la cuenta de servicio (`...@...iam.gserviceaccount.com`) como **Editor** (la app añade filas nuevas cuando la dirección crea actividades o proyectos desde la web; si solo la compartes como Lector, todo funciona salvo el botón «+»).
 5. Variables de entorno:
    - `GOOGLE_SHEETS_SPREADSHEET_ID`: el id de la URL `https://docs.google.com/spreadsheets/d/<ID>/edit`.
    - `GOOGLE_SERVICE_ACCOUNT_EMAIL`: campo `client_email` del JSON.
    - `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`: campo `private_key` del JSON (con los `\n`).
 
-La app solo pide permiso de **lectura** (`spreadsheets.readonly`).
+Para leer, la app usa un token de solo lectura (`spreadsheets.readonly`). Solo pide el permiso de escritura
+(`spreadsheets`) al crear contenido desde la web.
+
+### Alta desde la web (botón «+»)
+
+En **Calendario** y **Participa**, Administración, la dirección regional y las direcciones provinciales ven un botón «+».
+- Administración y dirección regional crean en cualquier territorio; la provincial, **solo en su provincia**.
+  El permiso se comprueba en el servidor (`can(user, 'content.create', { territory })`), no solo ocultando el botón.
+- Una actividad nueva es una **fila nueva** en `ACTIVIDADES`; un proyecto, una fila en `PROYECTOS` más una fila por
+  ámbito en `OPORTUNIDADES`. Los ids siguen la numeración existente (`ACT-043`, `PRY-007`, `OP-012`).
+- Las columnas se localizan por cabecera, así que el orden sigue siendo libre. Si falta una columna, no se escribe nada.
+- El texto se guarda tal cual (`valueInputOption=RAW`): nunca se interpreta como fórmula.
+- Tras crear, la caché del Sheet se invalida y el contenido aparece al momento. Para editar o borrar, se hace en el Sheet.
 
 ## 3. Estructura
 
@@ -79,8 +91,8 @@ compartido con la organización), `fecha`, `destacado`, `visible`.
 
 | clave | valor |
 |---|---|
-| `inicio_titulo` | Titular de Inicio |
-| `inicio_subtitulo` | Subtítulo de Inicio |
+| `inicio_titulo` | (Ya no se muestra: Inicio saluda con «Hola, nombre») |
+| `inicio_subtitulo` | (Ya no se muestra) |
 | `categorias_documentos` | Orden de categorías, separadas por comas |
 | `campana_principal` | id del proyecto que se muestra como **bloque principal** en Inicio y Participa (p. ej. `PRY-29N`). Vacío = sin bloque |
 

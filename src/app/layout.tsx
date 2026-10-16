@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
-import '@fontsource-variable/montserrat'
+import '@fontsource/anton/400.css'
+import '@fontsource/archivo/600.css'
 import './globals.css'
 import { ServiceWorkerRegister } from '@/components/pwa/ServiceWorkerRegister'
 import { OfflineBanner } from '@/components/pwa/OfflineBanner'
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#071330',
+  themeColor: '#05080f',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',

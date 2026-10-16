@@ -18,7 +18,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const user = await requireUser()
   return (
     <>
-      <a href="#contenido" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-xl focus:bg-white focus:px-4 focus:py-2 focus:font-bold">
+      <a href="#contenido" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-xl focus:bg-white focus:text-night focus:px-4 focus:py-2 focus:font-bold">
         Saltar al contenido
       </a>
       <TopBar initials={initials(user.displayName)} territoryName={territoryName(user.territory)} demo={isDemoMode} />

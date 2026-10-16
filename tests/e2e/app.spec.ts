@@ -28,21 +28,6 @@ test.describe('acceso', () => {
   })
 })
 
-test.describe('inicio', () => {
-  test('responde a qué viene, qué preparamos y dónde participar', async ({ page }) => {
-    await loginAs(page, /Alba/)
-    await expect(page.getByRole('heading', { name: 'Lo que estamos haciendo juntos.' })).toBeVisible()
-    await expect(page.locator('#proximamente')).toContainText('Próximamente')
-    await expect(page.locator('#en-preparacion')).toContainText('lo estamos preparando.')
-    await expect(page.locator('#participar')).toContainText('Puedes participar en')
-    // Las tarjetas de ámbitos mantienen un ancho legible (no se aplastan en móvil).
-    const cardWidth = await page.locator('#participar li').first().evaluate((el) => el.getBoundingClientRect().width)
-    expect(cardWidth).toBeGreaterThan(200)
-    // Alba es de Álava: Próximamente no muestra actividades de otros territorios si hay de los suyos.
-    await expect(page.locator('#proximamente').getByText('Gipuzkoa', { exact: true })).toHaveCount(0)
-  })
-})
-
 test.describe('inscripciones', () => {
   test('inscribirse, verlo en el perfil y cancelar', async ({ page }) => {
     await loginAs(page, /Alba/)
@@ -205,8 +190,8 @@ test.describe('PWA y navegación', () => {
     await loginAs(page, /Alba/)
     const nav = page.getByRole('navigation', { name: 'Principal' }).filter({ visible: true })
     const sections: [string, string][] = [
-      ['Calendario', '/calendario'],
-      ['Participa', '/participa'],
+      ['Actos', '/calendario'],
+      ['Proyectos', '/participa'],
       ['Documentos', '/documentos'],
       ['Perfil', '/perfil'],
       ['Inicio', '/'],
@@ -338,5 +323,134 @@ test.describe('solicitar acceso y miembros', () => {
     await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
     await page.goto('/solicitudes')
     await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+  })
+})
+
+test.describe('alta de actividades y proyectos', () => {
+  const inDays = (n: number) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10)
+
+  test('la dirección provincial crea una actividad en su provincia y aparece en el calendario', async ({ page }) => {
+    await loginAs(page, /Miguel/)
+    await page.goto('/calendario')
+    await page.getByRole('link', { name: 'Nuevo acto' }).click()
+    await expect(page).toHaveURL('/calendario/nueva')
+    const territory = page.getByLabel('Territorio')
+    await expect(territory.getByRole('option')).toHaveText(['Bizkaia'])
+    await page.getByLabel('Título').fill('Pintxo-pote de bienvenida')
+    await page.getByLabel('Fecha').fill(inDays(15))
+    await page.getByLabel('Hora').fill('20:00')
+    await page.getByLabel('Lugar').fill('Bilbao · Casco Viejo')
+    await page.getByLabel('Plazas').fill('25')
+    await page.getByRole('button', { name: 'Crear acto' }).click()
+    await expect(page).toHaveURL(/\/actividades\/ACT-\d+$/)
+    await expect(page.getByRole('heading', { name: 'Pintxo-pote de bienvenida' })).toBeVisible()
+    await page.goto('/calendario?t=bizkaia')
+    await expect(page.getByText('Pintxo-pote de bienvenida')).toBeVisible()
+  })
+
+  test('el servidor rechaza crear fuera de su provincia aunque se manipule el formulario', async ({ page }) => {
+    await loginAs(page, /Miguel/)
+    await page.goto('/calendario/nueva')
+    // Esperar a que la página esté hidratada: si no, React descarta la opción añadida a mano.
+    await page.waitForLoadState('networkidle')
+    await page.getByLabel('Territorio').evaluate((select: HTMLSelectElement) => {
+      select.add(new Option('Álava', 'alava'))
+      select.value = 'alava'
+    })
+    await page.getByLabel('Título').fill('Acto en Álava')
+    await page.getByLabel('Fecha').fill(inDays(10))
+    await page.getByRole('button', { name: 'Crear acto' }).click()
+    await expect(page.getByText('No puedes crear contenido en ese territorio.')).toBeVisible()
+    await expect(page.getByLabel('Título')).toHaveValue('Acto en Álava')
+  })
+
+  test('la dirección regional crea un proyecto con ámbitos y se puede participar', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/participa')
+    await page.getByRole('link', { name: 'Nuevo proyecto' }).click()
+    await expect(page.getByLabel('Territorio').getByRole('option')).toHaveCount(4)
+    await page.getByLabel('Territorio').selectOption('euskadi')
+    await page.getByLabel('Título').fill('Ruta por los pueblos')
+    await page.getByLabel('Descripción', { exact: true }).fill('Recorremos los pueblos en verano.')
+    await page.getByLabel('Nombre del ámbito 1').fill('Logística')
+    await page.getByRole('button', { name: 'Añadir ámbito' }).click()
+    await page.getByLabel('Nombre del ámbito 2').fill('Redes sociales')
+    await page.getByRole('button', { name: 'Crear proyecto' }).click()
+    await expect(page).toHaveURL(/\/participa\/PRY-\d+$/)
+    await expect(page.getByRole('heading', { name: 'Ruta por los pueblos' })).toBeVisible()
+    await expect(page.getByText('Logística').first()).toBeVisible()
+    await page.goto('/participa')
+    await expect(page.getByText('Ruta por los pueblos')).toBeVisible()
+  })
+
+  test('un afiliado no ve el botón «+» ni puede abrir los formularios', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/calendario')
+    await expect(page.getByRole('link', { name: 'Nuevo acto' })).toHaveCount(0)
+    await page.goto('/participa')
+    await expect(page.getByRole('link', { name: 'Nuevo proyecto' })).toHaveCount(0)
+    await page.goto('/calendario/nueva')
+    await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+    await page.goto('/participa/nuevo')
+    await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+  })
+})
+
+test.describe('inicio, actos y proyectos', () => {
+  test('Inicio saluda, enseña la campaña, los cinco actos más próximos y lo que estamos preparando', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Hola, Alba')
+    await expect(page.getByText('Lo que estamos haciendo juntos.')).toHaveCount(0)
+    const campaign = page.locator('#campana')
+    await expect(campaign.getByText(/personas participan/)).toBeVisible()
+    await expect(campaign.getByText(/^días?$/)).toBeVisible()
+    await expect(page.locator('#proximamente').locator('a[href^="/actividades/"]')).toHaveCount(5)
+    await expect(page.locator('#proximamente').getByRole('link', { name: 'Ver calendario completo' }).first()).toBeVisible()
+    const preparing = page.locator('#en-preparacion')
+    await expect(preparing.getByRole('heading', { name: 'Esto todavía lo estamos preparando.' })).toBeVisible()
+    await expect(preparing.getByText('Mesa redonda de economía con Álvaro Gotxi')).toBeVisible()
+  })
+
+  test('la campaña ofrece sus cinco ámbitos al pulsar «Quiero participar»', async ({ page }) => {
+    await loginAs(page, /Pablo/)
+    await page.locator('#campana').getByRole('button', { name: 'Quiero participar' }).click()
+    const dialog = page.getByRole('dialog')
+    for (const name of ['Redes sociales', 'Ideas y propuestas', 'Acciones en la calle', 'Coordinación', 'Voto por correo']) {
+      await expect(dialog.getByText(name, { exact: true })).toBeVisible()
+    }
+    await expect(dialog.getByRole('checkbox')).toHaveCount(5)
+  })
+
+  test('Debate: organización y formar parte de un equipo', async ({ page }) => {
+    await loginAs(page, /Pablo/)
+    await page.goto('/participa/PRY-DEBATE')
+    await page.getByRole('button', { name: 'Quiero participar' }).first().click()
+    const dialog = page.getByRole('dialog')
+    await expect(dialog.getByText('Organización', { exact: true })).toBeVisible()
+    await expect(dialog.getByText('Formar parte de un equipo', { exact: true })).toBeVisible()
+  })
+
+  test('mesa redonda de economía en Álava con sus formas de participar', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/participa/PRY-007')
+    await expect(page.getByRole('heading', { name: 'Mesa redonda de economía con Álvaro Gotxi' })).toBeVisible()
+    await expect(page.getByText(/por confirmar/).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Quiero participar' }).first().click()
+    const dialog = page.getByRole('dialog')
+    await expect(dialog.getByText('Preparar preguntas', { exact: true })).toBeVisible()
+    await expect(dialog.getByText('Redes sociales', { exact: true })).toBeVisible()
+  })
+
+  test('en Actos lo que ya ha pasado va al final y en gris', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/calendario')
+    const past = page.locator('#pasados')
+    await expect(past.getByText('Asamblea de inicio de curso')).toBeVisible()
+    await expect(past.locator('.grayscale')).toHaveCount(1)
+    // La sección de pasados es lo último de la lista.
+    const order = await page.locator('main a[href^="/actividades/"]').evaluateAll((links) =>
+      links.map((l) => l.textContent ?? ''),
+    )
+    expect(order.at(-1)).toContain('Asamblea de inicio de curso')
   })
 })

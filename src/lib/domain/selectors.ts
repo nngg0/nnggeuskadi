@@ -24,6 +24,11 @@ export function upcomingActivities(activities: Activity[], now: Date): Activity[
   return sortByDate(publicActivities(activities).filter((a) => !isPast(a, now)))
 }
 
+/** Actividades que ya han pasado, de la más reciente a la más antigua. */
+export function pastActivities(activities: Activity[], now: Date): Activity[] {
+  return sortByDate(publicActivities(activities).filter((a) => isPast(a, now))).reverse()
+}
+
 /**
  * Bloque "Próximamente" de Inicio: actividades confirmadas de su territorio y de Euskadi.
  * Si no hay suficientes, se completa con el resto de territorios.

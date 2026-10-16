@@ -21,13 +21,13 @@ export function ProfileForm({ displayName, notifyNewInitiatives }: { displayName
           minLength={2}
           maxLength={80}
           autoComplete="name"
-          className="mt-2 h-12 w-full rounded-xl border border-line-strong bg-white px-4 font-semibold text-night focus:border-electric focus:outline-none focus:ring-4 focus:ring-electric/15"
+          className="mt-2 h-12 w-full rounded-xl border border-line-strong bg-card px-4 font-semibold text-ink focus:border-electric focus:outline-none focus:ring-4 focus:ring-electric/15"
         />
         <p className="mt-1.5 text-xs text-slate">Solo lo ve la dirección que organiza las actividades en las que participas.</p>
       </div>
       <label className="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-line p-4">
         <span>
-          <span className="block text-sm font-bold text-night">Avisarme de nuevas iniciativas</span>
+          <span className="block text-sm font-bold text-ink">Avisarme de nuevas iniciativas</span>
           <span className="mt-0.5 block text-xs text-slate">Preparado para las notificaciones de la app (próximamente).</span>
         </span>
         <input type="checkbox" name="notifyNewInitiatives" defaultChecked={notifyNewInitiatives} className="peer sr-only" />

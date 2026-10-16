@@ -2,20 +2,24 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ActivityCard } from '@/components/activities/ActivityCard'
 import { MonthGrid } from '@/components/calendar/MonthGrid'
+import { CreateButton } from '@/components/content/CreateButton'
 import { Container, PageHeader } from '@/components/layout/PageHeader'
 import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/States'
 import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
+import { creatableTerritories } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { cn } from '@/lib/cn'
 import { getContent } from '@/lib/content/source'
 import { formatMonthYear, formatRelativeDay, isIsoDate, isMonthKey, madridDate, monthKey } from '@/lib/domain/dates'
-import { filterActivitiesByTerritory, publicActivities, sortByDate, upcomingActivities } from '@/lib/domain/selectors'
+import { filterActivitiesByTerritory, pastActivities, publicActivities, sortByDate, upcomingActivities } from '@/lib/domain/selectors'
 import { parseTerritoryFilter } from '@/lib/domain/territories'
 import { personalStore } from '@/lib/personal'
 import { activityViews, type ActivityView } from '@/lib/view/activities'
 
-export const metadata: Metadata = { title: 'Calendario' }
+export const metadata: Metadata = { title: 'Actos' }
+
+const PAST_LIMIT = 12
 
 type Search = Promise<Record<string, string | string[] | undefined>>
 
@@ -62,6 +66,9 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
           ),
         )
   const views = await activityViews(listActivities, user.id, now)
+  // En la lista, lo que ya ha pasado va al final y en gris.
+  const pastViews =
+    view === 'lista' ? await activityViews(filterActivitiesByTerritory(pastActivities(content.activities, now), territory).slice(0, PAST_LIMIT), user.id, now) : []
   const registeredIds = new Set(views.filter((v) => v.isRegistered).map((v) => v.activity.id))
   const monthActivities = view === 'mes' ? filterActivitiesByTerritory(publicActivities(content.activities), territory) : []
   const monthRegistered =
@@ -69,14 +76,18 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
 
   return (
     <>
-      <PageHeader eyebrow="Calendario" title="Lo que viene.">
-        Todas las actividades de NNGG Euskadi. Las de tu territorio están marcadas en el filtro.
+      <PageHeader
+        eyebrow="Actos"
+        title="Lo que viene."
+        action={creatableTerritories(user).length > 0 ? <CreateButton href="/calendario/nueva" label="Nuevo acto" /> : null}
+      >
+        Todos los actos de NNGG Euskadi. Los que ya han pasado quedan al final, en gris.
       </PageHeader>
 
       <Container className="py-6 md:py-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <TerritoryFilter value={territory} territories={content.territories} userTerritory={user.territory} resetParams={['dia']} />
-          <div className="inline-flex self-start rounded-full border border-line-strong bg-white p-1" role="tablist" aria-label="Vista">
+          <div className="inline-flex self-start rounded-full border border-line-strong bg-card p-1" role="tablist" aria-label="Vista">
             {(['lista', 'mes'] as const).map((v) => (
               <Link
                 key={v}
@@ -85,7 +96,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
                 aria-selected={view === v}
                 className={cn(
                   'press inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold',
-                  view === v ? 'bg-electric text-white' : 'text-slate hover:text-night',
+                  view === v ? 'bg-electric text-white' : 'text-slate hover:text-ink',
                 )}
               >
                 <Icon name={v === 'lista' ? 'list' : 'grid'} size={16} />
@@ -124,30 +135,44 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
               )}
             </div>
           </div>
-        ) : views.length > 0 ? (
-          <div className="mt-6 space-y-8">
-            {groupByMonth(views).map(([key, items]) => (
-              <section key={key}>
-                <h2 className="eyebrow mb-3 text-slate">{formatMonthYear(key)}</h2>
-                <div className="grid gap-3 md:grid-cols-2">
-                  {items.map((v) => (
-                    <ActivityCard key={v.activity.id} view={v} className="animate-rise" />
+        ) : (
+          <>
+            {views.length > 0 ? (
+              <div className="mt-6 space-y-8">
+                {groupByMonth(views).map(([key, items]) => (
+                  <section key={key}>
+                    <h2 className="eyebrow mb-3 text-slate">{formatMonthYear(key)}</h2>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      {items.map((v) => (
+                        <ActivityCard key={v.activity.id} view={v} className="animate-rise" />
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                className="mt-6"
+                title="No hay actos próximos"
+                icon="calendar"
+                action={territory !== 'todos' ? { href: '/calendario', label: 'Ver todos los territorios' } : { href: '/participa', label: 'Ver qué estamos preparando' }}
+              >
+                {territory !== 'todos'
+                  ? 'No hay actos programados en este territorio. Prueba a ver todos.'
+                  : 'Todavía no hay nada programado. Lo que se está preparando lo verás antes en Proyectos.'}
+              </EmptyState>
+            )}
+            {pastViews.length > 0 ? (
+              <section id="pasados" aria-labelledby="pasados-titulo" className="mt-12">
+                <h2 id="pasados-titulo" className="eyebrow mb-3 text-slate">Ya han pasado</h2>
+                <div className="grid gap-3 opacity-60 grayscale md:grid-cols-2">
+                  {pastViews.map((v) => (
+                    <ActivityCard key={v.activity.id} view={v} />
                   ))}
                 </div>
               </section>
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            className="mt-6"
-            title="No hay actividades próximas"
-            icon="calendar"
-            action={territory !== 'todos' ? { href: '/calendario', label: 'Ver todos los territorios' } : { href: '/participa', label: 'Ver qué estamos preparando' }}
-          >
-            {territory !== 'todos'
-              ? 'No hay actividades programadas en este territorio. Prueba a ver todos.'
-              : 'Todavía no hay nada programado. Lo que se está preparando lo verás antes en Participa.'}
-          </EmptyState>
+            ) : null}
+          </>
         )}
       </Container>
     </>

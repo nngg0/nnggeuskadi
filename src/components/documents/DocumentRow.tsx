@@ -14,7 +14,7 @@ function extension(url: string): string | null {
 export function DocumentRow({ document, saved, className }: { document: DocumentItem; saved: boolean; className?: string }) {
   const ext = extension(document.url)
   return (
-    <li className={cn('flex items-center gap-3 rounded-[1.25rem] border border-line bg-white p-3 pr-3 sm:gap-4 sm:p-4', className)}>
+    <li className={cn('flex items-center gap-3 rounded-[1.25rem] border border-line bg-card p-3 pr-3 sm:gap-4 sm:p-4', className)}>
       <a
         href={document.url}
         target="_blank"
@@ -30,7 +30,7 @@ export function DocumentRow({ document, saved, className }: { document: Document
             <span className="eyebrow !text-[0.6rem] text-electric">{document.category}</span>
             <span className="eyebrow !text-[0.58rem] text-slate">{territoryName(document.territory)}</span>
           </span>
-          <span className="mt-1 block font-bold leading-snug text-night group-hover:text-electric">
+          <span className="mt-1 block font-bold leading-snug text-ink group-hover:text-electric">
             {document.title}
             <Icon name="external" size={14} className="ml-1.5 inline align-[-1px] text-slate opacity-0 transition-opacity group-hover:opacity-100" />
           </span>

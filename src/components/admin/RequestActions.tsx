@@ -21,7 +21,7 @@ function isProvince(id: TerritoryId | null): id is ProvinceId {
 }
 
 const selectClass =
-  'h-11 rounded-xl border border-line-strong bg-white px-3 text-sm font-semibold text-night focus:border-electric focus:outline-none'
+  'h-11 rounded-xl border border-line-strong bg-card px-3 text-sm font-semibold text-ink focus:border-electric focus:outline-none'
 
 /** Aprobar (eligiendo territorio y rol) o rechazar una solicitud de acceso. */
 export function RequestActions({ id, name, territory: requested }: { id: string; name: string; territory: TerritoryId | null }) {

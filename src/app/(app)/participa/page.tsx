@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { CreateButton } from '@/components/content/CreateButton'
 import { Container, PageHeader } from '@/components/layout/PageHeader'
 import { CampaignBlock } from '@/components/projects/CampaignBlock'
 import { ProjectCard } from '@/components/projects/ProjectCard'
@@ -7,6 +8,7 @@ import { SectionHeader } from '@/components/ui/Eyebrow'
 import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/States'
 import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
+import { creatableTerritories } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { getContent } from '@/lib/content/source'
 import { madridDate } from '@/lib/domain/dates'
@@ -14,7 +16,7 @@ import { featuredProject, sortProjectsForUser, visibleProjects } from '@/lib/dom
 import { matchesTerritoryFilter, parseTerritoryFilter } from '@/lib/domain/territories'
 import { projectViews } from '@/lib/view/projects'
 
-export const metadata: Metadata = { title: 'Participa' }
+export const metadata: Metadata = { title: 'Proyectos' }
 
 type Search = Promise<Record<string, string | string[] | undefined>>
 
@@ -41,7 +43,8 @@ export default async function ParticipaPage({ searchParams }: { searchParams: Se
   return (
     <>
       <PageHeader
-        eyebrow="Participa"
+        eyebrow="Proyectos"
+        action={creatableTerritories(user).length > 0 ? <CreateButton href="/participa/nuevo" label="Nuevo proyecto" /> : null}
         title={
           <>
             Lo que todavía

@@ -100,6 +100,6 @@ Falta: claves VAPID, tabla `push_subscriptions` y el envío desde servidor.
 | Sin librería de Google (`googleapis`) | Basta un `fetch` y firmar un JWT con `node:crypto`: menos dependencias |
 | `zod` | Validación declarativa del Sheet y de entradas de acciones |
 | Service worker escrito a mano | Control total: no se cachean páginas ni datos personales |
-| Montserrat (vía `@fontsource-variable`) | Sans geométrica servida localmente, sin peticiones a terceros |
+| Anton y Archivo SemiBold (vía `@fontsource`) + Arial del sistema | Tipografías de la plantilla de NNGG, servidas localmente, sin peticiones a terceros |
 | Iconos SVG propios | Coherencia lineal y cero dependencias |
 | Demo con cookie | Funciona igual en local y en serverless sin base de datos |

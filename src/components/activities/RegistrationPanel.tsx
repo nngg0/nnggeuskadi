@@ -48,7 +48,7 @@ export function RegistrationPanel({ activityId, state }: { activityId: string; s
         </div>
         {confirmCancel ? (
           <div className="mt-3 rounded-2xl border border-line p-4">
-            <p className="text-sm font-semibold text-night">¿Seguro que quieres cancelar tu inscripción?</p>
+            <p className="text-sm font-semibold text-ink">¿Seguro que quieres cancelar tu inscripción?</p>
             <p className="mt-1 text-sm text-slate">Tu plaza quedará libre para otra persona.</p>
             <div className="mt-4 grid grid-cols-2 gap-2">
               <Button variant="secondary" size="md" onClick={() => setConfirmCancel(false)} disabled={pending}>
@@ -103,7 +103,7 @@ export function RegistrationPanel({ activityId, state }: { activityId: string; s
   return (
     <div>
       <div className="rounded-2xl border border-line bg-mist/60 px-5 py-4">
-        <p className="eyebrow text-night">{current.title}</p>
+        <p className="eyebrow text-ink">{current.title}</p>
         <p className="mt-1 text-sm text-slate">{current.text}</p>
       </div>
       {state.kind === 'full' || state.kind === 'closed' ? (

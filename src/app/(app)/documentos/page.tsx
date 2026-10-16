@@ -54,7 +54,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Se
   const chip = (active: boolean) =>
     cn(
       'press shrink-0 rounded-full border px-4 py-2 text-[0.8rem] font-semibold',
-      active ? 'border-electric bg-electric text-white' : 'border-line-strong bg-white text-night hover:border-night/40',
+      active ? 'border-electric bg-electric text-white' : 'border-line-strong bg-card text-ink hover:border-ink/40',
     )
 
   const featured = featuredDocuments(content.documents, user.territory)

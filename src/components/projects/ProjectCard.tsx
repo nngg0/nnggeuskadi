@@ -35,7 +35,7 @@ export function ProjectCard({ view, tone = 'light', className }: { view: Project
     <article
       className={cn(
         'flex flex-col rounded-[var(--radius-card)] border p-6 sm:p-7',
-        dark ? 'border-white/10 bg-night-2 text-white' : 'border-line bg-white',
+        dark ? 'border-white/10 bg-night-2 text-white' : 'border-line bg-card',
         className,
       )}
     >
@@ -48,7 +48,7 @@ export function ProjectCard({ view, tone = 'light', className }: { view: Project
       </div>
 
       <Link href={`/participa/${encodeURIComponent(project.id)}`} className="group mt-3 block">
-        <h3 className={cn('display text-[1.7rem] sm:text-[1.9rem]', dark ? 'text-white' : 'text-night')}>
+        <h3 className={cn('display text-[1.7rem] sm:text-[1.9rem]', dark ? 'text-white' : 'text-ink')}>
           {project.title}
           <Icon name="arrowRight" size={22} className={cn('ml-2 inline align-[-2px] opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100', dark ? 'text-sky' : 'text-electric')} />
         </h3>
@@ -68,7 +68,7 @@ export function ProjectCard({ view, tone = 'light', className }: { view: Project
                     ? 'bg-electric text-white'
                     : dark
                       ? 'border border-white/15 text-white/85'
-                      : 'border border-line-strong text-night',
+                      : 'border border-line-strong text-ink',
                 )}
               >
                 {opportunity.name}
