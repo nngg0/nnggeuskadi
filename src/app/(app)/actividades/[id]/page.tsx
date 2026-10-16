@@ -11,7 +11,6 @@ import { Eyebrow } from '@/components/ui/Eyebrow'
 import { Icon } from '@/components/ui/Icon'
 import { can } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
-import { siteUrl } from '@/lib/config/env'
 import { getContent } from '@/lib/content/source'
 import { formatDayMonth, formatInstant, formatWeekday } from '@/lib/domain/dates'
 import { publicActivities } from '@/lib/domain/selectors'
@@ -111,7 +110,8 @@ export default async function ActivityPage({ params }: { params: Params }) {
           </div>
           {view.state.kind !== 'past' && view.state.kind !== 'cancelled' ? (
             <div className="mt-5 border-t border-line pt-5">
-              <AddToCalendar activity={activity} url={`${siteUrl()}/actividades/${encodeURIComponent(activity.id)}`} />
+              <p className="eyebrow mb-3 text-slate">Añadir a mi calendario</p>
+              <AddToCalendar activity={activity} />
             </div>
           ) : null}
         </Card>
