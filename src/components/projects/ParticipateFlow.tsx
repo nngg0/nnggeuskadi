@@ -29,6 +29,25 @@ interface Props {
 }
 
 /**
+ * Bloquea el scroll de la página mientras la hoja está abierta.
+ * `overflow: hidden` no basta en Safari de iPhone (el fondo sigue moviéndose o se queda trabado),
+ * así que se fija el body en su posición y, al cerrar, se devuelve el scroll exactamente donde estaba.
+ */
+function lockPageScroll(): () => void {
+  const { body } = document
+  const y = window.scrollY
+  const previous = { position: body.style.position, top: body.style.top, width: body.style.width, overflow: body.style.overflow }
+  body.style.position = 'fixed'
+  body.style.top = `-${y}px`
+  body.style.width = '100%'
+  body.style.overflow = 'hidden'
+  return () => {
+    Object.assign(body.style, previous)
+    window.scrollTo(0, y)
+  }
+}
+
+/**
  * "Quiero participar": abre una hoja inferior donde elegir uno o varios ámbitos,
  * confirma, registra la participación y muestra el resultado al instante.
  */
@@ -43,16 +62,15 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
 
   useEffect(() => {
     if (!open) return
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    dialogRef.current?.focus()
+    const unlock = lockPageScroll()
+    dialogRef.current?.focus({ preventScroll: true })
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
     window.addEventListener('keydown', onKey)
     const trigger = triggerRef.current
     return () => {
-      document.body.style.overflow = previousOverflow
+      unlock()
       window.removeEventListener('keydown', onKey)
-      trigger?.focus()
+      trigger?.focus({ preventScroll: true })
     }
   }, [open])
 
@@ -130,14 +148,14 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
 
       {open ? (
         <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center" role="presentation">
-          <div className="absolute inset-0 animate-fade bg-night/60 backdrop-blur-[2px]" onClick={() => setOpen(false)} />
+          <div className="absolute inset-0 animate-fade touch-none bg-night/60 backdrop-blur-[2px]" onClick={() => setOpen(false)} />
           <div
             ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby={`participa-${projectId}`}
             tabIndex={-1}
-            className="pb-safe relative max-h-[92dvh] w-full max-w-lg animate-sheet overflow-y-auto rounded-t-[1.75rem] bg-card text-ink outline-none sm:animate-rise sm:rounded-[1.75rem]"
+            className="pb-safe relative max-h-[92dvh] w-full max-w-lg animate-sheet overflow-y-auto overscroll-contain rounded-t-[1.75rem] bg-card text-ink outline-none sm:animate-rise sm:rounded-[1.75rem]"
           >
             <div className="sticky top-0 z-10 flex items-start justify-between gap-4 bg-card px-6 pb-3 pt-6">
               <div>
