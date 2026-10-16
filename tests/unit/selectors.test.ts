@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { demoWorkbook } from '@/demo/content'
 import { parseWorkbook } from '@/lib/sheets/parse'
 import {
+  campaignPeriod,
+  campaignActivityCount,
   daysUntil,
   documentCategories,
   featuredProject,
@@ -92,5 +94,37 @@ describe('campaña principal', () => {
   it('cuenta los días que faltan', () => {
     expect(daysUntil('2026-11-29', '2026-10-05')).toBe(55)
     expect(daysUntil('2026-10-05', '2026-10-05')).toBe(0)
+  })
+})
+
+describe('actos hasta la campaña', () => {
+  const base = content.activities[0]!
+  const act = (id: string, date: string, status: (typeof base)['status'] = 'confirmada') => ({ ...base, id, date, time: '18:00', status })
+  const at = new Date('2026-10-16T10:00:00Z')
+  const acts = [
+    act('A', '2026-10-10'), // pasado
+    act('B', '2026-10-22'),
+    act('C', '2026-10-24', 'cancelada'),
+    act('D', '2026-11-29'), // el mismo día de la campaña cuenta
+    act('E', '2026-12-05'), // después de la campaña
+    act('F', '2026-11-01', 'borrador'),
+  ]
+
+  it('cuenta los actos próximos hasta la fecha de la campaña, sin cancelados ni borradores', () => {
+    expect(campaignActivityCount(acts, { expectedDate: '2026-11-29' }, at)).toBe(2)
+  })
+
+  it('sin fecha de campaña cuenta todos los próximos', () => {
+    expect(campaignActivityCount(acts, { expectedDate: null }, at)).toBe(3)
+  })
+})
+
+describe('periodo de campaña', () => {
+  it('por defecto, los 15 días antes del día de reflexión: 13 a 27 de noviembre para el 29N', () => {
+    expect(campaignPeriod({ expectedDate: '2026-11-29' }, { campaignStart: null, campaignEnd: null })).toEqual({ start: '2026-11-13', end: '2026-11-27' })
+  })
+  it('se puede fijar en CONFIGURACION; sin fechas no hay periodo', () => {
+    expect(campaignPeriod({ expectedDate: '2026-11-29' }, { campaignStart: '2026-11-10', campaignEnd: '2026-11-20' })).toEqual({ start: '2026-11-10', end: '2026-11-20' })
+    expect(campaignPeriod(null, { campaignStart: null, campaignEnd: null })).toBeNull()
   })
 })

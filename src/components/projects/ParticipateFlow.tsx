@@ -23,7 +23,8 @@ interface Props {
   projectTitle: string
   options: OpportunityOption[]
   participating: boolean
-  tone?: 'light' | 'dark' | 'brand'
+  /** brandOutline: botón secundario sobre el bloque azul de la campaña. */
+  tone?: 'light' | 'dark' | 'brand' | 'brandOutline'
   block?: boolean
 }
 
@@ -107,7 +108,7 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
           )}
         >
           <span className="inline-flex items-center gap-2.5">
-            <span className={cn('flex size-6 items-center justify-center rounded-full', tone === 'light' ? 'bg-success text-white' : 'bg-sky text-ink')}>
+            <span className={cn('flex size-6 items-center justify-center rounded-full', tone === 'light' ? 'bg-success text-white' : 'bg-sky text-night')}>
               <Icon name="check" size={14} strokeWidth={3} />
             </span>
             Ya participas
@@ -121,7 +122,7 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
           arrow
           onClick={openSheet}
           disabled={noOptions}
-          variant={noOptions ? 'secondary' : tone === 'brand' ? 'onDark' : 'primary'}
+          variant={noOptions ? 'secondary' : tone === 'brand' ? 'onDark' : tone === 'brandOutline' ? 'outlineDark' : 'primary'}
         >
           {noOptions ? 'Participación cerrada' : 'Quiero participar'}
         </Button>

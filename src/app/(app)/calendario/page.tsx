@@ -12,7 +12,7 @@ import { requireUser } from '@/lib/auth/session'
 import { cn } from '@/lib/cn'
 import { getContent } from '@/lib/content/source'
 import { formatMonthYear, formatRelativeDay, isIsoDate, isMonthKey, madridDate, monthKey } from '@/lib/domain/dates'
-import { filterActivitiesByTerritory, pastActivities, publicActivities, sortByDate, upcomingActivities } from '@/lib/domain/selectors'
+import { campaignPeriod, featuredProject, filterActivitiesByTerritory, pastActivities, publicActivities, sortByDate, upcomingActivities } from '@/lib/domain/selectors'
 import { parseTerritoryFilter } from '@/lib/domain/territories'
 import { personalStore } from '@/lib/personal'
 import { activityViews, type ActivityView } from '@/lib/view/activities'
@@ -41,6 +41,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
   const today = madridDate(now)
 
   const territory = parseTerritoryFilter(first(params.t))
+  const campaign = featuredProject(content)
   const view = first(params.vista) === 'mes' ? 'mes' : 'lista'
   const month = isMonthKey(first(params.mes)) ? first(params.mes)! : monthKey(today)
   const dayParam = first(params.dia)
@@ -114,6 +115,9 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
               today={today}
               selectedDay={selectedDay}
               registeredIds={monthRegistered}
+              campaignDay={campaign?.expectedDate ?? null}
+              campaignLabel={campaign?.title.match(/\b\d{1,2}[A-Z]\b/)?.[0] ?? 'Campaña'}
+              campaignRange={campaignPeriod(campaign, content.config)}
               hrefFor={(p) => hrefFor({ vista: 'mes', mes: p.mes, dia: p.dia ?? null })}
             />
             <div>
@@ -125,7 +129,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
               {views.length > 0 ? (
                 <div className="grid gap-3">
                   {views.map((v) => (
-                    <ActivityCard key={v.activity.id} view={v} className="animate-rise" />
+                    <ActivityCard key={v.activity.id} view={v} withCalendar className="animate-rise" />
                   ))}
                 </div>
               ) : (
@@ -144,7 +148,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
                     <h2 className="eyebrow mb-3 text-slate">{formatMonthYear(key)}</h2>
                     <div className="grid gap-3 md:grid-cols-2">
                       {items.map((v) => (
-                        <ActivityCard key={v.activity.id} view={v} className="animate-rise" />
+                        <ActivityCard key={v.activity.id} view={v} withCalendar className="animate-rise" />
                       ))}
                     </div>
                   </section>

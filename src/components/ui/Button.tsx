@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import { Icon } from './Icon'
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'onDark' | 'danger'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'onDark' | 'outlineDark' | 'danger'
 type Size = 'lg' | 'md' | 'sm'
 
 const VARIANTS: Record<Variant, string> = {
@@ -11,6 +11,7 @@ const VARIANTS: Record<Variant, string> = {
   secondary: 'bg-card text-ink border border-line-strong hover:border-ink/40 disabled:text-slate',
   ghost: 'text-electric hover:bg-electric-50',
   onDark: 'bg-white text-night hover:bg-sky',
+  outlineDark: 'border border-white/50 text-white hover:bg-white/10',
   danger: 'bg-card text-danger border border-danger/30 hover:bg-danger-50',
 }
 

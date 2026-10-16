@@ -78,6 +78,9 @@ export interface AppConfig {
   documentCategories: string[]
   /** Proyecto que se muestra como bloque principal en Inicio y Participa (p. ej. la Campaña 29N). */
   featuredProjectId: string | null
+  /** Periodo de campaña (en rojo en el calendario). Null = por defecto, los 15 días antes del día de reflexión. */
+  campaignStart: string | null
+  campaignEnd: string | null
   /** Pares clave/valor sin interpretar, para futuras opciones. */
   raw: Record<string, string>
 }

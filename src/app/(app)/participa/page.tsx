@@ -5,6 +5,7 @@ import { Container, PageHeader } from '@/components/layout/PageHeader'
 import { CampaignBlock } from '@/components/projects/CampaignBlock'
 import { ProjectCard } from '@/components/projects/ProjectCard'
 import { SectionHeader } from '@/components/ui/Eyebrow'
+import { FlagDivider } from '@/components/ui/FlagDivider'
 import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/States'
 import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
@@ -12,7 +13,7 @@ import { creatableTerritories } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { getContent } from '@/lib/content/source'
 import { madridDate } from '@/lib/domain/dates'
-import { featuredProject, sortProjectsForUser, visibleProjects } from '@/lib/domain/selectors'
+import { campaignActivityCount, featuredProject, sortProjectsForUser, visibleProjects } from '@/lib/domain/selectors'
 import { matchesTerritoryFilter, parseTerritoryFilter } from '@/lib/domain/territories'
 import { projectViews } from '@/lib/view/projects'
 
@@ -50,7 +51,18 @@ export default async function ParticipaPage({ searchParams }: { searchParams: Se
         Elige de qué proyecto quieres formar parte.
       </PageHeader>
 
-      {campaignView ? <CampaignBlock view={campaignView} today={madridDate(new Date())} /> : null}
+      {campaignView ? (
+        <>
+          <FlagDivider />
+          <CampaignBlock
+            view={campaignView}
+            today={madridDate(new Date())}
+            activityCount={campaignActivityCount(content.activities, campaignView.project, new Date())}
+            primary="view"
+          />
+          <FlagDivider />
+        </>
+      ) : null}
 
       <Container className="py-6 md:py-8">
         <TerritoryFilter value={territory} territories={content.territories} userTerritory={user.territory} />

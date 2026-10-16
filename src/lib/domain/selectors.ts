@@ -1,6 +1,6 @@
-import type { Activity, ContentBundle, DocumentItem, Opportunity, Project } from './types'
+import type { Activity, AppConfig, ContentBundle, DocumentItem, Opportunity, Project } from './types'
 import { activityStart, isPast } from './registration'
-import { madridDate, weekRange } from './dates'
+import { addDays, madridDate, weekRange } from './dates'
 import {
   matchesTerritoryFilter,
   stripAccents,
@@ -22,6 +22,27 @@ export function sortByDate(activities: Activity[]): Activity[] {
 
 export function upcomingActivities(activities: Activity[], now: Date): Activity[] {
   return sortByDate(publicActivities(activities).filter((a) => !isPast(a, now)))
+}
+
+/** Actos que quedan hasta la campaña (incluido su día), sin los cancelados. Sin fecha de campaña: todos los próximos. */
+export function campaignActivityCount(activities: Activity[], campaign: Pick<Project, 'expectedDate'>, now: Date): number {
+  return upcomingActivities(activities, now).filter(
+    (a) => a.status !== 'cancelada' && (!campaign.expectedDate || a.date <= campaign.expectedDate),
+  ).length
+}
+
+/**
+ * Periodo de campaña que se marca en rojo en el calendario. Por defecto, la campaña electoral:
+ * los 15 días que terminan antes del día de reflexión (para el 29N, del 13 al 27 de noviembre).
+ * Se puede fijar con campana_inicio / campana_fin en CONFIGURACION.
+ */
+export function campaignPeriod(
+  campaign: Pick<Project, 'expectedDate'> | null,
+  config: Pick<AppConfig, 'campaignStart' | 'campaignEnd'>,
+): { start: string; end: string } | null {
+  const start = config.campaignStart ?? (campaign?.expectedDate ? addDays(campaign.expectedDate, -16) : null)
+  const end = config.campaignEnd ?? (campaign?.expectedDate ? addDays(campaign.expectedDate, -2) : null)
+  return start && end && start <= end ? { start, end } : null
 }
 
 /** Actividades que ya han pasado, de la más reciente a la más antigua. */

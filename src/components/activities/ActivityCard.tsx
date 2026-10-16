@@ -7,9 +7,9 @@ import { AddToCalendar } from './AddToCalendar'
 
 /**
  * Tarjeta de actividad para listas (Inicio, Actos, Perfil). Toda la tarjeta abre la ficha
- * (enlace estirado desde el título); los botones de calendario quedan por encima.
+ * (enlace estirado desde el título). En Actos lleva además los botones de calendario, por encima.
  */
-export function ActivityCard({ view, className }: { view: ActivityView; className?: string }) {
+export function ActivityCard({ view, withCalendar = false, className }: { view: ActivityView; withCalendar?: boolean; className?: string }) {
   const { activity, state, registeredCount } = view
   const muted = state.kind === 'cancelled' || state.kind === 'past'
   return (
@@ -44,7 +44,7 @@ export function ActivityCard({ view, className }: { view: ActivityView; classNam
             <div className="mt-4">
               <CapacityMeter count={registeredCount} capacity={activity.capacity} compact />
             </div>
-            <AddToCalendar activity={activity} compact className="relative z-10 mt-4" />
+            {withCalendar ? <AddToCalendar activity={activity} compact className="relative z-10 mt-4" /> : null}
           </>
         ) : null}
       </div>

@@ -30,4 +30,6 @@ export const CONFIG_KEYS = {
   heroSubtitle: 'inicio_subtitulo',
   documentCategories: 'categorias_documentos',
   featuredProject: 'campana_principal',
+  campaignStart: 'campana_inicio',
+  campaignEnd: 'campana_fin',
 } as const
