@@ -414,7 +414,8 @@ test.describe('inicio, actos y proyectos', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Hola, Alba')
     await expect(page.getByText('Lo que estamos haciendo juntos.')).toHaveCount(0)
     const campaign = page.locator('#campana')
-    await expect(campaign.getByText(/personas participan/)).toBeVisible()
+    await expect(campaign.getByText(/^actos?$/)).toBeVisible()
+    await expect(campaign.getByText(/personas participan/)).toHaveCount(0)
     await expect(campaign.getByText(/^días?$/)).toBeVisible()
     await expect(page.locator('#proximamente').locator('h3 a[href^="/actividades/"]')).toHaveCount(5)
     await expect(page.locator('#proximamente').getByRole('link', { name: 'Ver calendario completo' }).first()).toBeVisible()
@@ -473,4 +474,23 @@ test('Proyectos: «Lo que está entre manos» y el texto de la campaña', async 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Lo que está entre manos')
   await expect(page.getByText('Elige de qué proyecto quieres formar parte.')).toBeVisible()
   await expect(page.locator('#campana').getByText('¡POR FIN! Esta campaña la construimos entre todos.', { exact: false })).toBeVisible()
+})
+
+test('calendario: botones solo en Actos y mes con la campaña destacada', async ({ page }) => {
+  await loginAs(page, /Alba/)
+  await expect(page.locator('#proximamente').getByRole('link', { name: /iPhone|Google Calendar/ })).toHaveCount(0)
+  await page.goto('/calendario?vista=mes&mes=2026-11')
+  const grid = page.getByRole('grid')
+  await expect(grid.getByLabel(/^29, día de la campaña/)).toBeVisible()
+  await expect(grid.getByLabel(/^13, campaña electoral/)).toBeVisible()
+  await expect(grid.getByLabel(/^27, campaña electoral/)).toBeVisible()
+  await expect(grid.getByLabel(/^12(, |$)/)).not.toHaveAttribute('aria-label', /campaña/)
+})
+
+test('Proyectos: la campaña entre banderitas, con «Ver la campaña» como botón principal', async ({ page }) => {
+  await loginAs(page, /Pablo/)
+  await page.goto('/participa')
+  const buttons = page.locator('#campana').locator('a, button').filter({ hasText: /Ver la campaña|Quiero participar/ })
+  await expect(buttons.nth(0)).toHaveText(/Ver la campaña/)
+  await expect(buttons.nth(1)).toHaveText(/Quiero participar/)
 })

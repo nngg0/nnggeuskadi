@@ -41,7 +41,7 @@ export function NewProjectForm({ territories, today }: { territories: { id: Terr
       <fieldset className="grid gap-3 rounded-2xl border border-line p-4">
         <legend className="eyebrow px-1 !text-[0.62rem] text-slate">Ámbitos en los que se puede participar</legend>
         {rows.map((key, index) => (
-          <div key={key} className="grid gap-2 rounded-xl bg-white/60 sm:grid-cols-[minmax(0,14rem)_1fr_auto] sm:items-start">
+          <div key={key} className="grid gap-2 rounded-xl sm:grid-cols-[minmax(0,14rem)_1fr_auto] sm:items-start">
             <input
               name="ambito_nombre"
               aria-label={`Nombre del ámbito ${index + 1}`}

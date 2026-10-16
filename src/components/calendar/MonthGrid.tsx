@@ -13,6 +13,9 @@ export function MonthGrid({
   today,
   selectedDay,
   registeredIds,
+  campaignDay = null,
+  campaignLabel = 'Campaña',
+  campaignRange = null,
   hrefFor,
 }: {
   month: string
@@ -20,6 +23,12 @@ export function MonthGrid({
   today: string
   selectedDay: string | null
   registeredIds: Set<string>
+  /** Día de la campaña (p. ej. 29N): muy destacado. */
+  campaignDay?: string | null
+  /** Rótulo corto del día de campaña, p. ej. "29N". */
+  campaignLabel?: string
+  /** Periodo de campaña: en rojo. */
+  campaignRange?: { start: string; end: string } | null
   hrefFor: (params: { mes?: string; dia?: string | null }) => string
 }) {
   const total = daysInMonth(month)
@@ -66,25 +75,49 @@ export function MonthGrid({
           const selected = date === selectedDay
           const isToday = date === today
           const mine = items.some((a) => registeredIds.has(a.id))
-          const label = `${i + 1}${items.length ? `, ${items.length} ${items.length === 1 ? 'actividad' : 'actividades'}` : ''}`
+          const isCampaignDay = date === campaignDay
+          const inCampaign = !isCampaignDay && campaignRange !== null && date >= campaignRange.start && date <= campaignRange.end
+          const label = [
+            String(i + 1),
+            isCampaignDay ? 'día de la campaña' : inCampaign ? 'campaña electoral' : null,
+            items.length ? `${items.length} ${items.length === 1 ? 'acto' : 'actos'}` : null,
+          ]
+            .filter(Boolean)
+            .join(', ')
           const body = (
             <>
-              <span className={cn('text-sm', items.length ? 'font-bold' : 'font-medium')}>{i + 1}</span>
-              <span className="flex h-1.5 gap-0.5">
-                {items.slice(0, 3).map((a) => (
-                  <span
-                    key={a.id}
-                    className={cn('size-1.5 rounded-full', selected ? 'bg-white' : registeredIds.has(a.id) ? 'bg-success' : 'bg-electric')}
-                  />
-                ))}
+              <span className={cn(isCampaignDay ? 'font-display text-xl leading-none' : 'text-sm', items.length || isCampaignDay ? 'font-bold' : 'font-medium')}>
+                {i + 1}
               </span>
+              {isCampaignDay ? <span className="eyebrow !text-[0.5rem] leading-none">{campaignLabel}</span> : null}
+              {items.length ? (
+                <span className="flex h-2 gap-0.5">
+                  {items.slice(0, 3).map((a) => (
+                    <span
+                      key={a.id}
+                      className={cn(
+                        'size-2 rounded-full',
+                        selected || inCampaign ? 'bg-white' : isCampaignDay ? 'bg-night' : registeredIds.has(a.id) ? 'bg-success' : 'bg-sky',
+                      )}
+                    />
+                  ))}
+                </span>
+              ) : null}
             </>
           )
           const classes = cn(
-            'flex aspect-square flex-col items-center justify-center gap-1 rounded-xl transition-colors',
-            selected ? 'bg-electric text-white' : items.length ? 'text-ink hover:bg-electric-50' : 'text-slate/70',
+            'relative flex aspect-square flex-col items-center justify-center gap-1 rounded-xl transition-colors',
+            selected
+              ? 'bg-electric text-white'
+              : isCampaignDay
+                ? 'z-10 scale-110 bg-flag-yellow text-night shadow-lg shadow-flag-yellow/40 ring-2 ring-white'
+                : inCampaign
+                  ? cn('bg-flag-red text-white', items.length ? 'ring-2 ring-inset ring-white/80' : 'bg-flag-red/70')
+                  : items.length
+                    ? 'bg-electric/30 text-white ring-1 ring-inset ring-sky/60 hover:bg-electric/45'
+                    : 'text-slate/70',
             isToday && !selected && 'ring-2 ring-inset ring-electric',
-            mine && !selected && 'bg-success-50',
+            mine && !selected && !isCampaignDay && !inCampaign && 'bg-success/30 ring-success/70',
           )
           return items.length ? (
             <Link key={date} href={hrefFor({ mes: month, dia: selected ? null : date })} className={cn('press', classes)} aria-label={label} aria-pressed={selected} scroll={false}>
@@ -98,9 +131,15 @@ export function MonthGrid({
         })}
       </div>
       <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-line pt-3 text-xs text-slate">
-        <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-electric" />Actividad</span>
+        <span className="inline-flex items-center gap-1.5"><span className="size-3 rounded-md bg-electric/30 ring-1 ring-inset ring-sky/60" />Hay acto</span>
         <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-success" />Estás inscrito</span>
         <span className="inline-flex items-center gap-1.5"><span className="size-3 rounded-md ring-2 ring-inset ring-electric" />Hoy</span>
+        {campaignRange ? (
+          <span className="inline-flex items-center gap-1.5"><span className="size-3 rounded-md bg-flag-red" />Campaña electoral</span>
+        ) : null}
+        {campaignDay ? (
+          <span className="inline-flex items-center gap-1.5"><span className="size-3 rounded-md bg-flag-yellow" />{campaignLabel}</span>
+        ) : null}
       </div>
     </div>
   )

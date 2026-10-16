@@ -3,6 +3,7 @@ import { formatMonthShort, formatWeekdayShort } from '@/lib/domain/dates'
 import { daysUntil } from '@/lib/domain/selectors'
 import type { ProjectView } from '@/lib/view/projects'
 import { Container } from '@/components/layout/PageHeader'
+import { ButtonLink } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { ParticipateFlow } from './ParticipateFlow'
 import { toOptions } from './ProjectCard'
@@ -21,7 +22,18 @@ function CalendarTile({ date }: { date: string }) {
 }
 
 /** Bloque principal: la campaña que la organización marca en CONFIGURACION (p. ej. Campaña 29N). */
-export function CampaignBlock({ view, today }: { view: ProjectView; today: string }) {
+export function CampaignBlock({
+  view,
+  today,
+  activityCount,
+  primary = 'participate',
+}: {
+  view: ProjectView
+  today: string
+  activityCount: number
+  /** Botón principal: «Quiero participar» (Inicio) o «Ver la campaña» (Proyectos). */
+  primary?: 'participate' | 'view'
+}) {
   const { project } = view
   const days = project.expectedDate ? daysUntil(project.expectedDate, today) : null
   return (
@@ -43,24 +55,41 @@ export function CampaignBlock({ view, today }: { view: ProjectView; today: strin
                 </div>
               ) : null}
               <div>
-                <dd className="font-display text-4xl leading-none text-sky sm:text-5xl">{view.participantCount}</dd>
-                <dt className="eyebrow mt-1 text-white/70">{view.participantCount === 1 ? 'persona participa' : 'personas participan'}</dt>
+                <dd className="font-display text-4xl leading-none text-sky sm:text-5xl">{activityCount}</dd>
+                <dt className="eyebrow mt-1 text-white/70">{activityCount === 1 ? 'acto' : 'actos'}</dt>
               </div>
             </dl>
           </div>
         </div>
         {project.description ? <p className="mt-5 max-w-xl text-[0.95rem] leading-relaxed text-white/75">{project.description}</p> : null}
         <div className="mt-6 grid max-w-md gap-3">
-          <ParticipateFlow
-            projectId={project.id}
-            projectTitle={project.title}
-            options={toOptions(view)}
-            participating={view.participation !== null}
-            tone="brand"
-          />
-          <Link href={`/participa/${encodeURIComponent(project.id)}`} className="press inline-flex items-center gap-2 text-sm font-bold text-white/85 hover:text-white">
-            Ver la campaña <Icon name="arrowRight" size={18} />
-          </Link>
+          {primary === 'view' ? (
+            <>
+              <ButtonLink href={`/participa/${encodeURIComponent(project.id)}`} variant="onDark" block arrow>
+                Ver la campaña
+              </ButtonLink>
+              <ParticipateFlow
+                projectId={project.id}
+                projectTitle={project.title}
+                options={toOptions(view)}
+                participating={view.participation !== null}
+                tone="brandOutline"
+              />
+            </>
+          ) : (
+            <>
+              <ParticipateFlow
+                projectId={project.id}
+                projectTitle={project.title}
+                options={toOptions(view)}
+                participating={view.participation !== null}
+                tone="brand"
+              />
+              <Link href={`/participa/${encodeURIComponent(project.id)}`} className="press inline-flex items-center gap-2 text-sm font-bold text-white/85 hover:text-white">
+                Ver la campaña <Icon name="arrowRight" size={18} />
+              </Link>
+            </>
+          )}
         </div>
       </Container>
     </section>

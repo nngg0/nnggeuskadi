@@ -18,7 +18,7 @@ export function EmptyState({
   className?: string
 }) {
   return (
-    <div className={cn('rounded-[var(--radius-card)] border border-dashed border-line-strong bg-white/60 px-6 py-8', className)}>
+    <div className={cn('rounded-[var(--radius-card)] border border-dashed border-line-strong bg-card/70 px-6 py-8', className)}>
       <span className="mb-4 inline-flex size-11 items-center justify-center rounded-full bg-electric-50 text-electric">
         <Icon name={icon} size={22} />
       </span>

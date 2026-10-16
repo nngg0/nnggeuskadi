@@ -13,7 +13,7 @@ import { can } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { getContent } from '@/lib/content/source'
 import { madridDate } from '@/lib/domain/dates'
-import { featuredProject, preparingProjects, upcomingActivities } from '@/lib/domain/selectors'
+import { campaignActivityCount, featuredProject, preparingProjects, upcomingActivities } from '@/lib/domain/selectors'
 import { personalStore } from '@/lib/personal'
 import { activityViews } from '@/lib/view/activities'
 import { projectViews } from '@/lib/view/projects'
@@ -69,10 +69,10 @@ export default async function HomePage() {
         </Link>
       ) : null}
 
-      <FlagDivider />
       {campaignView ? (
         <>
-          <CampaignBlock view={campaignView} today={today} />
+          <FlagDivider />
+          <CampaignBlock view={campaignView} today={today} activityCount={campaignActivityCount(content.activities, campaignView.project, now)} />
           <FlagDivider />
         </>
       ) : null}
@@ -98,8 +98,6 @@ export default async function HomePage() {
           <ArrowLink href="/calendario" className="mt-5 sm:hidden">Ver calendario completo</ArrowLink>
         </Container>
       </section>
-
-      <FlagDivider />
 
       <section id="en-preparacion" className="scroll-mt-14 bg-night py-12 text-white md:py-16">
         <Container>

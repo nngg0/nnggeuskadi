@@ -348,6 +348,8 @@ export const DEFAULT_CONFIG: AppConfig = {
   heroSubtitle: 'Qué viene, qué estamos preparando y dónde puedes participar.',
   documentCategories: ['Organización', 'Argumentarios', 'Comunicación', 'Campañas', 'Formación', 'Material gráfico'],
   featuredProjectId: null,
+  campaignStart: null,
+  campaignEnd: null,
   raw: {},
 }
 
@@ -368,6 +370,8 @@ export function parseConfig(table: RawTable | undefined): Parsed<AppConfig> {
         heroSubtitle: raw[CONFIG_KEYS.heroSubtitle]?.trim() || DEFAULT_CONFIG.heroSubtitle,
         documentCategories: categories.length > 0 ? categories : DEFAULT_CONFIG.documentCategories,
         featuredProjectId: raw[CONFIG_KEYS.featuredProject]?.trim() || null,
+        campaignStart: parseDate(raw[CONFIG_KEYS.campaignStart] ?? ''),
+        campaignEnd: parseDate(raw[CONFIG_KEYS.campaignEnd] ?? ''),
         raw,
       },
     ],
