@@ -63,7 +63,7 @@ export default async function ProfilePage() {
       <section className="bg-night text-white">
         <Container className="pb-8 pt-6 md:pb-10 md:pt-10">
           <Eyebrow tone="sky">Perfil</Eyebrow>
-          <h1 className="display mt-3 text-[2.35rem] sm:text-5xl">{user.displayName}</h1>
+          <h1 className="display mt-3 text-[2.6rem] sm:text-[3.35rem]">{user.displayName}</h1>
           <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 font-semibold">
               <Icon name="territory" size={16} className="text-sky" />

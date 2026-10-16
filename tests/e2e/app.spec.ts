@@ -454,3 +454,11 @@ test.describe('inicio, actos y proyectos', () => {
     expect(order.at(-1)).toContain('Asamblea de inicio de curso')
   })
 })
+
+test('Proyectos: «Lo que está entre manos» y el texto de la campaña', async ({ page }) => {
+  await loginAs(page, /Alba/)
+  await page.goto('/participa')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Lo que está entre manos')
+  await expect(page.getByText('Elige de qué proyecto quieres formar parte.')).toBeVisible()
+  await expect(page.locator('#campana').getByText('¡POR FIN! Esta campaña la construimos entre todos.', { exact: false })).toBeVisible()
+})

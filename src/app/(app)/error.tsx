@@ -17,7 +17,7 @@ export default function AppError({ error, reset }: { error: Error & { digest?: s
           <Icon name="alert" size={28} />
         </span>
         <p className="eyebrow mt-5 text-danger">Algo no ha ido bien</p>
-        <h1 className="display mt-2 text-3xl text-ink">No hemos podido cargar esta sección.</h1>
+        <h1 className="display mt-2 text-3xl">No hemos podido cargar esta sección.</h1>
         <p className="mt-3 text-sm leading-relaxed text-slate">
           Puede ser un problema puntual de conexión. Vuelve a intentarlo en unos segundos.
           {error.digest ? <span className="mt-2 block text-xs text-slate/70">Referencia: {error.digest}</span> : null}

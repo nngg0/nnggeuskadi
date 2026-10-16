@@ -141,7 +141,7 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
             <div className="sticky top-0 z-10 flex items-start justify-between gap-4 bg-card px-6 pb-3 pt-6">
               <div>
                 <p className="eyebrow text-electric">Quiero participar</p>
-                <h2 id={`participa-${projectId}`} className="display mt-2 text-2xl text-ink">
+                <h2 id={`participa-${projectId}`} className="display mt-2 text-2xl">
                   {projectTitle}
                 </h2>
               </div>
@@ -160,7 +160,7 @@ export function ParticipateFlow({ projectId, projectTitle, options, participatin
                 <span className="mx-auto flex size-16 animate-pop items-center justify-center rounded-full bg-electric text-white">
                   <Icon name={result.withdrawn ? 'check' : 'participa'} size={30} strokeWidth={2.2} />
                 </span>
-                <p className="display mt-5 text-2xl text-ink">{result.withdrawn ? 'Hecho.' : '¡Cuenta contigo!'}</p>
+                <p className="display mt-5 text-2xl">{result.withdrawn ? 'Hecho.' : '¡Cuenta contigo!'}</p>
                 <p className="mx-auto mt-2 max-w-xs text-[0.95rem] leading-relaxed text-slate">{result.message}</p>
                 <div className="mt-6 grid gap-2">
                   {!result.withdrawn ? (
