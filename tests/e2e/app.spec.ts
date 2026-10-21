@@ -372,7 +372,7 @@ test.describe('alta de actividades y proyectos', () => {
     await page.getByLabel('Título').fill('Acto en Álava')
     await page.getByLabel('Fecha').fill(inDays(10))
     await page.getByRole('button', { name: 'Crear acto' }).click()
-    await expect(page.getByText('No puedes crear contenido en ese territorio.')).toBeVisible()
+    await expect(page.getByText('No puedes crear ni editar contenido en ese territorio.')).toBeVisible()
     await expect(page.getByLabel('Título')).toHaveValue('Acto en Álava')
   })
 
@@ -493,6 +493,59 @@ test('Proyectos: la campaña entre banderitas, con «Ver la campaña» como bot�
   const buttons = page.locator('#campana').locator('a, button').filter({ hasText: /Ver la campaña|Quiero participar/ })
   await expect(buttons.nth(0)).toHaveText(/Ver la campaña/)
   await expect(buttons.nth(1)).toHaveText(/Quiero participar/)
+})
+
+test.describe('editar actos', () => {
+  test('la dirección provincial edita un acto de su provincia y se ve al momento', async ({ page }) => {
+    await loginAs(page, /Miguel/)
+    await page.goto('/actividades/ACT-035')
+    await page.getByRole('link', { name: 'Editar' }).click()
+    await expect(page).toHaveURL('/actividades/ACT-035/editar')
+    await expect(page.getByLabel('Título')).toHaveValue('Paseo y charla: Bilbao que viene')
+    await expect(page.getByLabel('Territorio').getByRole('option')).toHaveText(['Bizkaia'])
+    await page.getByLabel('Título').fill('Paseo por Zorrotzaurre')
+    await page.getByLabel('Lugar').fill('Bilbao · Zorrotzaurre')
+    await page.getByLabel('Hora').fill('12:00')
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page).toHaveURL('/actividades/ACT-035')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Paseo por Zorrotzaurre')
+    await expect(page.getByText('Bilbao · Zorrotzaurre')).toBeVisible()
+    await expect(page.getByText('12:00')).toBeVisible()
+  })
+
+  test('cancelar un acto desde la edición', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/actividades/ACT-042/editar')
+    await page.getByLabel('Estado').selectOption('cancelada')
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page).toHaveURL('/actividades/ACT-042')
+    await expect(page.getByText('Cancelada').first()).toBeVisible()
+  })
+
+  test('la provincial no edita actos de otra provincia, ni moviéndolos a otra con el formulario manipulado', async ({ page }) => {
+    await loginAs(page, /Miguel/)
+    await page.goto('/actividades/ACT-032')
+    await expect(page.getByRole('link', { name: 'Editar' })).toHaveCount(0)
+    await page.goto('/actividades/ACT-032/editar')
+    await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+
+    await page.goto('/actividades/ACT-033/editar')
+    await page.waitForLoadState('networkidle')
+    await page.getByLabel('Territorio').evaluate((select: HTMLSelectElement) => {
+      select.add(new Option('Álava', 'alava'))
+      select.value = 'alava'
+    })
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page.getByText('No puedes crear ni editar contenido en ese territorio.')).toBeVisible()
+  })
+
+  test('un afiliado no ve «Editar» ni puede abrir la edición', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/actividades/ACT-031')
+    await expect(page.getByRole('link', { name: 'Editar' })).toHaveCount(0)
+    await page.goto('/actividades/ACT-031/editar')
+    await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+  })
 })
 
 test('la hoja de participar bloquea el fondo solo mientras está abierta y devuelve el scroll', async ({ page }) => {

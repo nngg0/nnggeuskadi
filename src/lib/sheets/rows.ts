@@ -24,3 +24,34 @@ export function idsOf(table: RawTable | undefined): string[] {
   if (index < 0) return []
   return rows.map((r) => String(r[index] ?? '').trim()).filter(Boolean)
 }
+
+/**
+ * Fila existente con los valores nuevos encima: las columnas que no vienen en `record` se conservan.
+ * Igual que en el alta, si falta una columna con valor no se escribe nada.
+ */
+export function mergeRow(header: string[], existing: string[], record: SheetRecord): string[] {
+  const updated = recordToRow(header, record)
+  const keys = new Set(Object.keys(record))
+  return header.map((h, i) => (keys.has(normalizeHeader(String(h ?? ''))) ? updated[i]! : String(existing[i] ?? '')))
+}
+
+/** Celdas que cambia `record` en una fila: índice de columna → valor. Rechaza si falta una columna con valor. */
+export function changedCells(header: string[], record: SheetRecord): Map<number, string> {
+  const row = recordToRow(header, record)
+  const keys = new Set(Object.keys(record))
+  const cells = new Map<number, string>()
+  header.forEach((h, i) => {
+    if (keys.has(normalizeHeader(String(h ?? '')))) cells.set(i, row[i]!)
+  })
+  return cells
+}
+
+/** Número de fila del Sheet (1 = cabeceras) de la fila con ese id, o null. */
+export function rowNumberOf(table: RawTable | undefined, id: string): number | null {
+  if (!table || table.length === 0) return null
+  const [header = [], ...rows] = table
+  const index = header.map((h) => normalizeHeader(String(h ?? ''))).indexOf('id')
+  if (index < 0) return null
+  const found = rows.findIndex((r) => String(r[index] ?? '').trim() === id)
+  return found < 0 ? null : found + 2
+}

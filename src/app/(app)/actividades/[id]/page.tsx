@@ -38,6 +38,7 @@ export default async function ActivityPage({ params }: { params: Params }) {
   const [view] = await activityViews([activity], user.id)
   if (!view) notFound()
   const canManage = can(user, 'manage.viewPeople', { territory: activity.territory })
+  const canEdit = can(user, 'content.create', { territory: activity.territory })
   const registrants = canManage ? await personalStore().eventRegistrants(activity.id) : []
   const label = view.state.kind === 'registered' ? 'Tu próximo plan' : activity.featured ? 'Próximo acto' : 'Actividad'
 
@@ -45,9 +46,19 @@ export default async function ActivityPage({ params }: { params: Params }) {
     <>
       <section className="bg-night text-white">
         <Container className="pb-10 pt-4 md:pb-14 md:pt-8">
-          <Link href="/calendario" className="press -ml-2 inline-flex items-center gap-1 rounded-full px-2 py-1.5 text-sm font-semibold text-white/70 hover:text-white">
-            <Icon name="arrowLeft" size={18} /> Calendario
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link href="/calendario" className="press -ml-2 inline-flex items-center gap-1 rounded-full px-2 py-1.5 text-sm font-semibold text-white/70 hover:text-white">
+              <Icon name="arrowLeft" size={18} /> Actos
+            </Link>
+            {canEdit ? (
+              <Link
+                href={`/actividades/${encodeURIComponent(activity.id)}/editar`}
+                className="press inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-sm font-bold text-white hover:bg-white/10"
+              >
+                <Icon name="edit" size={16} /> Editar
+              </Link>
+            ) : null}
+          </div>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <Eyebrow tone="sky">{label}</Eyebrow>
             <span className="eyebrow text-white/50">{territoryName(activity.territory)}</span>

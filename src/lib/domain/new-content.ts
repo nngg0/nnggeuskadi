@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { isIsoDate, isTime } from './dates'
 import { TERRITORY_IDS, type TerritoryId } from './territories'
+import type { ActivityStatus } from './types'
 
 /*
  * Alta de actividades y proyectos desde la web.
@@ -9,6 +10,8 @@ import { TERRITORY_IDS, type TerritoryId } from './territories'
  */
 
 export const NEW_ACTIVITY_STATUSES = ['confirmada', 'borrador'] as const
+/** Al editar también se puede cerrar la inscripción o cancelar el acto. */
+export const EDIT_ACTIVITY_STATUSES = ['confirmada', 'borrador', 'cerrada', 'cancelada'] as const
 export const NEW_PROJECT_STATUSES = ['en_preparacion', 'en_marcha'] as const
 export const MAX_NEW_OPPORTUNITIES = 12
 
@@ -22,6 +25,15 @@ const optionalIsoDate = z
 const territory = z.enum(TERRITORY_IDS, { message: 'Elige un territorio.' })
 
 export function newActivitySchema(today: string) {
+  return activitySchema({ minDate: today, statuses: NEW_ACTIVITY_STATUSES })
+}
+
+/** Edición: admite todos los estados y conservar la fecha original aunque ya haya pasado. */
+export function editActivitySchema(today: string, originalDate: string) {
+  return activitySchema({ minDate: originalDate < today ? originalDate : today, statuses: EDIT_ACTIVITY_STATUSES })
+}
+
+function activitySchema({ minDate, statuses }: { minDate: string; statuses: readonly [ActivityStatus, ...ActivityStatus[]] }) {
   return z
     .object({
       titulo: text(160).min(3, 'Escribe un título.'),
@@ -31,7 +43,7 @@ export function newActivitySchema(today: string) {
         .string()
         .trim()
         .refine(isIsoDate, 'Elige la fecha.')
-        .refine((v) => v >= today, 'La fecha no puede ser anterior a hoy.'),
+        .refine((v) => v >= minDate, 'La fecha no puede ser anterior a hoy.'),
       hora: z
         .string()
         .trim()
@@ -44,7 +56,7 @@ export function newActivitySchema(today: string) {
         .refine((v) => v === '' || (/^\d+$/.test(v) && Number(v) >= 1 && Number(v) <= 100000), 'Plazas: un número entre 1 y 100000, o vacío.')
         .transform((v) => (v ? Number(v) : null)),
       inscripcion_fin: optionalIsoDate,
-      estado: z.enum(NEW_ACTIVITY_STATUSES).default('confirmada'),
+      estado: z.enum(statuses).default('confirmada'),
     })
     .refine((v) => !v.inscripcion_fin || v.inscripcion_fin <= v.fecha, {
       message: 'El cierre de inscripción no puede ser posterior a la actividad.',
@@ -117,6 +129,18 @@ export function activityRecord(id: string, input: NewActivityInput): SheetRecord
     visible: 'sí',
     destacado: 'no',
   }
+}
+
+/**
+ * Columnas que cambia una edición. Se conservan las que el formulario no muestra
+ * (inscripcion_inicio, visible, destacado) y, si no se ha tocado, el cierre de inscripción original
+ * (puede llevar una hora distinta de 23:59).
+ */
+export function activityEditRecord(input: NewActivityInput, original: { closesOnDate: string | null }): SheetRecord {
+  const record = activityRecord('', input)
+  for (const key of ['id', 'inscripcion_inicio', 'visible', 'destacado']) delete record[key]
+  if (input.inscripcion_fin === original.closesOnDate) delete record.inscripcion_fin
+  return record
 }
 
 export function projectRecords(

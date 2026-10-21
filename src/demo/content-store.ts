@@ -3,10 +3,10 @@ import { cookies } from 'next/headers'
 import { z } from 'zod'
 import type { SheetRecord } from '@/lib/domain/new-content'
 import type { RawWorkbook, SheetName } from '@/lib/sheets/columns'
-import { recordToRow } from '@/lib/sheets/rows'
+import { mergeRow, recordToRow, rowNumberOf } from '@/lib/sheets/rows'
 
 /*
- * DATOS DEMO — filas creadas desde la web («+» en Calendario y Participa) sin Google Sheets.
+ * DATOS DEMO — filas creadas o editadas desde la web («+» y «Editar») sin Google Sheets.
  * Se guardan en una cookie del navegador y se suman al libro demo antes de validarlo, así que
  * pasan por el mismo validador que las filas reales. Solo se conservan las últimas (límite de tamaño de cookie).
  */
@@ -47,7 +47,10 @@ export async function addDemoRecords(sheet: (typeof WRITABLE)[number], records: 
   })
 }
 
-/** Libro demo con las filas creadas en este navegador añadidas al final de cada hoja. */
+/**
+ * Libro demo con lo hecho en este navegador: las filas nuevas se añaden al final de cada hoja
+ * y las ediciones (mismo id que una fila existente) se aplican sobre ella.
+ */
 export async function withDemoRecords(workbook: RawWorkbook): Promise<RawWorkbook> {
   const entries = await readEntries()
   if (entries.length === 0) return workbook
@@ -56,7 +59,11 @@ export async function withDemoRecords(workbook: RawWorkbook): Promise<RawWorkboo
     const table = result[s]
     if (!table?.[0]) continue
     try {
-      result[s] = [...table, recordToRow(table[0], r)]
+      const rowNumber = r.id ? rowNumberOf(table, r.id) : null
+      result[s] =
+        rowNumber === null
+          ? [...table, recordToRow(table[0], r)]
+          : table.map((row, i) => (i === rowNumber - 1 ? mergeRow(table[0]!, row, r) : row))
     } catch {
       // fila de una versión anterior de la demo: se ignora
     }

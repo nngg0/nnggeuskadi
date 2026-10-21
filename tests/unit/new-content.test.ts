@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  activityEditRecord,
   activityRecord,
+  editActivitySchema,
   newActivitySchema,
   newProjectSchema,
   nextId,
@@ -9,7 +11,8 @@ import {
 } from '@/lib/domain/new-content'
 import { SHEETS } from '@/lib/sheets/columns'
 import { parseActivities, parseOpportunities, parseProjects } from '@/lib/sheets/parse'
-import { idsOf, recordToRow } from '@/lib/sheets/rows'
+import { changedCells, idsOf, mergeRow, recordToRow, rowNumberOf } from '@/lib/sheets/rows'
+import { columnLetter } from '@/lib/sheets/client'
 
 const TODAY = '2026-10-16'
 
@@ -124,5 +127,41 @@ describe('filas nuevas del Sheet', () => {
       titulo: 'Sin ámbitos', descripcion: '', tipo: '', territorio: 'euskadi', fecha_prevista: '', ambitos: [],
     })
     expect(r.success).toBe(false)
+  })
+})
+
+describe('edición de actos', () => {
+  const form = { ...activityForm, estado: 'cancelada' }
+
+  it('admite cerrar o cancelar y conservar una fecha ya pasada, pero no moverla a otra fecha pasada', () => {
+    expect(editActivitySchema(TODAY, '2026-10-10').safeParse({ ...form, fecha: '2026-10-10', inscripcion_fin: '' }).success).toBe(true)
+    expect(editActivitySchema(TODAY, '2026-10-10').safeParse({ ...form, fecha: '2026-10-01', inscripcion_fin: '' }).success).toBe(false)
+    expect(editActivitySchema(TODAY, '2026-11-03').safeParse({ ...form, fecha: '2026-10-10', inscripcion_fin: '' }).success).toBe(false)
+    expect(newActivitySchema(TODAY).safeParse(form).success).toBe(false) // al crear no se puede cancelar
+  })
+
+  it('solo cambia las columnas del formulario y conserva el cierre original si no se toca', () => {
+    const input = editActivitySchema(TODAY, '2026-11-03').parse(activityForm)
+    const record = activityEditRecord(input, { closesOnDate: '2026-11-01' })
+    expect(record).not.toHaveProperty('id')
+    expect(record).not.toHaveProperty('inscripcion_inicio')
+    expect(record).not.toHaveProperty('visible')
+    expect(record).not.toHaveProperty('destacado')
+    expect(record).not.toHaveProperty('inscripcion_fin')
+    expect(activityEditRecord(input, { closesOnDate: '2026-10-30' })).toHaveProperty('inscripcion_fin', '01/11/2026')
+  })
+
+  it('localiza la fila por id y escribe solo las celdas que cambian', () => {
+    const header = ['ID', 'titulo', 'visible', 'fecha']
+    const table = [header, ['ACT-1', 'Uno', 'sí', '01/11/2026'], ['ACT-2', 'Dos', 'no', '02/11/2026']]
+    expect(rowNumberOf(table, 'ACT-2')).toBe(3)
+    expect(rowNumberOf(table, 'ACT-9')).toBeNull()
+    expect([...changedCells(header, { titulo: 'Nuevo', fecha: '05/11/2026' })]).toEqual([[1, 'Nuevo'], [3, '05/11/2026']])
+    expect(mergeRow(header, table[2]!, { titulo: 'Nuevo' })).toEqual(['ACT-2', 'Nuevo', 'no', '02/11/2026'])
+    expect(() => changedCells(header, { lugar: 'Bilbao' })).toThrow(/Faltan columnas/)
+  })
+
+  it('letras de columna A1', () => {
+    expect([0, 12, 25, 26, 27].map(columnLetter)).toEqual(['A', 'M', 'Z', 'AA', 'AB'])
   })
 })
