@@ -17,14 +17,14 @@ export function Field({ id, label, hint, children }: { id: string; label: string
 }
 
 /** Selector de territorio con solo los territorios en los que esta persona puede crear. */
-export function TerritorySelect({ territories }: { territories: { id: TerritoryId; name: string }[] }) {
+export function TerritorySelect({ territories, defaultValue }: { territories: { id: TerritoryId; name: string }[]; defaultValue?: TerritoryId }) {
   return (
     <Field
       id="territorio"
       label="Territorio"
       hint={territories.length === 1 ? 'Solo puedes crear contenido en tu provincia.' : undefined}
     >
-      <select id="territorio" name="territorio" required defaultValue={territories[0]?.id} className={`${inputClass} h-12`}>
+      <select id="territorio" name="territorio" required defaultValue={defaultValue ?? territories[0]?.id} className={`${inputClass} h-12`}>
         {territories.map((t) => (
           <option key={t.id} value={t.id}>
             {t.name}

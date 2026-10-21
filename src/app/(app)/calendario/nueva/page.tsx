@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { NewActivityForm } from '@/components/content/NewActivityForm'
+import { ActivityForm } from '@/components/content/ActivityForm'
 import { Container, PageHeader } from '@/components/layout/PageHeader'
 import Link from 'next/link'
 import { Icon } from '@/components/ui/Icon'
@@ -32,7 +32,7 @@ export default async function NewActivityPage() {
             <Icon name="arrowLeft" size={18} />
             Volver a Actos
           </Link>
-          <NewActivityForm territories={territories} today={madridDate(new Date())} />
+          <ActivityForm territories={territories} today={madridDate(new Date())} />
         </div>
       </Container>
     </>

@@ -114,3 +114,33 @@ export async function appendSheetRows(sheet: SheetName, rows: string[][]): Promi
   })
   if (!res.ok) throw new Error(`Google Sheets respondió ${res.status} al escribir en ${sheet}`)
 }
+
+/** Letra de columna A1 (0 → A, 25 → Z, 26 → AA). */
+export function columnLetter(index: number): string {
+  let n = index + 1
+  let letters = ''
+  while (n > 0) {
+    const rem = (n - 1) % 26
+    letters = String.fromCharCode(65 + rem) + letters
+    n = Math.floor((n - 1) / 26)
+  }
+  return letters
+}
+
+/**
+ * Escribe solo las celdas indicadas de una fila (índice de columna → valor), sin tocar el resto:
+ * así se conservan fórmulas, formatos y columnas que el formulario no edita. RAW: texto tal cual.
+ */
+export async function updateSheetCells(sheet: SheetName, rowNumber: number, cells: Map<number, string>): Promise<void> {
+  if (rowNumber < 2) throw new Error('No se pueden sobrescribir las cabeceras')
+  if (cells.size === 0) return
+  const env = sheetsEnv()
+  const data = [...cells].map(([col, value]) => ({ range: `${sheet}!${columnLetter(col)}${rowNumber}`, values: [[value]] }))
+  const res = await fetch(`${API}/${encodeURIComponent(env.spreadsheetId)}/values:batchUpdate`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${await accessToken(WRITE_SCOPE)}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ valueInputOption: 'RAW', data }),
+    cache: 'no-store',
+  })
+  if (!res.ok) throw new Error(`Google Sheets respondió ${res.status} al actualizar ${sheet}`)
+}
