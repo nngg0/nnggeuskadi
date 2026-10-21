@@ -86,11 +86,8 @@ export function RegistrationTag({ state }: { state: RegistrationState }) {
     case 'past':
       return <Tag tone="neutral">{state.wasRegistered ? 'Asististe' : 'Finalizada'}</Tag>
     case 'open':
-      return state.remaining !== null && state.remaining <= 5 ? (
-        <Tag tone="warning">Quedan {state.remaining}</Tag>
-      ) : (
-        <Tag tone="electric">Inscripción abierta</Tag>
-      )
+      // Apuntarse es lo normal: no se anuncia. Solo se avisa cuando quedan pocas plazas.
+      return state.remaining !== null && state.remaining <= 5 ? <Tag tone="warning">Quedan {state.remaining}</Tag> : null
   }
 }
 

@@ -717,3 +717,11 @@ test.describe('juntas directivas', () => {
     await expect(page.getByRole('checkbox', { name: /es de la Junta Directiva/ })).toHaveCount(0)
   })
 })
+
+test('no se muestra «Inscripción abierta»: apuntarse es lo normal', async ({ page }) => {
+  await loginAs(page, /Alba/)
+  for (const path of ['/', '/calendario', '/actividades/ACT-031', '/perfil']) {
+    await page.goto(path)
+    await expect(page.getByText(/Inscripción abierta/i)).toHaveCount(0)
+  }
+})
