@@ -565,3 +565,91 @@ test('la hoja de participar bloquea el fondo solo mientras está abierta y devue
   await page.mouse.wheel(0, 400)
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before)
 })
+
+test.describe('editar proyectos', () => {
+  test('la dirección regional cambia un proyecto y sus ámbitos: renombra, cierra, quita y añade', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/participa/PRY-DEBATE')
+    await page.getByRole('link', { name: 'Editar' }).click()
+    await expect(page).toHaveURL('/participa/PRY-DEBATE/editar')
+    await page.getByLabel('Descripción', { exact: true }).fill('Debate interno sobre Europa. Fecha por confirmar.')
+    await expect(page.getByLabel('Nombre del ámbito 1')).toHaveValue('Organización')
+    await page.getByLabel('Nombre del ámbito 1').fill('Organización y sede')
+    await page.getByLabel('Estado del ámbito 1').selectOption('cerrada')
+    await page.getByRole('button', { name: 'Quitar el ámbito 2' }).click()
+    await page.getByRole('button', { name: 'Añadir ámbito' }).click()
+    await page.getByLabel('Nombre del ámbito 2').fill('Moderación')
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page).toHaveURL('/participa/PRY-DEBATE')
+    await expect(page.getByText('Debate interno sobre Europa. Fecha por confirmar.')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Quiero participar' }).first().click()
+    const dialog = page.getByRole('dialog')
+    await expect(dialog.getByText('Moderación', { exact: true })).toBeVisible()
+    await expect(dialog.getByRole('checkbox', { name: /Organización y sede/ })).toBeDisabled()
+    await expect(dialog.getByText('Formar parte de un equipo')).toHaveCount(0)
+  })
+
+  test('cerrar un proyecto lo oculta y se puede reabrir desde «Cerrados u ocultos»', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/participa/PRY-005/editar')
+    await page.getByLabel('Estado', { exact: true }).selectOption('cerrado')
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page).toHaveURL('/participa')
+    await expect(page.locator('main article', { hasText: 'Guía del afiliado de Gipuzkoa' })).toHaveCount(0)
+    await page.locator('#cerrados').getByRole('link', { name: 'Editar Guía del afiliado de Gipuzkoa' }).click()
+    await page.getByLabel('Estado', { exact: true }).selectOption('en_preparacion')
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page).toHaveURL('/participa/PRY-005')
+  })
+
+  test('la provincial solo edita proyectos de su provincia', async ({ page }) => {
+    await loginAs(page, /Miguel/)
+    await page.goto('/participa/PRY-004')
+    await expect(page.getByRole('link', { name: 'Editar' })).toBeVisible()
+    await page.goto('/participa/PRY-DEBATE')
+    await expect(page.getByRole('link', { name: 'Editar' })).toHaveCount(0)
+    await page.goto('/participa/PRY-DEBATE/editar')
+    await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+  })
+
+  test('un afiliado no edita proyectos', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/participa/PRY-007')
+    await expect(page.getByRole('link', { name: 'Editar' })).toHaveCount(0)
+    await page.goto('/participa/PRY-007/editar')
+    await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+  })
+})
+
+test.describe('roles de los miembros', () => {
+  test('Administración cambia el rol y la provincia de un miembro', async ({ page }) => {
+    await loginAs(page, /Administración/)
+    await page.goto('/miembros')
+    const role = page.getByRole('combobox', { name: 'Rol de Leire Sanz' })
+    await expect(role).toHaveValue('afiliado')
+    await role.selectOption('direccion_provincial')
+    await page.getByRole('combobox', { name: 'Territorio de Leire Sanz' }).selectOption('gipuzkoa')
+    await page.getByRole('button', { name: 'Guardar rol de Leire Sanz' }).click()
+    await expect(page.getByText('Rol actualizado.', { exact: false })).toBeVisible()
+    await page.reload()
+    await expect(page.getByRole('combobox', { name: 'Rol de Leire Sanz' })).toHaveValue('direccion_provincial')
+    await expect(page.getByRole('combobox', { name: 'Territorio de Leire Sanz' })).toHaveValue('gipuzkoa')
+  })
+
+  test('Administración no puede quitarse su propio rol', async ({ page }) => {
+    await loginAs(page, /Administración/)
+    await page.goto('/miembros')
+    await page.getByRole('combobox', { name: 'Rol de Administración' }).selectOption('afiliado')
+    await page.getByRole('combobox', { name: 'Territorio de Administración' }).selectOption('alava')
+    await page.getByRole('button', { name: 'Guardar rol de Administración' }).click()
+    await expect(page.getByText('No puedes quitarte tu propio rol de Administración.', { exact: false })).toBeVisible()
+  })
+
+  test('la dirección regional ve los miembros pero no cambia roles', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/miembros')
+    await expect(page.getByText('Leire Sanz')).toBeVisible()
+    await expect(page.getByRole('combobox', { name: /^Rol de / })).toHaveCount(0)
+  })
+})

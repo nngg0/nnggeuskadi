@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Container, PageHeader } from '@/components/layout/PageHeader'
+import { MemberRoleControl } from '@/components/admin/MemberRoleControl'
 import { EmptyState } from '@/components/ui/States'
 import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
-import { canListMembers, managedTerritories, ROLE_LABELS } from '@/lib/auth/permissions'
+import { can, canListMembers, managedTerritories, ROLE_LABELS } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { usernameFromEmail } from '@/lib/auth/username'
 import { getContent } from '@/lib/content/source'
@@ -26,6 +27,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
   const [members, content] = await Promise.all([personalStore().listMembers(), getContent()])
   const visible = members.filter((m) => matchesTerritoryFilter(m.territory, filter))
   const territories = content.territories.filter((t) => scope.includes(t.id))
+  const canChangeRoles = can(user, 'members.approve')
 
   return (
     <>
@@ -33,6 +35,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
         {scope.length === 1
           ? `Afiliados de ${territoryName(scope[0]!)} con acceso a la intranet.`
           : 'Afiliados de todos los territorios con acceso a la intranet.'}{' '}
+        {canChangeRoles ? 'Desde aquí puedes cambiar el rol y la provincia de cada persona. ' : ''}
         Uso interno: no compartas estos datos fuera de la organización.
       </PageHeader>
       <Container className="py-6 md:py-8">
@@ -49,7 +52,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
         ) : (
           <ul className="divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line bg-card">
             {visible.map((m) => (
-              <li key={m.email} className="grid gap-2 px-5 py-4 sm:grid-cols-[1fr_auto] sm:items-center">
+              <li key={m.id} className="grid gap-2 px-5 py-4 sm:grid-cols-[1fr_auto] sm:items-center">
                 <div className="min-w-0">
                   <p className="font-bold text-ink">
                     {m.displayName}
@@ -73,8 +76,12 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
                   ) : null}
                 </div>
                 <div className="text-xs text-slate sm:text-right">
-                  <p className="font-semibold text-ink">{ROLE_LABELS[m.role]}</p>
-                  <p>Desde el {formatFullDate(madridDate(new Date(m.createdAt)))}</p>
+                  {canChangeRoles ? (
+                    <MemberRoleControl id={m.id} name={m.displayName} role={m.role} territory={m.territory} />
+                  ) : (
+                    <p className="font-semibold text-ink">{ROLE_LABELS[m.role]}</p>
+                  )}
+                  <p className="mt-1">Desde el {formatFullDate(madridDate(new Date(m.createdAt)))}</p>
                 </div>
               </li>
             ))}

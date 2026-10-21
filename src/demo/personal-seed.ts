@@ -70,7 +70,7 @@ export const DEMO_ACCESS_REQUESTS: AccessRequest[] = [
 
 /** Afiliados ficticios adicionales para el listado de miembros. */
 export const DEMO_EXTRA_MEMBERS: Member[] = [
-  { displayName: 'Leire Sanz', email: 'leire.sanz@usuarios.nnggeuskadi.vercel.app', territory: 'bizkaia', role: 'afiliado', interests: ['vivienda', 'calle'], createdAt: '2026-09-12T10:00:00.000Z' },
-  { displayName: 'Unai Lasa', email: 'unai-lasa@usuarios.nnggeuskadi.vercel.app', territory: 'gipuzkoa', role: 'afiliado', interests: ['economia'], createdAt: '2026-09-20T10:00:00.000Z' },
-  { displayName: 'Nerea Gil', email: 'nerea@usuarios.nnggeuskadi.vercel.app', territory: 'alava', role: 'afiliado', interests: ['debate', 'justicia'], createdAt: '2026-09-28T10:00:00.000Z' },
+  { id: '20000000-0000-4000-8000-000000000001', displayName: 'Leire Sanz', email: 'leire.sanz@usuarios.nnggeuskadi.vercel.app', territory: 'bizkaia', role: 'afiliado', interests: ['vivienda', 'calle'], createdAt: '2026-09-12T10:00:00.000Z' },
+  { id: '20000000-0000-4000-8000-000000000002', displayName: 'Unai Lasa', email: 'unai-lasa@usuarios.nnggeuskadi.vercel.app', territory: 'gipuzkoa', role: 'afiliado', interests: ['economia'], createdAt: '2026-09-20T10:00:00.000Z' },
+  { id: '20000000-0000-4000-8000-000000000003', displayName: 'Nerea Gil', email: 'nerea@usuarios.nnggeuskadi.vercel.app', territory: 'alava', role: 'afiliado', interests: ['debate', 'justicia'], createdAt: '2026-09-28T10:00:00.000Z' },
 ]

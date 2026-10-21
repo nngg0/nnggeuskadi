@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { submitAccessRequest } from '@/lib/access/request-access'
 import { can } from '@/lib/auth/permissions'
 import { normalizeUsername, USERNAME_HINT, USERNAME_PATTERN } from '@/lib/auth/username'
-import { PROVINCE_IDS } from '@/lib/domain/territories'
+import { PROVINCE_IDS, TERRITORY_IDS } from '@/lib/domain/territories'
 import { USER_ROLES, type ActionResult } from '@/lib/domain/types'
 import { personalStore } from '@/lib/personal'
 import { actionUser, failure, NOT_AUTHENTICATED, success, UNEXPECTED } from './helpers'
@@ -92,6 +92,33 @@ export async function rejectAccessRequest(id: string): Promise<ActionResult> {
     return success('Solicitud rechazada.')
   } catch (error) {
     console.error('[rechazar solicitud]', error)
+    return UNEXPECTED
+  }
+}
+
+const memberTerritorySchema = z.enum(TERRITORY_IDS)
+
+/** Administración cambia el rol (y la provincia) de un miembro. La base de datos lo vuelve a comprobar. */
+export async function setMemberRole(memberId: string, role: string, territory: string): Promise<ActionResult> {
+  const user = await actionUser()
+  if (!user) return NOT_AUTHENTICATED
+  if (!can(user, 'members.approve')) return failure('Solo Administración puede cambiar roles.')
+  const parsedId = idSchema.safeParse(memberId)
+  const parsedRole = roleSchema.safeParse(role)
+  const parsedTerritory = memberTerritorySchema.safeParse(territory)
+  if (!parsedId.success || !parsedRole.success || !parsedTerritory.success) return failure('Datos no válidos.')
+  if (parsedId.data === user.id && parsedRole.data !== 'administracion') {
+    return failure('No puedes quitarte tu propio rol de Administración. Pídeselo a otra persona de Administración.')
+  }
+  if ((parsedRole.data === 'afiliado' || parsedRole.data === 'direccion_provincial') && parsedTerritory.data === 'euskadi') {
+    return failure('Afiliados y direcciones provinciales necesitan una provincia: Álava, Bizkaia o Gipuzkoa.')
+  }
+  try {
+    await personalStore().setMemberRole(parsedId.data, parsedRole.data, parsedTerritory.data)
+    revalidatePath('/', 'layout')
+    return success('Rol actualizado. Se aplica la próxima vez que entre o recargue.')
+  } catch (error) {
+    console.error('[cambiar rol]', error)
     return UNEXPECTED
   }
 }

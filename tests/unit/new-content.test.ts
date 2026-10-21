@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  editedOpportunitiesFromForm,
+  editProjectSchema,
+  planOpportunityChanges,
+  projectEditRecord,
   activityEditRecord,
   activityRecord,
   editActivitySchema,
@@ -163,5 +167,59 @@ describe('edición de actos', () => {
 
   it('letras de columna A1', () => {
     expect([0, 12, 25, 26, 27].map(columnLetter)).toEqual(['A', 'M', 'Z', 'AA', 'AB'])
+  })
+})
+
+describe('edición de proyectos y ámbitos', () => {
+  const base = { titulo: 'Debate', descripcion: '', tipo: '', territorio: 'euskadi', estado: 'cerrado', fecha_prevista: '' }
+
+  it('lee los ámbitos del formulario: existentes con id, nuevos sin id, y descarta filas nuevas vacías', () => {
+    expect(
+      editedOpportunitiesFromForm(['OP-1', '', '', 'OP-2'], ['Organización', 'Logística', '', ''], ['', '', '', ''], ['cerrada', 'abierta', 'abierta', '']),
+    ).toEqual([
+      { id: 'OP-1', nombre: 'Organización', descripcion: '', estado: 'cerrada' },
+      { id: '', nombre: 'Logística', descripcion: '', estado: 'abierta' },
+      { id: 'OP-2', nombre: '', descripcion: '', estado: undefined },
+    ])
+  })
+
+  it('valida: se puede cerrar el proyecto, hace falta al menos un ámbito y cada uno con nombre', () => {
+    const ok = editProjectSchema(TODAY, null).safeParse({ ...base, ambitos: [{ id: 'OP-1', nombre: 'Organización', descripcion: '' }] })
+    expect(ok.success && ok.data.estado).toBe('cerrado')
+    expect(ok.success && ok.data.ambitos[0]!.estado).toBe('abierta')
+    expect(editProjectSchema(TODAY, null).safeParse({ ...base, ambitos: [] }).success).toBe(false)
+    expect(editProjectSchema(TODAY, null).safeParse({ ...base, ambitos: [{ id: 'OP-2', nombre: '', descripcion: '' }] }).success).toBe(false)
+    expect(editProjectSchema(TODAY, null).safeParse({ ...base, ambitos: [{ id: 'x y', nombre: 'Ok', descripcion: '' }] }).success).toBe(false)
+  })
+
+  it('conserva una fecha prevista ya pasada pero no permite otra pasada', () => {
+    const amb = [{ id: '', nombre: 'Uno', descripcion: '' }]
+    expect(editProjectSchema(TODAY, '2026-10-01').safeParse({ ...base, fecha_prevista: '2026-10-01', ambitos: amb }).success).toBe(true)
+    expect(editProjectSchema(TODAY, '2026-10-01').safeParse({ ...base, fecha_prevista: '2026-09-01', ambitos: amb }).success).toBe(false)
+  })
+
+  it('planifica: actualiza los que siguen, oculta los quitados y crea los nuevos con ids libres', () => {
+    const input = editProjectSchema(TODAY, null).parse({
+      ...base,
+      ambitos: [
+        { id: 'OP-DEB-1', nombre: 'Organización y sede', descripcion: 'Todo', estado: 'cerrada' },
+        { id: '', nombre: 'Logística', descripcion: '' },
+      ],
+    })
+    const plan = planOpportunityChanges('PRY-DEBATE', [{ id: 'OP-DEB-1' }, { id: 'OP-DEB-2' }], input.ambitos, ['OP-001', 'OP-002'])
+    expect(plan.unknownIds).toEqual([])
+    expect(plan.updates).toEqual([
+      { id: 'OP-DEB-1', record: { nombre: 'Organización y sede', descripcion: 'Todo', estado: 'cerrada' } },
+      { id: 'OP-DEB-2', record: { visible: 'no' } },
+    ])
+    expect(plan.creates).toEqual([
+      { id: 'OP-003', proyecto_id: 'PRY-DEBATE', nombre: 'Logística', descripcion: '', fecha_limite: '', estado: 'abierta', visible: 'sí' },
+    ])
+    expect(projectEditRecord(input)).toMatchObject({ titulo: 'Debate', territorio: 'Euskadi', estado: 'cerrado', fecha_prevista: '' })
+  })
+
+  it('detecta ids de ámbitos que no son del proyecto', () => {
+    const input = editProjectSchema(TODAY, null).parse({ ...base, ambitos: [{ id: 'OP-29N-1', nombre: 'Ajeno', descripcion: '' }] })
+    expect(planOpportunityChanges('PRY-DEBATE', [{ id: 'OP-DEB-1' }], input.ambitos, []).unknownIds).toEqual(['OP-29N-1'])
   })
 })

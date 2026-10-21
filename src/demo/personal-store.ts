@@ -43,6 +43,8 @@ const stateSchema = z.object({
   ar: z.record(z.string().max(64), z.string().max(30)).default({}),
   // Territorio elegido al aprobar: id -> territorio
   at: z.record(z.string().max(64), z.string().max(30)).default({}),
+  // Cambios de rol hechos por Administración: id del miembro -> "rol|territorio"
+  mr: z.record(z.string().max(64), z.string().max(60)).default({}),
 })
 type DemoState = z.infer<typeof stateSchema>
 
@@ -58,6 +60,7 @@ function initialState(userId: string): DemoState {
     s: [...seed.saved],
     ar: {},
     at: {},
+    mr: {},
   }
 }
 
@@ -249,13 +252,27 @@ export const demoPersonalStore: PersonalStore = {
     })
   },
 
+  async setMemberRole(memberId, role, territory) {
+    const user = await currentDemoUser()
+    if (!user || !can(user, 'members.approve')) throw new Error('Sin permiso')
+    if (memberId === user.id && role !== 'administracion') throw new Error('cannot_demote_self')
+    const current = (await this.listMembers()).find((m) => m.id === memberId)
+    if (!current) throw new Error('member_not_found')
+    const next = territory ?? current.territory
+    if ((role === 'afiliado' || role === 'direccion_provincial') && next === 'euskadi') throw new Error('missing_province')
+    await mutate(user.id, (s) => {
+      s.mr[memberId] = `${role}|${next}`
+    })
+  },
+
   async listMembers() {
     const user = await currentDemoUser()
     if (!user) return []
     const scope = managedTerritories(user)
-    const { ar: reviewed, at: territories } = await readState(user.id)
+    const { ar: reviewed, at: territories, mr: roleChanges } = await readState(user.id)
     const approved: Member[] = DEMO_ACCESS_REQUESTS.filter((r) => (USER_ROLES as readonly string[]).includes(reviewed[r.id] ?? '')).map(
       (r) => ({
+        id: r.id,
         displayName: r.displayName,
         email: r.email,
         territory: parseTerritory(territories[r.id]) ?? r.territory ?? 'euskadi',
@@ -265,6 +282,7 @@ export const demoPersonalStore: PersonalStore = {
       }),
     )
     const users: Member[] = DEMO_USERS.map((u) => ({
+      id: u.id,
       displayName: u.displayName,
       email: u.email,
       territory: u.territory,
@@ -273,6 +291,12 @@ export const demoPersonalStore: PersonalStore = {
       createdAt: '2026-09-01T10:00:00.000Z',
     }))
     return [...users, ...DEMO_EXTRA_MEMBERS, ...approved]
+      .map((m) => {
+        const [role, territory] = (roleChanges[m.id] ?? '').split('|')
+        return role && (USER_ROLES as readonly string[]).includes(role)
+          ? { ...m, role: role as UserRole, territory: parseTerritory(territory) ?? m.territory }
+          : m
+      })
       .filter((m) => scope.includes(m.territory))
       .sort((a, b) => a.territory.localeCompare(b.territory) || a.displayName.localeCompare(b.displayName, 'es'))
   },

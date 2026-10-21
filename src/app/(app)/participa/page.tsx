@@ -14,7 +14,7 @@ import { requireUser } from '@/lib/auth/session'
 import { getContent } from '@/lib/content/source'
 import { madridDate } from '@/lib/domain/dates'
 import { campaignActivityCount, featuredProject, sortProjectsForUser, visibleProjects } from '@/lib/domain/selectors'
-import { matchesTerritoryFilter, parseTerritoryFilter } from '@/lib/domain/territories'
+import { matchesTerritoryFilter, parseTerritoryFilter, territoryName } from '@/lib/domain/territories'
 import { projectViews } from '@/lib/view/projects'
 
 export const metadata: Metadata = { title: 'Proyectos' }
@@ -39,6 +39,11 @@ export default async function ParticipaPage({ searchParams }: { searchParams: Se
   const campaignView = campaignViews[0] ?? null
   const preparing = views.filter((v) => v.project.status === 'en_preparacion')
   const running = views.filter((v) => v.project.status === 'en_marcha')
+  // Para quien puede editarlos: los cerrados u ocultos, para poder reabrirlos.
+  const editable = new Set(creatableTerritories(user))
+  const closed = content.projects.filter(
+    (p) => (p.status === 'cerrado' || !p.visible) && editable.has(p.territory) && matchesTerritoryFilter(p.territory, territory),
+  )
   const mine = [...campaignViews, ...views].filter((v) => v.participation)
 
   return (
@@ -109,6 +114,31 @@ export default async function ParticipaPage({ searchParams }: { searchParams: Se
                 <ProjectCard key={view.project.id} view={view} />
               ))}
             </div>
+          </section>
+        ) : null}
+
+        {closed.length > 0 ? (
+          <section id="cerrados" className="mt-12">
+            <SectionHeader eyebrow="Solo dirección" title="Cerrados u ocultos." />
+            <ul className="divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line bg-card">
+              {closed.map((p) => (
+                <li key={p.id} className="flex items-center justify-between gap-3 px-5 py-3">
+                  <span className="min-w-0">
+                    <span className="block truncate font-semibold text-ink">{p.title}</span>
+                    <span className="eyebrow !text-[0.58rem] text-slate">
+                      {territoryName(p.territory)} · {p.status === 'cerrado' ? 'Cerrado' : 'Oculto'}
+                    </span>
+                  </span>
+                  <Link
+                    href={`/participa/${encodeURIComponent(p.id)}/editar`}
+                    aria-label={`Editar ${p.title}`}
+                    className="press inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line-strong px-3 py-1.5 text-xs font-bold text-ink hover:border-electric"
+                  >
+                    <Icon name="edit" size={14} /> Editar
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </section>
         ) : null}
       </Container>

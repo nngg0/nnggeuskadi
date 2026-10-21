@@ -157,6 +157,8 @@ export interface AccessRequest {
 
 /** Miembro en el listado de la dirección. */
 export interface Member {
+  /** Id del perfil (para que Administración cambie su rol). */
+  id: string
   displayName: string
   email: string
   territory: TerritoryId

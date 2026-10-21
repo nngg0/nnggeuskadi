@@ -39,6 +39,7 @@ export default async function ProjectPage({ params }: { params: Params }) {
   const [view] = await projectViews([project], content.opportunities, user.id)
   if (!view) notFound()
   const canManage = can(user, 'manage.viewPeople', { territory: project.territory })
+  const canEdit = can(user, 'content.create', { territory: project.territory })
   const participants = canManage ? await personalStore().projectParticipants(project.id) : []
   const names = new Map(view.opportunities.map((o) => [o.opportunity.id, o.opportunity.name]))
 
@@ -46,9 +47,19 @@ export default async function ProjectPage({ params }: { params: Params }) {
     <>
       <section className="bg-night text-white">
         <Container className="pb-10 pt-4 md:pb-14 md:pt-8">
-          <Link href="/participa" className="press -ml-2 inline-flex items-center gap-1 rounded-full px-2 py-1.5 text-sm font-semibold text-white/70 hover:text-white">
-            <Icon name="arrowLeft" size={18} /> Participa
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link href="/participa" className="press -ml-2 inline-flex items-center gap-1 rounded-full px-2 py-1.5 text-sm font-semibold text-white/70 hover:text-white">
+              <Icon name="arrowLeft" size={18} /> Proyectos
+            </Link>
+            {canEdit ? (
+              <Link
+                href={`/participa/${encodeURIComponent(project.id)}/editar`}
+                className="press inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-sm font-bold text-white hover:bg-white/10"
+              >
+                <Icon name="edit" size={16} /> Editar
+              </Link>
+            ) : null}
+          </div>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <Eyebrow tone="sky">
               {PROJECT_STATUS_LABEL[project.status]}

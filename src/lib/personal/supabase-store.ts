@@ -208,8 +208,9 @@ export const supabasePersonalStore: PersonalStore = {
     const { data, error } = await supabase.rpc('list_members')
     if (error) fail('miembros', error)
     return (
-      (data ?? []) as { display_name: string; email: string; territory: string; role: string; interests: string[]; created_at: string }[]
+      (data ?? []) as { id: string; display_name: string; email: string; territory: string; role: string; interests: string[]; created_at: string }[]
     ).map((m) => ({
+      id: m.id,
       displayName: m.display_name,
       email: m.email,
       territory: toTerritory(m.territory),
@@ -217,5 +218,11 @@ export const supabasePersonalStore: PersonalStore = {
       interests: sanitizeInterests(m.interests),
       createdAt: m.created_at,
     }))
+  },
+
+  async setMemberRole(userId, role, territory) {
+    const supabase = await createSupabaseServerClient()
+    const { error } = await supabase.rpc('set_member_role', { p_user_id: userId, p_role: role, p_territory: territory })
+    if (error) fail('cambiar rol', error)
   },
 }

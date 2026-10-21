@@ -73,6 +73,8 @@ Todas con UUID/timestamps, claves foráneas con `on delete cascade` hacia el usu
 | `list_event_registrants(id)` | authenticated | Nombres de inscritos, **solo** si `can_manage_territory` |
 | `list_project_participants(id)` | authenticated | Nombres de quienes se ofrecen, **solo** si `can_manage_territory` |
 | `aggregate_counts()` | service_role | Cifras para `/api/agregados` |
+| `list_members()` | authenticated | Miembros (con id) que la persona puede gestionar según `can_manage_territory` |
+| `set_member_role(id, rol, territorio)` | authenticated | **Solo Administración** (`is_admin`): cambia rol y provincia; nadie puede quitarse a sí mismo Administración; afiliados y provinciales necesitan provincia |
 
 ## Alta de afiliados
 
@@ -85,6 +87,8 @@ Todas con UUID/timestamps, claves foráneas con `on delete cascade` hacia el usu
 2. **Solo Administración** la revisa en `/solicitudes` (aviso en Inicio y en Perfil → Gestión): aprueba eligiendo provincia
    y rol, o rechaza. Aprobar añade el email a `member_allowlist` y crea el perfil; rechazar borra la cuenta creada.
 3. La dirección ve el listado de miembros en `/miembros`: la provincial, su territorio; la regional y Administración, todos.
+   **Administración** puede cambiar ahí mismo el rol (afiliado, dirección provincial, dirección regional, Administración)
+   y la provincia de cada persona. Se aplica la próxima vez que esa persona cargue una página.
 
 Nadie verifica los datos (no hay SMTP): aprueba solo a quien conozcas. Las cuentas con usuario no pueden recuperar la
 contraseña por correo: se la restablece Administración.

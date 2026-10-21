@@ -54,4 +54,6 @@ export interface PersonalStore {
   approveAccessRequest(id: string, role: UserRole, territory: TerritoryId): Promise<void>
   rejectAccessRequest(id: string): Promise<void>
   listMembers(): Promise<Member[]>
+  /** Solo Administración (verificado también en base de datos). Territorio null = conservar el actual. */
+  setMemberRole(userId: string, role: UserRole, territory: TerritoryId | null): Promise<void>
 }
