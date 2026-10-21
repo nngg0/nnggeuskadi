@@ -28,16 +28,22 @@ El Sheet es el pequeño CMS de la organización: quien lo edita cambia lo que ve
 Para leer, la app usa un token de solo lectura (`spreadsheets.readonly`). Solo pide el permiso de escritura
 (`spreadsheets`) al crear contenido desde la web.
 
-### Alta desde la web (botón «+»)
+### Alta y edición desde la web (botón «+» y «Editar»)
 
-En **Calendario** y **Participa**, Administración, la dirección regional y las direcciones provinciales ven un botón «+».
+En **Actos** y **Proyectos**, Administración, la dirección regional y las direcciones provinciales ven un botón «+».
 - Administración y dirección regional crean en cualquier territorio; la provincial, **solo en su provincia**.
   El permiso se comprueba en el servidor (`can(user, 'content.create', { territory })`), no solo ocultando el botón.
 - Una actividad nueva es una **fila nueva** en `ACTIVIDADES`; un proyecto, una fila en `PROYECTOS` más una fila por
   ámbito en `OPORTUNIDADES`. Los ids siguen la numeración existente (`ACT-043`, `PRY-007`, `OP-012`).
 - Las columnas se localizan por cabecera, así que el orden sigue siendo libre. Si falta una columna, no se escribe nada.
 - El texto se guarda tal cual (`valueInputOption=RAW`): nunca se interpreta como fórmula.
-- Tras crear, la caché del Sheet se invalida y el contenido aparece al momento. Para editar o borrar, se hace en el Sheet.
+- Tras crear o editar, la caché del Sheet se invalida y el contenido aparece al momento.
+- **Editar** (botón en la ficha del acto o del proyecto, con los mismos permisos): se localiza la fila por `id` y se
+  escriben **solo las celdas que cambian**; el resto de la fila (fórmulas, formatos, `visible`, `destacado`…) no se toca.
+- Al editar un proyecto, sus ámbitos se pueden renombrar, abrir o cerrar, añadir y quitar. Quitar un ámbito pone
+  `visible = no` (no se borra la fila), para que quien ya se apuntó conserve su participación. Los proyectos cerrados u
+  ocultos aparecen al final de Proyectos («Cerrados u ocultos») solo para quien puede editarlos, para poder reabrirlos.
+- Borrar filas sigue haciéndose en el Sheet.
 
 ## 3. Estructura
 
@@ -64,6 +70,12 @@ Valores aceptados en todas las hojas:
 | `estado` | | `confirmada` (por defecto), `cerrada` (cierre manual), `cancelada`, `borrador` (oculta) |
 | `visible` | | Por defecto sí |
 | `destacado` | | Se prioriza en Inicio |
+| `tipo` | | Vacío o `acto` = acto normal · `junta` = **junta directiva** (acto interno de NNGG, en violeta) |
+| `acceso` | | Solo juntas: `abierto` (todos los afiliados, por defecto) · `cerrado` (solo miembros de la Junta Directiva) |
+
+Las columnas `tipo` y `acceso` son opcionales: sin ellas todo son actos normales. Hacen falta para crear juntas desde la web.
+Las juntas cerradas **no se envían** a quien no es de la Junta Directiva (ni listas, ni ficha, ni calendario .ics): se
+filtran en el servidor. Quién es de la Junta lo marcan Administración o la dirección regional en Miembros.
 
 ### PROYECTOS
 

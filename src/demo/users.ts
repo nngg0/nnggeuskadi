@@ -13,6 +13,7 @@ export const DEMO_USERS: CurrentUser[] = [
     role: 'direccion_euskadi',
     settings: { notifyNewInitiatives: true },
     interests: ['organizacion', 'economia'],
+    junta: true,
   },
   {
     id: '00000000-0000-4000-8000-000000000001',
@@ -22,6 +23,7 @@ export const DEMO_USERS: CurrentUser[] = [
     role: 'afiliado',
     settings: { notifyNewInitiatives: true },
     interests: ['debate', 'vivienda', 'calle'],
+    junta: false,
   },
   {
     id: '00000000-0000-4000-8000-000000000002',
@@ -31,6 +33,7 @@ export const DEMO_USERS: CurrentUser[] = [
     role: 'afiliado',
     settings: { notifyNewInitiatives: false },
     interests: ['seguridad'],
+    junta: false,
   },
   {
     id: '00000000-0000-4000-8000-000000000004',
@@ -40,6 +43,7 @@ export const DEMO_USERS: CurrentUser[] = [
     role: 'direccion_provincial',
     settings: { notifyNewInitiatives: true },
     interests: ['calle', 'organizacion'],
+    junta: false,
   },
 ]
 
@@ -52,6 +56,7 @@ DEMO_USERS.push({
   role: 'administracion',
   settings: { notifyNewInitiatives: true },
   interests: [],
+  junta: true,
 })
 
 export function findDemoUser(id: string | undefined): CurrentUser | null {

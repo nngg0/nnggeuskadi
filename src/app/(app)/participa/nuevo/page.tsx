@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { NewProjectForm } from '@/components/content/NewProjectForm'
+import { ProjectForm } from '@/components/content/ProjectForm'
 import { Container, PageHeader } from '@/components/layout/PageHeader'
 import Link from 'next/link'
 import { Icon } from '@/components/ui/Icon'
@@ -32,7 +32,7 @@ export default async function NewProjectPage() {
             <Icon name="arrowLeft" size={18} />
             Volver a Proyectos
           </Link>
-          <NewProjectForm territories={territories} today={madridDate(new Date())} />
+          <ProjectForm territories={territories} today={madridDate(new Date())} />
         </div>
       </Container>
     </>

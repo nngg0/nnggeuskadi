@@ -128,14 +128,16 @@ export function columnLetter(index: number): string {
 }
 
 /**
- * Escribe solo las celdas indicadas de una fila (índice de columna → valor), sin tocar el resto:
+ * Escribe solo las celdas indicadas de una o varias filas (índice de columna → valor), en una sola petición y sin tocar el resto:
  * así se conservan fórmulas, formatos y columnas que el formulario no edita. RAW: texto tal cual.
  */
-export async function updateSheetCells(sheet: SheetName, rowNumber: number, cells: Map<number, string>): Promise<void> {
-  if (rowNumber < 2) throw new Error('No se pueden sobrescribir las cabeceras')
-  if (cells.size === 0) return
+export async function updateSheetCells(sheet: SheetName, rows: { rowNumber: number; cells: Map<number, string> }[]): Promise<void> {
+  if (rows.some((r) => r.rowNumber < 2)) throw new Error('No se pueden sobrescribir las cabeceras')
+  const data = rows.flatMap(({ rowNumber, cells }) =>
+    [...cells].map(([col, value]) => ({ range: `${sheet}!${columnLetter(col)}${rowNumber}`, values: [[value]] })),
+  )
+  if (data.length === 0) return
   const env = sheetsEnv()
-  const data = [...cells].map(([col, value]) => ({ range: `${sheet}!${columnLetter(col)}${rowNumber}`, values: [[value]] }))
   const res = await fetch(`${API}/${encodeURIComponent(env.spreadsheetId)}/values:batchUpdate`, {
     method: 'POST',
     headers: { authorization: `Bearer ${await accessToken(WRITE_SCOPE)}`, 'content-type': 'application/json' },

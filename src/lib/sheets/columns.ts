@@ -7,6 +7,8 @@ export const SHEETS = {
   ACTIVIDADES: [
     'id', 'titulo', 'descripcion', 'territorio', 'fecha', 'hora', 'lugar', 'plazas',
     'inscripcion_inicio', 'inscripcion_fin', 'estado', 'visible', 'destacado',
+    // Opcionales: tipo = acto (vacío) | junta; acceso (solo juntas) = abierto (vacío) | cerrado.
+    'tipo', 'acceso',
   ],
   PROYECTOS: [
     'id', 'titulo', 'descripcion', 'tipo', 'territorio', 'estado', 'fecha_inicio', 'fecha_prevista', 'visible', 'destacado',

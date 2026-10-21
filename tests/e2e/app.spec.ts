@@ -565,3 +565,155 @@ test('la hoja de participar bloquea el fondo solo mientras está abierta y devue
   await page.mouse.wheel(0, 400)
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before)
 })
+
+test.describe('editar proyectos', () => {
+  test('la dirección regional cambia un proyecto y sus ámbitos: renombra, cierra, quita y añade', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/participa/PRY-DEBATE')
+    await page.getByRole('link', { name: 'Editar' }).click()
+    await expect(page).toHaveURL('/participa/PRY-DEBATE/editar')
+    await page.getByLabel('Descripción', { exact: true }).fill('Debate interno sobre Europa. Fecha por confirmar.')
+    await expect(page.getByLabel('Nombre del ámbito 1')).toHaveValue('Organización')
+    await page.getByLabel('Nombre del ámbito 1').fill('Organización y sede')
+    await page.getByLabel('Estado del ámbito 1').selectOption('cerrada')
+    await page.getByRole('button', { name: 'Quitar el ámbito 2' }).click()
+    await page.getByRole('button', { name: 'Añadir ámbito' }).click()
+    await page.getByLabel('Nombre del ámbito 2').fill('Moderación')
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page).toHaveURL('/participa/PRY-DEBATE')
+    await expect(page.getByText('Debate interno sobre Europa. Fecha por confirmar.')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Quiero participar' }).first().click()
+    const dialog = page.getByRole('dialog')
+    await expect(dialog.getByText('Moderación', { exact: true })).toBeVisible()
+    await expect(dialog.getByRole('checkbox', { name: /Organización y sede/ })).toBeDisabled()
+    await expect(dialog.getByText('Formar parte de un equipo')).toHaveCount(0)
+  })
+
+  test('cerrar un proyecto lo oculta y se puede reabrir desde «Cerrados u ocultos»', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/participa/PRY-005/editar')
+    await page.getByLabel('Estado', { exact: true }).selectOption('cerrado')
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page).toHaveURL('/participa')
+    await expect(page.locator('main article', { hasText: 'Guía del afiliado de Gipuzkoa' })).toHaveCount(0)
+    await page.locator('#cerrados').getByRole('link', { name: 'Editar Guía del afiliado de Gipuzkoa' }).click()
+    await page.getByLabel('Estado', { exact: true }).selectOption('en_preparacion')
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page).toHaveURL('/participa/PRY-005')
+  })
+
+  test('la provincial solo edita proyectos de su provincia', async ({ page }) => {
+    await loginAs(page, /Miguel/)
+    await page.goto('/participa/PRY-004')
+    await expect(page.getByRole('link', { name: 'Editar' })).toBeVisible()
+    await page.goto('/participa/PRY-DEBATE')
+    await expect(page.getByRole('link', { name: 'Editar' })).toHaveCount(0)
+    await page.goto('/participa/PRY-DEBATE/editar')
+    await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+  })
+
+  test('un afiliado no edita proyectos', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/participa/PRY-007')
+    await expect(page.getByRole('link', { name: 'Editar' })).toHaveCount(0)
+    await page.goto('/participa/PRY-007/editar')
+    await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+  })
+})
+
+test.describe('roles de los miembros', () => {
+  test('Administración cambia el rol y la provincia de un miembro', async ({ page }) => {
+    await loginAs(page, /Administración/)
+    await page.goto('/miembros')
+    const role = page.getByRole('combobox', { name: 'Rol de Leire Sanz' })
+    await expect(role).toHaveValue('afiliado')
+    await role.selectOption('direccion_provincial')
+    await page.getByRole('combobox', { name: 'Territorio de Leire Sanz' }).selectOption('gipuzkoa')
+    await page.getByRole('button', { name: 'Guardar rol de Leire Sanz' }).click()
+    await expect(page.getByText('Rol actualizado.', { exact: false })).toBeVisible()
+    await page.reload()
+    await expect(page.getByRole('combobox', { name: 'Rol de Leire Sanz' })).toHaveValue('direccion_provincial')
+    await expect(page.getByRole('combobox', { name: 'Territorio de Leire Sanz' })).toHaveValue('gipuzkoa')
+  })
+
+  test('Administración no puede quitarse su propio rol', async ({ page }) => {
+    await loginAs(page, /Administración/)
+    await page.goto('/miembros')
+    await page.getByRole('combobox', { name: 'Rol de Administración' }).selectOption('afiliado')
+    await page.getByRole('combobox', { name: 'Territorio de Administración' }).selectOption('alava')
+    await page.getByRole('button', { name: 'Guardar rol de Administración' }).click()
+    await expect(page.getByText('No puedes quitarte tu propio rol de Administración.', { exact: false })).toBeVisible()
+  })
+
+  test('la dirección regional ve los miembros pero no cambia roles', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/miembros')
+    await expect(page.getByText('Leire Sanz')).toBeVisible()
+    await expect(page.getByRole('combobox', { name: /^Rol de / })).toHaveCount(0)
+  })
+})
+
+test.describe('juntas directivas', () => {
+  test('un afiliado ve las juntas abiertas, en violeta, pero no las cerradas (ni por enlace ni en el calendario)', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/calendario')
+    const abierta = page.locator('article', { hasText: 'Junta directiva abierta: balance del trimestre' })
+    await expect(abierta).toBeVisible()
+    await expect(abierta.getByText('Junta directiva · Abierta')).toBeVisible()
+    await expect(page.getByText('Junta directiva de NNGG Euskadi')).toHaveCount(0)
+    await page.goto('/actividades/ACT-050')
+    await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+    expect((await page.request.get('/actividades/ACT-050/ics')).status()).toBe(404)
+  })
+
+  test('un miembro de la Junta ve las juntas cerradas', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/calendario')
+    const cerrada = page.locator('article', { hasText: 'Junta directiva de NNGG Euskadi' })
+    await expect(cerrada.getByText('Junta directiva · Cerrada')).toBeVisible()
+    await page.goto('/actividades/ACT-050')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Junta directiva de NNGG Euskadi')
+  })
+
+  test('la dirección regional crea una junta cerrada desde la app', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/calendario/nueva')
+    await page.getByLabel('Tipo').selectOption('junta')
+    await expect(page.getByLabel('Quién puede verla')).toHaveValue('cerrado')
+    await page.getByLabel('Título').fill('Junta extraordinaria')
+    await page.getByLabel('Fecha').fill(new Date(Date.now() + 20 * 864e5).toISOString().slice(0, 10))
+    await page.getByRole('button', { name: 'Crear acto' }).click()
+    await expect(page).toHaveURL(/\/actividades\/ACT-\d+$/)
+    await expect(page.getByText('Junta directiva · Cerrada')).toBeVisible()
+    await page.getByRole('link', { name: 'Editar' }).click()
+    await expect(page.getByLabel('Tipo')).toHaveValue('junta')
+    await page.getByLabel('Quién puede verla').selectOption('abierto')
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page.getByText('Junta directiva · Abierta')).toBeVisible()
+  })
+
+  test('Administración y la regional marcan quién es de la Junta; la provincial no', async ({ page }) => {
+    await loginAs(page, /Administración/)
+    await page.goto('/miembros')
+    const leire = page.getByRole('checkbox', { name: 'Leire Sanz es de la Junta Directiva' })
+    await expect(leire).not.toBeChecked()
+    await leire.check({ force: true })
+    await expect(leire).toBeChecked()
+    await page.reload()
+    await expect(page.getByRole('checkbox', { name: 'Leire Sanz es de la Junta Directiva' })).toBeChecked()
+  })
+
+  test('la regional ve el interruptor de Junta; la provincial no', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/miembros')
+    await expect(page.getByRole('checkbox', { name: 'Leire Sanz es de la Junta Directiva' })).toHaveCount(1)
+  })
+
+  test('la provincial no marca la Junta', async ({ page }) => {
+    await loginAs(page, /Miguel/)
+    await page.goto('/miembros')
+    await expect(page.getByText('Pablo Folgado')).toBeVisible()
+    await expect(page.getByRole('checkbox', { name: /es de la Junta Directiva/ })).toHaveCount(0)
+  })
+})

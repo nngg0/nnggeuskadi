@@ -2,14 +2,16 @@ import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import { formatDayMonth, formatMonthShort, formatWeekdayShort } from '@/lib/domain/dates'
 import type { RegistrationState } from '@/lib/domain/registration'
+import type { Activity } from '@/lib/domain/types'
 import { territoryName, type TerritoryId } from '@/lib/domain/territories'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { Tag } from '@/components/ui/Tag'
 
 /** Bloque de fecha: "VIE / 17 / OCT". */
-export function DateBlock({ date, className, tone = 'night' }: { date: string; className?: string; tone?: 'night' | 'electric' | 'light' }) {
+export function DateBlock({ date, className, tone = 'night' }: { date: string; className?: string; tone?: 'night' | 'electric' | 'light' | 'junta' }) {
   const tones = {
     night: 'bg-night text-white',
+    junta: 'bg-junta text-night',
     electric: 'bg-electric text-white',
     light: 'bg-mist text-ink',
   }
@@ -90,4 +92,15 @@ export function RegistrationTag({ state }: { state: RegistrationState }) {
         <Tag tone="electric">Inscripción abierta</Tag>
       )
   }
+}
+
+/** Distintivo de las juntas directivas (actos internos de NNGG): «Junta directiva» y, si es cerrada, el candado. */
+export function JuntaTag({ activity }: { activity: Pick<Activity, 'kind' | 'access'> }) {
+  if (activity.kind !== 'junta') return null
+  return (
+    <Tag tone="junta">
+      {activity.access === 'cerrado' ? <Icon name="lock" size={12} strokeWidth={2.4} /> : null}
+      {activity.access === 'cerrado' ? 'Junta directiva · Cerrada' : 'Junta directiva · Abierta'}
+    </Tag>
+  )
 }

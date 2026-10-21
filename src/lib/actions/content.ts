@@ -10,10 +10,14 @@ import {
   activityEditRecord,
   activityRecord,
   editActivitySchema,
+  editedOpportunitiesFromForm,
+  editProjectSchema,
   newActivitySchema,
   newProjectSchema,
   nextId,
   opportunitiesFromForm,
+  planOpportunityChanges,
+  projectEditRecord,
   projectRecords,
 } from '@/lib/domain/new-content'
 import type { ActionResult } from '@/lib/domain/types'
@@ -22,7 +26,7 @@ import { idsOf } from '@/lib/sheets/rows'
 import { actionUser, contentIdSchema, failure, NOT_AUTHENTICATED, UNEXPECTED } from './helpers'
 
 /*
- * Alta de actos y proyectos desde la web (botón «+» de Actos y Proyectos) y edición de actos.
+ * Alta de actos y proyectos desde la web (botón «+» de Actos y Proyectos) y edición de actos y proyectos.
  * Administración y dirección regional crean y editan en cualquier territorio; la dirección provincial, solo en el suyo.
  * El permiso se comprueba aquí, con el territorio enviado, aunque el formulario solo ofrezca los permitidos.
  */
@@ -38,8 +42,16 @@ const activityFields = (formData: FormData) => ({
   plazas: field(formData, 'plazas'),
   inscripcion_fin: field(formData, 'inscripcion_fin'),
   estado: field(formData, 'estado') || undefined,
+  tipo: field(formData, 'tipo') || undefined,
+  acceso: field(formData, 'acceso') || undefined,
 })
 const FORBIDDEN = failure('No puedes crear ni editar contenido en ese territorio.')
+
+/** Error de escritura explicado si es por columnas que faltan en el Sheet; si no, el genérico. */
+function writeFailure(error: unknown): ActionResult {
+  const missing = error instanceof Error ? /Faltan columnas en el Sheet: (.+)$/.exec(error.message)?.[1] : undefined
+  return missing ? failure(`Faltan columnas en el Sheet (${missing}). Añádelas en la fila 1 de la pestaña y vuelve a intentarlo.`) : UNEXPECTED
+}
 
 function refreshContent() {
   updateTag(SHEETS_CACHE_TAG)
@@ -62,7 +74,7 @@ export async function createActivity(_prev: ActionResult | null, formData: FormD
     console.info(`[alta] ${user.id} creó la actividad ${id} (${input.data.territorio})`)
   } catch (error) {
     console.error('[crear actividad]', error)
-    return UNEXPECTED
+    return writeFailure(error)
   }
   refreshContent()
   redirect(input.data.estado === 'borrador' ? '/calendario' : `/actividades/${encodeURIComponent(id)}`)
@@ -91,7 +103,7 @@ export async function updateActivity(activityId: string, _prev: ActionResult | n
     console.info(`[edición] ${user.id} editó la actividad ${original.id} (${input.data.territorio})`)
   } catch (error) {
     console.error('[editar actividad]', error)
-    return UNEXPECTED
+    return writeFailure(error)
   }
   refreshContent()
   redirect(input.data.estado === 'borrador' ? '/calendario' : `/actividades/${encodeURIComponent(original.id)}`)
@@ -141,4 +153,60 @@ export async function createProject(_prev: ActionResult | null, formData: FormDa
   }
   refreshContent()
   redirect(`/participa/${encodeURIComponent(projectId)}`)
+}
+
+/**
+ * Edición de un proyecto y de sus ámbitos. Se usa con `updateProject.bind(null, id)` en el formulario.
+ * Los ámbitos quitados se ocultan (visible = no) en lugar de borrarse: quien ya se apuntó lo conserva.
+ */
+export async function updateProject(projectId: string, _prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
+  const user = await actionUser()
+  if (!user) return NOT_AUTHENTICATED
+  const id = contentIdSchema.safeParse(projectId)
+  if (!id.success) return failure('Proyecto no válido.')
+  const content = await getContent()
+  const original = content.projects.find((p) => p.id === id.data)
+  if (!original) return failure('Este proyecto ya no existe.')
+  if (!can(user, 'content.create', { territory: original.territory })) return failure('No puedes editar proyectos de ese territorio.')
+
+  const today = madridDate(new Date())
+  const input = editProjectSchema(today, original.expectedDate).safeParse({
+    titulo: field(formData, 'titulo'),
+    descripcion: field(formData, 'descripcion'),
+    tipo: field(formData, 'tipo'),
+    territorio: field(formData, 'territorio'),
+    estado: field(formData, 'estado') || undefined,
+    fecha_prevista: field(formData, 'fecha_prevista'),
+    ambitos: editedOpportunitiesFromForm(
+      formData.getAll('ambito_id'),
+      formData.getAll('ambito_nombre'),
+      formData.getAll('ambito_descripcion'),
+      formData.getAll('ambito_estado'),
+    ),
+  })
+  if (!input.success) return failure(input.error.issues[0]?.message ?? 'Revisa los datos.')
+  if (!can(user, 'content.create', { territory: input.data.territorio })) return FORBIDDEN
+
+  try {
+    const writer = contentWriter()
+    const current = content.opportunities.filter((o) => o.projectId === original.id && o.visible)
+    const plan = planOpportunityChanges(original.id, current, input.data.ambitos, idsOf(await writer.read('OPORTUNIDADES')))
+    if (plan.unknownIds.length > 0) return failure('Los ámbitos han cambiado mientras editabas. Recarga la página y vuelve a intentarlo.')
+
+    if (!(await writer.update('PROYECTOS', original.id, projectEditRecord(input.data)))) {
+      return failure('No hemos encontrado este proyecto en el Sheet. Puede que lo hayan borrado.')
+    }
+    const missing = await writer.updateMany('OPORTUNIDADES', plan.updates)
+    if (missing.length > 0) {
+      refreshContent()
+      return failure('Se ha guardado el proyecto, pero no sus ámbitos: alguno ya no está en el Sheet. Recarga y revísalos.')
+    }
+    if (plan.creates.length > 0) await writer.append('OPORTUNIDADES', plan.creates)
+    console.info(`[edición] ${user.id} editó el proyecto ${original.id} (${input.data.territorio})`)
+  } catch (error) {
+    console.error('[editar proyecto]', error)
+    return UNEXPECTED
+  }
+  refreshContent()
+  redirect(input.data.estado === 'cerrado' ? '/participa' : `/participa/${encodeURIComponent(original.id)}`)
 }

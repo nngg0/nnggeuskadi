@@ -20,6 +20,12 @@ export interface ContentWriter {
   append(sheet: WritableSheet, records: SheetRecord[]): Promise<void>
   /** Cambia las columnas de `record` en la fila con ese id. Devuelve false si la fila ya no existe. */
   update(sheet: WritableSheet, id: string, record: SheetRecord): Promise<boolean>
+  /** Igual que `update` para varias filas a la vez. Devuelve los ids que no se han encontrado (y no escribe nada si falta alguno). */
+  updateMany(sheet: WritableSheet, changes: { id: string; record: SheetRecord }[]): Promise<string[]>
+}
+
+async function updateOne(writer: ContentWriter, sheet: WritableSheet, id: string, record: SheetRecord): Promise<boolean> {
+  return (await writer.updateMany(sheet, [{ id, record }])).length === 0
 }
 
 const sheetsWriter: ContentWriter = {
@@ -29,25 +35,33 @@ const sheetsWriter: ContentWriter = {
     if (!header || header.length === 0) throw new Error(`La hoja ${sheet} no tiene cabeceras`)
     await appendSheetRows(sheet, records.map((r) => recordToRow(header, r)))
   },
-  async update(sheet, id, record) {
+  update(sheet, id, record) {
+    return updateOne(sheetsWriter, sheet, id, record)
+  },
+  async updateMany(sheet, changes) {
     // Se relee la hoja justo antes: si alguien ha movido filas en el Sheet, se escribe en la fila correcta.
     const table = await fetchSheetFresh(sheet)
     const [header] = table
-    const rowNumber = rowNumberOf(table, id)
-    if (!header || rowNumber === null) return false
-    await updateSheetCells(sheet, rowNumber, changedCells(header, record))
-    return true
+    const located = changes.map((c) => ({ ...c, rowNumber: rowNumberOf(table, c.id) }))
+    const missing = located.filter((c) => c.rowNumber === null).map((c) => c.id)
+    if (!header || missing.length > 0) return header ? missing : changes.map((c) => c.id)
+    await updateSheetCells(sheet, located.map((c) => ({ rowNumber: c.rowNumber!, cells: changedCells(header, c.record) })))
+    return []
   },
 }
 
 const demoWriter: ContentWriter = {
   read: async (sheet) => (await withDemoRecords(demoWorkbook()))[sheet] ?? [],
   append: (sheet, records) => addDemoRecords(sheet, records),
-  async update(sheet, id, record) {
+  update(sheet, id, record) {
+    return updateOne(demoWriter, sheet, id, record)
+  },
+  async updateMany(sheet, changes) {
     const table = (await withDemoRecords(demoWorkbook()))[sheet]
-    if (rowNumberOf(table, id) === null) return false
-    await addDemoRecords(sheet, [{ ...record, id }])
-    return true
+    const missing = changes.filter((c) => rowNumberOf(table, c.id) === null).map((c) => c.id)
+    if (missing.length > 0) return missing
+    await addDemoRecords(sheet, changes.map((c) => ({ ...c.record, id: c.id })))
+    return []
   },
 }
 

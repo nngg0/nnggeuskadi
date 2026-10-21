@@ -35,7 +35,7 @@ export function demoWorkbook(now: Date = new Date()): RawWorkbook {
 
   return {
     ACTIVIDADES: table(
-      ['id', 'titulo', 'descripcion', 'territorio', 'fecha', 'hora', 'lugar', 'plazas', 'inscripcion_inicio', 'inscripcion_fin', 'estado', 'visible', 'destacado'],
+      ['id', 'titulo', 'descripcion', 'territorio', 'fecha', 'hora', 'lugar', 'plazas', 'inscripcion_inicio', 'inscripcion_fin', 'estado', 'visible', 'destacado', 'tipo', 'acceso'],
       [
         ['ACT-031', 'Encuentro NNGG Euskadi', 'Nos juntamos afiliados de los tres territorios para arrancar el curso político: balance, prioridades del año y espacio para proponer iniciativas.\n\nHabrá un pequeño picoteo al terminar.', 'Euskadi', D(9), '18:30', 'Vitoria-Gasteiz · Palacio Europa', '80', D(-10), D(7), 'confirmada', 'sí', 'sí'],
         ['ACT-029', 'Arranque de la Campaña 29N', 'Presentamos la campaña y repartimos tareas. Si te has apuntado en Participa, este es tu sitio; si no, también.', 'Euskadi', D(4), '19:00', 'Bilbao · Sede PP Bizkaia', '', '', '', 'confirmada', 'sí', 'no'],
@@ -51,6 +51,8 @@ export function demoWorkbook(now: Date = new Date()): RawWorkbook {
         ['ACT-041', 'Charla con concejales jóvenes', 'Aplazada hasta nueva fecha.', 'Gipuzkoa', D(8), '19:00', 'Eibar', '40', D(-10), D(7), 'cancelada', 'sí', 'no'],
         ['ACT-042', 'Café político: fiscalidad joven', 'Conversación informal sobre impuestos, primer empleo y emancipación.', 'Álava', D(24), '18:30', 'Vitoria-Gasteiz · Café Dublin', '18', D(-2), D(22), 'confirmada', 'sí', 'no'],
         ['ACT-030', 'Asamblea de inicio de curso', 'Actividad pasada (sirve para ver el histórico).', 'Euskadi', D(-12), '18:00', 'Bilbao', '100', D(-40), D(-14), 'confirmada', 'sí', 'no'],
+        ['ACT-050', 'Junta directiva de NNGG Euskadi', 'Reunión de la Junta Directiva: preparación de la Campaña 29N y reparto de responsabilidades.', 'Euskadi', D(6), '20:00', 'Bilbao · Sede PP Bizkaia', '', '', '', 'confirmada', 'sí', 'no', 'junta', 'cerrado'],
+        ['ACT-051', 'Junta directiva abierta: balance del trimestre', 'Junta abierta a todos los afiliados: balance del trimestre y turno de propuestas.', 'Euskadi', D(13), '19:00', 'Vitoria-Gasteiz · Sede PP Álava', '', '', '', 'confirmada', 'sí', 'no', 'junta', 'abierto'],
         ['ACT-099', 'Borrador interno', 'Esta fila tiene estado borrador y no debe verse.', 'Euskadi', D(30), '18:00', 'Bilbao', '20', '', '', 'borrador', 'sí', 'no'],
       ],
     ),

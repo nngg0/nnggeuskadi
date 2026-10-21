@@ -17,7 +17,7 @@ import { can, canListMembers, ROLE_LABELS } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { accountLabel } from '@/lib/auth/username'
 import { isDemoMode } from '@/lib/config/mode'
-import { getContent } from '@/lib/content/source'
+import { getContentFor } from '@/lib/content/source'
 import { formatMonthShort } from '@/lib/domain/dates'
 import { sortByDate } from '@/lib/domain/selectors'
 import { territoryName } from '@/lib/domain/territories'
@@ -38,7 +38,7 @@ const SECTIONS = [
 
 export default async function ProfilePage() {
   const user = await requireUser()
-  const content = await getContent()
+  const content = await getContentFor(user)
   const store = personalStore()
   const [registrations, participations, savedIds] = await Promise.all([
     store.myRegistrations(user.id),

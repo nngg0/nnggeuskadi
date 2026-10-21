@@ -19,6 +19,8 @@ function activity(overrides: Partial<Activity> = {}): Activity {
     status: 'confirmada',
     visible: true,
     featured: false,
+    kind: 'acto',
+    access: 'abierto',
     ...overrides,
   }
 }
