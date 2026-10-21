@@ -700,6 +700,7 @@ test.describe('juntas directivas', () => {
     await expect(leire).not.toBeChecked()
     await leire.check({ force: true })
     await expect(leire).toBeChecked()
+    await expect(page.locator('li', { hasText: 'Leire Sanz' }).getByText('Guardado')).toBeVisible()
     await page.reload()
     await expect(page.getByRole('checkbox', { name: 'Leire Sanz es de la Junta Directiva' })).toBeChecked()
   })
@@ -724,4 +725,40 @@ test('no se muestra «Inscripción abierta»: apuntarse es lo normal', async ({ 
     await page.goto(path)
     await expect(page.getByText(/Inscripción abierta/i)).toHaveCount(0)
   }
+})
+
+test.describe('eliminar actos', () => {
+  test('la dirección elimina un acto desde la edición, con aviso de inscritos', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/actividades/ACT-031/editar')
+    await page.getByRole('button', { name: 'Eliminar acto' }).click()
+    await expect(page.getByText(/personas? inscritas?/)).toBeVisible()
+    await page.getByRole('button', { name: 'Cancelar' }).click()
+
+    await page.goto('/actividades/ACT-042/editar')
+    await page.getByRole('button', { name: 'Eliminar acto' }).click()
+    await expect(page.getByText('¿Seguro que quieres eliminar «Café político: fiscalidad joven»?')).toBeVisible()
+    await page.getByRole('button', { name: 'Sí, eliminar' }).click()
+    await expect(page).toHaveURL('/calendario')
+    await expect(page.getByText('Café político: fiscalidad joven')).toHaveCount(0)
+    await page.goto('/actividades/ACT-042')
+    await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+  })
+
+  test('un afiliado no puede eliminar (ni abrir la edición)', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/actividades/ACT-042/editar')
+    await expect(page.getByRole('button', { name: 'Eliminar acto' })).toHaveCount(0)
+  })
+})
+
+test('vista mensual: los actos que ya han pasado van al final y en gris', async ({ page }) => {
+  await loginAs(page, /Alba/)
+  const now = new Date()
+  const past = new Date(now.getTime() - 12 * 864e5)
+  const month = past.toISOString().slice(0, 7)
+  await page.goto(`/calendario?vista=mes&mes=${month}`)
+  const section = page.getByRole('region', { name: 'Ya han pasado' })
+  await expect(section.getByText('Asamblea de inicio de curso')).toBeVisible()
+  await expect(section.locator('.grayscale')).toHaveCount(1)
 })

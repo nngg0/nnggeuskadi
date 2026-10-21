@@ -210,3 +210,26 @@ export async function updateProject(projectId: string, _prev: ActionResult | nul
   refreshContent()
   redirect(input.data.estado === 'cerrado' ? '/participa' : `/participa/${encodeURIComponent(original.id)}`)
 }
+
+/**
+ * Borra un acto: elimina su fila de ACTIVIDADES. Mismos permisos que editarlo.
+ * Las inscripciones que tuviera se quedan en la base de datos, pero ya no se muestran.
+ */
+export async function deleteActivity(activityId: string): Promise<ActionResult> {
+  const user = await actionUser()
+  if (!user) return NOT_AUTHENTICATED
+  const id = contentIdSchema.safeParse(activityId)
+  if (!id.success) return failure('Acto no válido.')
+  const original = (await getContent()).activities.find((a) => a.id === id.data)
+  if (!original) return failure('Este acto ya no existe.')
+  if (!can(user, 'content.create', { territory: original.territory })) return failure('No puedes eliminar actos de ese territorio.')
+  try {
+    if (!(await contentWriter().remove('ACTIVIDADES', original.id))) return failure('Este acto ya no está en el Sheet.')
+    console.info(`[borrado] ${user.id} eliminó la actividad ${original.id} (${original.territory})`)
+  } catch (error) {
+    console.error('[eliminar actividad]', error)
+    return UNEXPECTED
+  }
+  refreshContent()
+  redirect('/calendario')
+}

@@ -43,7 +43,7 @@ En **Actos** y **Proyectos**, Administración, la dirección regional y las dire
 - Al editar un proyecto, sus ámbitos se pueden renombrar, abrir o cerrar, añadir y quitar. Quitar un ámbito pone
   `visible = no` (no se borra la fila), para que quien ya se apuntó conserve su participación. Los proyectos cerrados u
   ocultos aparecen al final de Proyectos («Cerrados u ocultos») solo para quien puede editarlos, para poder reabrirlos.
-- Borrar filas sigue haciéndose en el Sheet.
+- **Eliminar un acto**: desde «Editar» → «Eliminar acto» (con confirmación y aviso de cuántas personas hay inscritas). Se borra su fila de ACTIVIDADES. Los proyectos se cierran (no se borran) para conservar las participaciones.
 
 ## 3. Estructura
 

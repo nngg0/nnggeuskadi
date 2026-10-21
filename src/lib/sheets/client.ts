@@ -146,3 +146,33 @@ export async function updateSheetCells(sheet: SheetName, rows: { rowNumber: numb
   })
   if (!res.ok) throw new Error(`Google Sheets respondió ${res.status} al actualizar ${sheet}`)
 }
+
+/** Id numérico de una pestaña (lo necesita la API para borrar filas). */
+async function sheetIdOf(sheet: SheetName): Promise<number> {
+  const env = sheetsEnv()
+  const res = await fetch(`${API}/${encodeURIComponent(env.spreadsheetId)}?fields=sheets.properties(sheetId,title)`, {
+    headers: { authorization: `Bearer ${await accessToken(WRITE_SCOPE)}` },
+    cache: 'no-store',
+  })
+  if (!res.ok) throw new Error(`Google Sheets respondió ${res.status} al leer las pestañas`)
+  const json = (await res.json()) as { sheets?: { properties?: { sheetId?: number; title?: string } }[] }
+  const found = json.sheets?.find((s) => s.properties?.title === sheet)?.properties?.sheetId
+  if (found === undefined) throw new Error(`No existe la pestaña ${sheet}`)
+  return found
+}
+
+/** Borra una fila entera (número de fila del Sheet, 1 = cabeceras). */
+export async function deleteSheetRow(sheet: SheetName, rowNumber: number): Promise<void> {
+  if (rowNumber < 2) throw new Error('No se pueden borrar las cabeceras')
+  const env = sheetsEnv()
+  const sheetId = await sheetIdOf(sheet)
+  const res = await fetch(`${API}/${encodeURIComponent(env.spreadsheetId)}:batchUpdate`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${await accessToken(WRITE_SCOPE)}`, 'content-type': 'application/json' },
+    body: JSON.stringify({
+      requests: [{ deleteDimension: { range: { sheetId, dimension: 'ROWS', startIndex: rowNumber - 1, endIndex: rowNumber } } }],
+    }),
+    cache: 'no-store',
+  })
+  if (!res.ok) throw new Error(`Google Sheets respondió ${res.status} al borrar en ${sheet}`)
+}

@@ -1,10 +1,10 @@
 import 'server-only'
 import { contentSource } from '@/lib/config/env'
 import type { SheetRecord } from '@/lib/domain/new-content'
-import { appendSheetRows, fetchSheetFresh, updateSheetCells } from '@/lib/sheets/client'
+import { appendSheetRows, deleteSheetRow, fetchSheetFresh, updateSheetCells } from '@/lib/sheets/client'
 import type { RawTable } from '@/lib/sheets/columns'
 import { changedCells, recordToRow, rowNumberOf } from '@/lib/sheets/rows'
-import { addDemoRecords, withDemoRecords } from '@/demo/content-store'
+import { addDemoRecords, DEMO_DELETED, withDemoRecords } from '@/demo/content-store'
 import { demoWorkbook } from '@/demo/content'
 
 /**
@@ -22,6 +22,8 @@ export interface ContentWriter {
   update(sheet: WritableSheet, id: string, record: SheetRecord): Promise<boolean>
   /** Igual que `update` para varias filas a la vez. Devuelve los ids que no se han encontrado (y no escribe nada si falta alguno). */
   updateMany(sheet: WritableSheet, changes: { id: string; record: SheetRecord }[]): Promise<string[]>
+  /** Borra la fila con ese id. Devuelve false si ya no existe. */
+  remove(sheet: WritableSheet, id: string): Promise<boolean>
 }
 
 async function updateOne(writer: ContentWriter, sheet: WritableSheet, id: string, record: SheetRecord): Promise<boolean> {
@@ -48,6 +50,13 @@ const sheetsWriter: ContentWriter = {
     await updateSheetCells(sheet, located.map((c) => ({ rowNumber: c.rowNumber!, cells: changedCells(header, c.record) })))
     return []
   },
+  async remove(sheet, id) {
+    // Se localiza la fila justo antes de borrar, por si alguien ha movido filas en el Sheet.
+    const rowNumber = rowNumberOf(await fetchSheetFresh(sheet), id)
+    if (rowNumber === null) return false
+    await deleteSheetRow(sheet, rowNumber)
+    return true
+  },
 }
 
 const demoWriter: ContentWriter = {
@@ -62,6 +71,12 @@ const demoWriter: ContentWriter = {
     if (missing.length > 0) return missing
     await addDemoRecords(sheet, changes.map((c) => ({ ...c.record, id: c.id })))
     return []
+  },
+  async remove(sheet, id) {
+    const table = (await withDemoRecords(demoWorkbook()))[sheet]
+    if (rowNumberOf(table, id) === null) return false
+    await addDemoRecords(sheet, [{ id, [DEMO_DELETED]: 'sí' }])
+    return true
   },
 }
 
