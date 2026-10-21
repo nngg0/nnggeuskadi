@@ -655,7 +655,7 @@ test.describe('roles de los miembros', () => {
 })
 
 test.describe('juntas directivas', () => {
-  test('un afiliado ve las juntas abiertas, en violeta, pero no las cerradas (ni por enlace ni en el calendario)', async ({ page }) => {
+  test('un afiliado ve las juntas abiertas, en gris, pero no las cerradas (ni por enlace ni en el calendario)', async ({ page }) => {
     await loginAs(page, /Alba/)
     await page.goto('/calendario')
     const abierta = page.locator('article', { hasText: 'Junta directiva abierta: balance del trimestre' })
@@ -716,4 +716,12 @@ test.describe('juntas directivas', () => {
     await expect(page.getByText('Pablo Folgado')).toBeVisible()
     await expect(page.getByRole('checkbox', { name: /es de la Junta Directiva/ })).toHaveCount(0)
   })
+})
+
+test('no se muestra «Inscripción abierta»: apuntarse es lo normal', async ({ page }) => {
+  await loginAs(page, /Alba/)
+  for (const path of ['/', '/calendario', '/actividades/ACT-031', '/perfil']) {
+    await page.goto(path)
+    await expect(page.getByText(/Inscripción abierta/i)).toHaveCount(0)
+  }
 })
