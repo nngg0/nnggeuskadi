@@ -11,7 +11,7 @@ import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/States'
 import { can } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
-import { getContent } from '@/lib/content/source'
+import { getContentFor } from '@/lib/content/source'
 import { madridDate } from '@/lib/domain/dates'
 import { campaignActivityCount, featuredProject, preparingProjects, upcomingActivities } from '@/lib/domain/selectors'
 import { personalStore } from '@/lib/personal'
@@ -25,7 +25,7 @@ const UPCOMING_COUNT = 5
 /** Inicio: saludo, la campaña, los cinco actos más próximos y lo que todavía estamos preparando. */
 export default async function HomePage() {
   const user = await requireUser()
-  const content = await getContent()
+  const content = await getContentFor(user)
   const now = new Date()
   const today = madridDate(now)
 

@@ -70,6 +70,45 @@ do $$ begin
   assert (select role from public.profiles where id = '00000000-0000-0000-0000-0000000000a1') = 'administracion', 'sigue siendo Administración';
 end $$;
 
+-- Junta Directiva: la marcan Administración y la regional; la provincial y los afiliados no.
+reset role;
+update public.profiles set role = 'direccion_euskadi' where id = '00000000-0000-0000-0000-0000000000a2';
+set local role authenticated;
+do $$
+declare who uuid;
+begin
+  foreach who in array array['00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000a2']::uuid[] loop
+    perform set_config('request.jwt.claim.sub', who::text, true);
+    perform public.set_member_junta('00000000-0000-0000-0000-0000000000c1', who = '00000000-0000-0000-0000-0000000000a1');
+  end loop;
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', true);
+  perform public.set_member_junta('00000000-0000-0000-0000-0000000000c1', true);
+  assert (select junta_directiva from public.list_members() where email = 'afi@example.org'), 'list_members trae la marca de Junta';
+  begin
+    perform public.set_member_junta('00000000-0000-0000-0000-0000000000ff', true);
+    raise exception 'miembro inexistente';
+  exception when no_data_found then null;
+  end;
+  foreach who in array array['00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000c1']::uuid[] loop
+    perform set_config('request.jwt.claim.sub', who::text, true);
+    begin
+      perform public.set_member_junta(who, true);
+      raise exception 'solo Administración y la regional marcan la Junta';
+    exception when insufficient_privilege then null;
+    end;
+  end loop;
+end $$;
+
+-- Nadie se marca a sí mismo como Junta directamente en su perfil.
+set local request.jwt.claim.sub = '00000000-0000-0000-0000-0000000000b1';
+do $$ begin
+  begin
+    update public.profiles set junta_directiva = true where id = '00000000-0000-0000-0000-0000000000b1';
+    raise exception 'nadie se marca como Junta';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+
 -- Los usuarios siguen sin poder tocar su propio rol directamente.
 set local role authenticated;
 set local request.jwt.claim.sub = '00000000-0000-0000-0000-0000000000b1';

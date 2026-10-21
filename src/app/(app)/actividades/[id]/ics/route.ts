@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSession } from '@/lib/auth/session'
 import { siteUrl } from '@/lib/config/env'
-import { getContent } from '@/lib/content/source'
+import { getContentFor } from '@/lib/content/source'
 import { buildIcs } from '@/lib/domain/ics'
 import { publicActivities } from '@/lib/domain/selectors'
 
@@ -11,7 +11,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
   if (session.status !== 'member') return new NextResponse('No autorizado', { status: 401 })
 
   const id = decodeURIComponent((await params).id)
-  const content = await getContent()
+  const content = await getContentFor(session.user)
   const activity = publicActivities(content.activities).find((a) => a.id === id)
   if (!activity) return new NextResponse('No encontrada', { status: 404 })
 

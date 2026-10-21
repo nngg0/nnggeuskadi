@@ -9,6 +9,13 @@ import type { Territory, TerritoryId } from './territories'
 export const ACTIVITY_STATUSES = ['confirmada', 'borrador', 'cerrada', 'cancelada'] as const
 export type ActivityStatus = (typeof ACTIVITY_STATUSES)[number]
 
+/** «junta»: acto interno de NNGG (junta directiva), en otro color. */
+export const ACTIVITY_KINDS = ['acto', 'junta'] as const
+export type ActivityKind = (typeof ACTIVITY_KINDS)[number]
+/** Solo aplica a juntas: abierta a todos los afiliados o cerrada (solo miembros de la Junta Directiva). */
+export const ACTIVITY_ACCESS = ['abierto', 'cerrado'] as const
+export type ActivityAccess = (typeof ACTIVITY_ACCESS)[number]
+
 export interface Activity {
   id: string
   title: string
@@ -27,6 +34,8 @@ export interface Activity {
   status: ActivityStatus
   visible: boolean
   featured: boolean
+  kind: ActivityKind
+  access: ActivityAccess
 }
 
 export const PROJECT_STATUSES = ['en_preparacion', 'en_marcha', 'cerrado'] as const
@@ -122,6 +131,8 @@ export interface CurrentUser {
   settings: UserSettings
   /** Hasta 3 temas de interés. */
   interests: InterestId[]
+  /** Miembro de la Junta Directiva: ve las juntas cerradas. Lo marcan Administración o la dirección regional. */
+  junta: boolean
 }
 
 export interface Registration {
@@ -165,6 +176,7 @@ export interface Member {
   role: UserRole
   interests: InterestId[]
   createdAt: string
+  junta: boolean
 }
 
 export type ActionResult = { ok: true; message: string } | { ok: false; message: string }

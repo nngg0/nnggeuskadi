@@ -44,7 +44,8 @@ async function supabaseSession(): Promise<SessionState> {
   if (error || !data.user) return { status: 'anonymous' }
   const { data: profile } = await supabase
     .from('profiles')
-    .select('display_name, territory, role, settings, interests')
+    // '*' para no romper el acceso si la columna junta_directiva todavía no existe (migración pendiente).
+    .select('*')
     .eq('id', data.user.id)
     .maybeSingle()
   if (!profile || !isTerritoryId(profile.territory) || !isRole(profile.role)) {
@@ -61,6 +62,7 @@ async function supabaseSession(): Promise<SessionState> {
       role: profile.role,
       settings: { notifyNewInitiatives: settings.notifyNewInitiatives !== false },
       interests: sanitizeInterests(profile.interests),
+      junta: profile.junta_directiva === true,
     },
   }
 }

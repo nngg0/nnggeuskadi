@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { isIsoDate, isTime } from './dates'
 import { TERRITORY_IDS, type TerritoryId } from './territories'
-import type { ActivityStatus, Opportunity } from './types'
+import { ACTIVITY_ACCESS, ACTIVITY_KINDS, type ActivityStatus, type Opportunity } from './types'
 
 /*
  * Alta de actividades y proyectos desde la web.
@@ -60,6 +60,8 @@ function activitySchema({ minDate, statuses }: { minDate: string; statuses: read
         .transform((v) => (v ? Number(v) : null)),
       inscripcion_fin: optionalIsoDate,
       estado: z.enum(statuses).default('confirmada'),
+      tipo: z.enum(ACTIVITY_KINDS).default('acto'),
+      acceso: z.enum(ACTIVITY_ACCESS).default('abierto'),
     })
     .refine((v) => !v.inscripcion_fin || v.inscripcion_fin <= v.fecha, {
       message: 'El cierre de inscripción no puede ser posterior a la actividad.',
@@ -210,6 +212,9 @@ export function activityRecord(id: string, input: NewActivityInput): SheetRecord
     estado: input.estado,
     visible: 'sí',
     destacado: 'no',
+    // Un acto normal deja tipo y acceso vacíos: así funciona aunque el Sheet aún no tenga esas columnas.
+    tipo: input.tipo === 'junta' ? 'junta' : '',
+    acceso: input.tipo === 'junta' && input.acceso === 'cerrado' ? 'cerrado' : input.tipo === 'junta' ? 'abierto' : '',
   }
 }
 

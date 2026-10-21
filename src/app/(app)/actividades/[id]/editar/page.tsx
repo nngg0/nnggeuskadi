@@ -27,6 +27,8 @@ function formValues(activity: Activity): ActivityFormValues {
     plazas: activity.capacity ? String(activity.capacity) : '',
     inscripcion_fin: activity.registrationClosesAt ? madridDate(new Date(activity.registrationClosesAt)) : '',
     estado: activity.status,
+    tipo: activity.kind,
+    acceso: activity.access,
   }
 }
 

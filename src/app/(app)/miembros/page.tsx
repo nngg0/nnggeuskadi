@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Container, PageHeader } from '@/components/layout/PageHeader'
+import { MemberJuntaToggle } from '@/components/admin/MemberJuntaToggle'
 import { MemberRoleControl } from '@/components/admin/MemberRoleControl'
 import { EmptyState } from '@/components/ui/States'
 import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
@@ -28,6 +29,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
   const visible = members.filter((m) => matchesTerritoryFilter(m.territory, filter))
   const territories = content.territories.filter((t) => scope.includes(t.id))
   const canChangeRoles = can(user, 'members.approve')
+  const canSetJunta = can(user, 'members.setJunta')
 
   return (
     <>
@@ -36,6 +38,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
           ? `Afiliados de ${territoryName(scope[0]!)} con acceso a la intranet.`
           : 'Afiliados de todos los territorios con acceso a la intranet.'}{' '}
         {canChangeRoles ? 'Desde aquí puedes cambiar el rol y la provincia de cada persona. ' : ''}
+        {canSetJunta ? 'Marca quién es de la Junta Directiva: solo ellos ven las juntas cerradas. ' : ''}
         Uso interno: no compartas estos datos fuera de la organización.
       </PageHeader>
       <Container className="py-6 md:py-8">
@@ -57,6 +60,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
                   <p className="font-bold text-ink">
                     {m.displayName}
                     <span className="eyebrow ml-2 !text-[0.58rem] text-electric">{territoryName(m.territory)}</span>
+                    {m.junta && !canSetJunta ? <span className="eyebrow ml-2 !text-[0.58rem] text-junta">Junta Directiva</span> : null}
                   </p>
                   {usernameFromEmail(m.email) ? (
                     <p className="truncate text-sm text-slate">{usernameFromEmail(m.email)}</p>
@@ -81,6 +85,11 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
                   ) : (
                     <p className="font-semibold text-ink">{ROLE_LABELS[m.role]}</p>
                   )}
+                  {canSetJunta ? (
+                    <div className="mt-2">
+                      <MemberJuntaToggle id={m.id} name={m.displayName} junta={m.junta} />
+                    </div>
+                  ) : null}
                   <p className="mt-1">Desde el {formatFullDate(madridDate(new Date(m.createdAt)))}</p>
                 </div>
               </li>

@@ -45,6 +45,8 @@ const stateSchema = z.object({
   at: z.record(z.string().max(64), z.string().max(30)).default({}),
   // Cambios de rol hechos por Administración: id del miembro -> "rol|territorio"
   mr: z.record(z.string().max(64), z.string().max(60)).default({}),
+  // Junta Directiva marcada por Administración o la regional: id del miembro -> sí/no
+  mj: z.record(z.string().max(64), z.boolean()).default({}),
 })
 type DemoState = z.infer<typeof stateSchema>
 
@@ -61,6 +63,7 @@ function initialState(userId: string): DemoState {
     ar: {},
     at: {},
     mr: {},
+    mj: {},
   }
 }
 
@@ -265,11 +268,20 @@ export const demoPersonalStore: PersonalStore = {
     })
   },
 
+  async setMemberJunta(memberId, junta) {
+    const user = await currentDemoUser()
+    if (!user || !can(user, 'members.setJunta')) throw new Error('Sin permiso')
+    if (!(await this.listMembers()).some((m) => m.id === memberId)) throw new Error('member_not_found')
+    await mutate(user.id, (s) => {
+      s.mj[memberId] = junta
+    })
+  },
+
   async listMembers() {
     const user = await currentDemoUser()
     if (!user) return []
     const scope = managedTerritories(user)
-    const { ar: reviewed, at: territories, mr: roleChanges } = await readState(user.id)
+    const { ar: reviewed, at: territories, mr: roleChanges, mj: juntaChanges } = await readState(user.id)
     const approved: Member[] = DEMO_ACCESS_REQUESTS.filter((r) => (USER_ROLES as readonly string[]).includes(reviewed[r.id] ?? '')).map(
       (r) => ({
         id: r.id,
@@ -279,6 +291,7 @@ export const demoPersonalStore: PersonalStore = {
         role: reviewed[r.id] as UserRole,
         interests: [],
         createdAt: r.createdAt,
+        junta: false,
       }),
     )
     const users: Member[] = DEMO_USERS.map((u) => ({
@@ -289,8 +302,10 @@ export const demoPersonalStore: PersonalStore = {
       role: u.role,
       interests: u.interests,
       createdAt: '2026-09-01T10:00:00.000Z',
+      junta: u.junta,
     }))
     return [...users, ...DEMO_EXTRA_MEMBERS, ...approved]
+      .map((m) => (m.id in juntaChanges ? { ...m, junta: juntaChanges[m.id]! } : m))
       .map((m) => {
         const [role, territory] = (roleChanges[m.id] ?? '').split('|')
         return role && (USER_ROLES as readonly string[]).includes(role)

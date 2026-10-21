@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { cn } from '@/lib/cn'
 import type { ActivityView } from '@/lib/view/activities'
 import { Icon } from '@/components/ui/Icon'
-import { CapacityMeter, DateBlock, MetaLine, RegistrationTag, TerritoryLabel } from './ActivityBits'
+import { CapacityMeter, DateBlock, JuntaTag, MetaLine, RegistrationTag, TerritoryLabel } from './ActivityBits'
 import { AddToCalendar } from './AddToCalendar'
 
 /**
@@ -12,19 +12,21 @@ import { AddToCalendar } from './AddToCalendar'
 export function ActivityCard({ view, withCalendar = false, className }: { view: ActivityView; withCalendar?: boolean; className?: string }) {
   const { activity, state, registeredCount } = view
   const muted = state.kind === 'cancelled' || state.kind === 'past'
+  const junta = activity.kind === 'junta'
   return (
     <article
       className={cn(
         'press group relative flex gap-4 rounded-[var(--radius-card)] border bg-card p-5 hover:border-electric/40 sm:p-6',
-        view.isRegistered && !muted ? 'border-success/35' : 'border-line',
+        view.isRegistered && !muted ? 'border-success/35' : junta ? 'border-junta/45 hover:border-junta/70' : 'border-line',
         muted && 'opacity-75',
         className,
       )}
     >
-      <DateBlock date={activity.date} tone={view.isRegistered && !muted ? 'electric' : 'night'} className="self-start" />
+      <DateBlock date={activity.date} tone={junta ? 'junta' : view.isRegistered && !muted ? 'electric' : 'night'} className="self-start" />
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <TerritoryLabel territory={activity.territory} />
+          <JuntaTag activity={activity} />
           <RegistrationTag state={state} />
         </div>
         <h3 className={cn('mt-2 font-label text-[1.08rem] font-semibold leading-snug text-ink', state.kind === 'cancelled' && 'line-through')}>

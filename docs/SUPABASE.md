@@ -74,6 +74,7 @@ Todas con UUID/timestamps, claves foráneas con `on delete cascade` hacia el usu
 | `list_project_participants(id)` | authenticated | Nombres de quienes se ofrecen, **solo** si `can_manage_territory` |
 | `aggregate_counts()` | service_role | Cifras para `/api/agregados` |
 | `list_members()` | authenticated | Miembros (con id) que la persona puede gestionar según `can_manage_territory` |
+| `set_member_junta(id, sí/no)` | authenticated | **Administración y dirección regional**: marca quién es de la Junta Directiva (`profiles.junta_directiva`) |
 | `set_member_role(id, rol, territorio)` | authenticated | **Solo Administración** (`is_admin`): cambia rol y provincia; nadie puede quitarse a sí mismo Administración; afiliados y provinciales necesitan provincia |
 
 ## Alta de afiliados

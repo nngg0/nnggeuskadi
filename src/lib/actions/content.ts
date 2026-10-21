@@ -42,8 +42,16 @@ const activityFields = (formData: FormData) => ({
   plazas: field(formData, 'plazas'),
   inscripcion_fin: field(formData, 'inscripcion_fin'),
   estado: field(formData, 'estado') || undefined,
+  tipo: field(formData, 'tipo') || undefined,
+  acceso: field(formData, 'acceso') || undefined,
 })
 const FORBIDDEN = failure('No puedes crear ni editar contenido en ese territorio.')
+
+/** Error de escritura explicado si es por columnas que faltan en el Sheet; si no, el genérico. */
+function writeFailure(error: unknown): ActionResult {
+  const missing = error instanceof Error ? /Faltan columnas en el Sheet: (.+)$/.exec(error.message)?.[1] : undefined
+  return missing ? failure(`Faltan columnas en el Sheet (${missing}). Añádelas en la fila 1 de la pestaña y vuelve a intentarlo.`) : UNEXPECTED
+}
 
 function refreshContent() {
   updateTag(SHEETS_CACHE_TAG)
@@ -66,7 +74,7 @@ export async function createActivity(_prev: ActionResult | null, formData: FormD
     console.info(`[alta] ${user.id} creó la actividad ${id} (${input.data.territorio})`)
   } catch (error) {
     console.error('[crear actividad]', error)
-    return UNEXPECTED
+    return writeFailure(error)
   }
   refreshContent()
   redirect(input.data.estado === 'borrador' ? '/calendario' : `/actividades/${encodeURIComponent(id)}`)
@@ -95,7 +103,7 @@ export async function updateActivity(activityId: string, _prev: ActionResult | n
     console.info(`[edición] ${user.id} editó la actividad ${original.id} (${input.data.territorio})`)
   } catch (error) {
     console.error('[editar actividad]', error)
-    return UNEXPECTED
+    return writeFailure(error)
   }
   refreshContent()
   redirect(input.data.estado === 'borrador' ? '/calendario' : `/actividades/${encodeURIComponent(original.id)}`)

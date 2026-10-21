@@ -10,7 +10,7 @@ import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
 import { creatableTerritories } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { cn } from '@/lib/cn'
-import { getContent } from '@/lib/content/source'
+import { getContentFor } from '@/lib/content/source'
 import { formatMonthYear, formatRelativeDay, isIsoDate, isMonthKey, madridDate, monthKey } from '@/lib/domain/dates'
 import { campaignPeriod, featuredProject, filterActivitiesByTerritory, pastActivities, publicActivities, sortByDate, upcomingActivities } from '@/lib/domain/selectors'
 import { parseTerritoryFilter } from '@/lib/domain/territories'
@@ -36,7 +36,7 @@ function groupByMonth(views: ActivityView[]): [string, ActivityView[]][] {
 export default async function CalendarPage({ searchParams }: { searchParams: Search }) {
   const user = await requireUser()
   const params = await searchParams
-  const content = await getContent()
+  const content = await getContentFor(user)
   const now = new Date()
   const today = madridDate(now)
 

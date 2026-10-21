@@ -8,6 +8,8 @@ import {
   type Territory,
 } from '@/lib/domain/territories'
 import {
+  ACTIVITY_ACCESS,
+  ACTIVITY_KINDS,
   ACTIVITY_STATUSES,
   OPPORTUNITY_STATUSES,
   PROJECT_STATUSES,
@@ -179,6 +181,24 @@ const httpsUrl = z
     }
   }, 'la url debe empezar por https://')
 
+/** «Junta», «Junta directiva», «junta_directiva» → junta; vacío → acto. */
+const activityKind = z.string().transform((v, ctx) => {
+  const key = stripAccents(v).trim().toLowerCase()
+  if (key === '' || key === 'acto' || key === 'publico') return ACTIVITY_KINDS[0]
+  if (key.startsWith('junta')) return 'junta' as const
+  ctx.addIssue({ code: 'custom', message: `tipo no reconocido: "${v}" (válidos: acto, junta)` })
+  return z.NEVER
+})
+
+/** abierto/abierta (o vacío) → abierto; cerrado/cerrada → cerrado. */
+const activityAccess = z.string().transform((v, ctx) => {
+  const key = stripAccents(v).trim().toLowerCase()
+  if (key === '' || key.startsWith('abiert')) return ACTIVITY_ACCESS[0]
+  if (key.startsWith('cerrad')) return 'cerrado' as const
+  ctx.addIssue({ code: 'custom', message: `acceso no reconocido: "${v}" (válidos: abierto, cerrado)` })
+  return z.NEVER
+})
+
 /* ------------------------------- Esquemas ------------------------------- */
 
 const cell = <S extends z.ZodType>(s: S) => z.preprocess((v) => v ?? '', s)
@@ -197,6 +217,8 @@ const activitySchema = z.object({
   estado: cell(enumOf(ACTIVITY_STATUSES, 'confirmada')),
   visible: cell(bool(true)),
   destacado: cell(bool(false)),
+  tipo: cell(activityKind),
+  acceso: cell(activityAccess),
 })
 
 const projectSchema = z.object({
@@ -288,6 +310,8 @@ export function parseActivities(table: RawTable | undefined): Parsed<Activity> {
     status: r.estado,
     visible: r.visible,
     featured: r.destacado,
+    kind: r.tipo,
+    access: r.tipo === 'junta' ? r.acceso : 'abierto',
   }), (a) => a.id)
 }
 

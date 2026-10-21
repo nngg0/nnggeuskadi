@@ -208,7 +208,7 @@ export const supabasePersonalStore: PersonalStore = {
     const { data, error } = await supabase.rpc('list_members')
     if (error) fail('miembros', error)
     return (
-      (data ?? []) as { id: string; display_name: string; email: string; territory: string; role: string; interests: string[]; created_at: string }[]
+      (data ?? []) as { id: string; display_name: string; email: string; territory: string; role: string; interests: string[]; created_at: string; junta_directiva?: boolean }[]
     ).map((m) => ({
       id: m.id,
       displayName: m.display_name,
@@ -217,7 +217,14 @@ export const supabasePersonalStore: PersonalStore = {
       role: ((USER_ROLES as readonly string[]).includes(m.role) ? m.role : 'afiliado') as UserRole,
       interests: sanitizeInterests(m.interests),
       createdAt: m.created_at,
+      junta: m.junta_directiva === true,
     }))
+  },
+
+  async setMemberJunta(userId, junta) {
+    const supabase = await createSupabaseServerClient()
+    const { error } = await supabase.rpc('set_member_junta', { p_user_id: userId, p_junta: junta })
+    if (error) fail('Junta Directiva', error)
   },
 
   async setMemberRole(userId, role, territory) {

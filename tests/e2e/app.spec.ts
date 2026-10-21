@@ -653,3 +653,67 @@ test.describe('roles de los miembros', () => {
     await expect(page.getByRole('combobox', { name: /^Rol de / })).toHaveCount(0)
   })
 })
+
+test.describe('juntas directivas', () => {
+  test('un afiliado ve las juntas abiertas, en violeta, pero no las cerradas (ni por enlace ni en el calendario)', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/calendario')
+    const abierta = page.locator('article', { hasText: 'Junta directiva abierta: balance del trimestre' })
+    await expect(abierta).toBeVisible()
+    await expect(abierta.getByText('Junta directiva · Abierta')).toBeVisible()
+    await expect(page.getByText('Junta directiva de NNGG Euskadi')).toHaveCount(0)
+    await page.goto('/actividades/ACT-050')
+    await expect(page.getByText('Esto ya no está aquí.')).toBeVisible()
+    expect((await page.request.get('/actividades/ACT-050/ics')).status()).toBe(404)
+  })
+
+  test('un miembro de la Junta ve las juntas cerradas', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/calendario')
+    const cerrada = page.locator('article', { hasText: 'Junta directiva de NNGG Euskadi' })
+    await expect(cerrada.getByText('Junta directiva · Cerrada')).toBeVisible()
+    await page.goto('/actividades/ACT-050')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Junta directiva de NNGG Euskadi')
+  })
+
+  test('la dirección regional crea una junta cerrada desde la app', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/calendario/nueva')
+    await page.getByLabel('Tipo').selectOption('junta')
+    await expect(page.getByLabel('Quién puede verla')).toHaveValue('cerrado')
+    await page.getByLabel('Título').fill('Junta extraordinaria')
+    await page.getByLabel('Fecha').fill(new Date(Date.now() + 20 * 864e5).toISOString().slice(0, 10))
+    await page.getByRole('button', { name: 'Crear acto' }).click()
+    await expect(page).toHaveURL(/\/actividades\/ACT-\d+$/)
+    await expect(page.getByText('Junta directiva · Cerrada')).toBeVisible()
+    await page.getByRole('link', { name: 'Editar' }).click()
+    await expect(page.getByLabel('Tipo')).toHaveValue('junta')
+    await page.getByLabel('Quién puede verla').selectOption('abierto')
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page.getByText('Junta directiva · Abierta')).toBeVisible()
+  })
+
+  test('Administración y la regional marcan quién es de la Junta; la provincial no', async ({ page }) => {
+    await loginAs(page, /Administración/)
+    await page.goto('/miembros')
+    const leire = page.getByRole('checkbox', { name: 'Leire Sanz es de la Junta Directiva' })
+    await expect(leire).not.toBeChecked()
+    await leire.check({ force: true })
+    await expect(leire).toBeChecked()
+    await page.reload()
+    await expect(page.getByRole('checkbox', { name: 'Leire Sanz es de la Junta Directiva' })).toBeChecked()
+  })
+
+  test('la regional ve el interruptor de Junta; la provincial no', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/miembros')
+    await expect(page.getByRole('checkbox', { name: 'Leire Sanz es de la Junta Directiva' })).toHaveCount(1)
+  })
+
+  test('la provincial no marca la Junta', async ({ page }) => {
+    await loginAs(page, /Miguel/)
+    await page.goto('/miembros')
+    await expect(page.getByText('Pablo Folgado')).toBeVisible()
+    await expect(page.getByRole('checkbox', { name: /es de la Junta Directiva/ })).toHaveCount(0)
+  })
+})

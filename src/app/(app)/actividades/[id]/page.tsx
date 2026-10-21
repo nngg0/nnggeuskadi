@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { CapacityMeter, RegistrationTag } from '@/components/activities/ActivityBits'
+import { CapacityMeter, JuntaTag, RegistrationTag } from '@/components/activities/ActivityBits'
 import { AddToCalendar } from '@/components/activities/AddToCalendar'
 import { RegistrationPanel } from '@/components/activities/RegistrationPanel'
 import { PeopleList } from '@/components/profile/PeopleList'
@@ -11,7 +11,7 @@ import { Eyebrow } from '@/components/ui/Eyebrow'
 import { Icon } from '@/components/ui/Icon'
 import { can } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
-import { getContent } from '@/lib/content/source'
+import { getContentFor } from '@/lib/content/source'
 import { formatDayMonth, formatInstant, formatWeekday } from '@/lib/domain/dates'
 import { publicActivities } from '@/lib/domain/selectors'
 import { territoryName } from '@/lib/domain/territories'
@@ -21,7 +21,8 @@ import { activityViews } from '@/lib/view/activities'
 type Params = Promise<{ id: string }>
 
 async function findActivity(id: string) {
-  const content = await getContent()
+  // Filtrado por persona: una junta cerrada no existe para quien no es de la Junta (ni siquiera en el título).
+  const content = await getContentFor(await requireUser())
   return publicActivities(content.activities).find((a) => a.id === decodeURIComponent(id)) ?? null
 }
 
@@ -40,7 +41,8 @@ export default async function ActivityPage({ params }: { params: Params }) {
   const canManage = can(user, 'manage.viewPeople', { territory: activity.territory })
   const canEdit = can(user, 'content.create', { territory: activity.territory })
   const registrants = canManage ? await personalStore().eventRegistrants(activity.id) : []
-  const label = view.state.kind === 'registered' ? 'Tu próximo plan' : activity.featured ? 'Próximo acto' : 'Actividad'
+  const label =
+    view.state.kind === 'registered' ? 'Tu próximo plan' : activity.kind === 'junta' ? 'Interno de NNGG' : activity.featured ? 'Próximo acto' : 'Actividad'
 
   return (
     <>
@@ -62,6 +64,7 @@ export default async function ActivityPage({ params }: { params: Params }) {
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <Eyebrow tone="sky">{label}</Eyebrow>
             <span className="eyebrow text-white/50">{territoryName(activity.territory)}</span>
+            <JuntaTag activity={activity} />
           </div>
           <h1 className="display mt-3 max-w-3xl text-[2.4rem] sm:text-5xl md:text-6xl">{activity.title}</h1>
           <dl className="mt-7 grid max-w-2xl gap-x-8 gap-y-4 sm:grid-cols-3">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { can, canListMembers, creatableTerritories, managedTerritories } from '@/lib/auth/permissions'
+import { can, canListMembers, canSeeActivity, creatableTerritories, managedTerritories } from '@/lib/auth/permissions'
 
 describe('permisos', () => {
   const afiliado = { role: 'afiliado' as const, territory: 'alava' as const }
@@ -90,5 +90,35 @@ describe('alta de actividades y proyectos', () => {
     expect(can(afiliado, 'content.create', { territory: 'alava' })).toBe(false)
     expect(can(admin, 'content.create')).toBe(false)
     expect(creatableTerritories(null)).toEqual([])
+  })
+})
+
+describe('juntas directivas', () => {
+  const junta = (access: 'abierto' | 'cerrado', territory: 'euskadi' | 'bizkaia' = 'euskadi') => ({ kind: 'junta' as const, access, territory })
+  const acto = { kind: 'acto' as const, access: 'abierto' as const, territory: 'euskadi' as const }
+  const afiliado = { role: 'afiliado' as const, territory: 'alava' as const, junta: false }
+  const deLaJunta = { role: 'afiliado' as const, territory: 'alava' as const, junta: true }
+  const bizkaia = { role: 'direccion_provincial' as const, territory: 'bizkaia' as const, junta: false }
+  const regional = { role: 'direccion_euskadi' as const, territory: 'euskadi' as const, junta: false }
+
+  it('los actos y las juntas abiertas los ve todo el mundo', () => {
+    expect(canSeeActivity(afiliado, acto)).toBe(true)
+    expect(canSeeActivity(afiliado, junta('abierto'))).toBe(true)
+  })
+
+  it('las juntas cerradas solo la Junta Directiva y quien puede editarlas', () => {
+    expect(canSeeActivity(afiliado, junta('cerrado'))).toBe(false)
+    expect(canSeeActivity(null, junta('cerrado'))).toBe(false)
+    expect(canSeeActivity(deLaJunta, junta('cerrado'))).toBe(true)
+    expect(canSeeActivity(regional, junta('cerrado'))).toBe(true)
+    expect(canSeeActivity(bizkaia, junta('cerrado'))).toBe(false)
+    expect(canSeeActivity(bizkaia, junta('cerrado', 'bizkaia'))).toBe(true)
+  })
+
+  it('marcan la Junta Directiva Administración y la regional', () => {
+    expect(can({ role: 'administracion', territory: 'euskadi' }, 'members.setJunta')).toBe(true)
+    expect(can(regional, 'members.setJunta')).toBe(true)
+    expect(can(bizkaia, 'members.setJunta')).toBe(false)
+    expect(can(afiliado, 'members.setJunta')).toBe(false)
   })
 })

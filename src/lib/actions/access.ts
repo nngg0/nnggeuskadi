@@ -122,3 +122,20 @@ export async function setMemberRole(memberId: string, role: string, territory: s
     return UNEXPECTED
   }
 }
+
+/** Administración o dirección regional marcan quién es de la Junta Directiva. La base de datos lo vuelve a comprobar. */
+export async function setMemberJunta(memberId: string, junta: boolean): Promise<ActionResult> {
+  const user = await actionUser()
+  if (!user) return NOT_AUTHENTICATED
+  if (!can(user, 'members.setJunta')) return failure('Solo Administración y la dirección regional marcan la Junta Directiva.')
+  const parsedId = idSchema.safeParse(memberId)
+  if (!parsedId.success || typeof junta !== 'boolean') return failure('Datos no válidos.')
+  try {
+    await personalStore().setMemberJunta(parsedId.data, junta)
+    revalidatePath('/', 'layout')
+    return success(junta ? 'Añadida a la Junta Directiva.' : 'Ya no forma parte de la Junta Directiva.')
+  } catch (error) {
+    console.error('[junta directiva]', error)
+    return UNEXPECTED
+  }
+}

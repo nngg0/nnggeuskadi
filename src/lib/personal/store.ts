@@ -56,4 +56,6 @@ export interface PersonalStore {
   listMembers(): Promise<Member[]>
   /** Solo Administración (verificado también en base de datos). Territorio null = conservar el actual. */
   setMemberRole(userId: string, role: UserRole, territory: TerritoryId | null): Promise<void>
+  /** Administración o dirección regional (verificado también en base de datos). */
+  setMemberJunta(userId: string, junta: boolean): Promise<void>
 }

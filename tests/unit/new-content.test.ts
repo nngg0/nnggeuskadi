@@ -223,3 +223,31 @@ describe('edición de proyectos y ámbitos', () => {
     expect(planOpportunityChanges('PRY-DEBATE', [{ id: 'OP-DEB-1' }], input.ambitos, []).unknownIds).toEqual(['OP-29N-1'])
   })
 })
+
+describe('juntas en el Sheet', () => {
+  const header = [...SHEETS.ACTIVIDADES]
+  const row = (tipo: string, acceso: string) => {
+    const r = recordToRow(header, activityRecord('ACT-200', newActivitySchema(TODAY).parse(activityForm)))
+    r[header.indexOf('tipo')] = tipo
+    r[header.indexOf('acceso')] = acceso
+    return r
+  }
+
+  it('lee tipo y acceso con las escrituras habituales; sin columnas es un acto normal', () => {
+    expect(parseActivities([header, row('Junta directiva', 'Cerrada')]).items[0]).toMatchObject({ kind: 'junta', access: 'cerrado' })
+    expect(parseActivities([header, row('junta', '')]).items[0]).toMatchObject({ kind: 'junta', access: 'abierto' })
+    expect(parseActivities([header, row('', 'cerrado')]).items[0]).toMatchObject({ kind: 'acto', access: 'abierto' })
+    const old = header.slice(0, 13)
+    expect(parseActivities([old, row('', '').slice(0, 13)]).items[0]).toMatchObject({ kind: 'acto', access: 'abierto' })
+    expect(parseActivities([header, row('fiesta', '')]).issues).toHaveLength(1)
+  })
+
+  it('un acto normal deja tipo y acceso vacíos (vale aunque el Sheet no tenga esas columnas); una junta los rellena', () => {
+    const acto = activityRecord('ACT-1', newActivitySchema(TODAY).parse(activityForm))
+    expect([acto.tipo, acto.acceso]).toEqual(['', ''])
+    expect(() => recordToRow(header.slice(0, 13), acto)).not.toThrow()
+    const junta = activityRecord('ACT-2', newActivitySchema(TODAY).parse({ ...activityForm, tipo: 'junta', acceso: 'cerrado' }))
+    expect([junta.tipo, junta.acceso]).toEqual(['junta', 'cerrado'])
+    expect(() => recordToRow(header.slice(0, 13), junta)).toThrow(/Faltan columnas en el Sheet: tipo, acceso/)
+  })
+})

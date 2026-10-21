@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { can } from '@/lib/auth/permissions'
-import { getContent } from '@/lib/content/source'
+import { getContentFor } from '@/lib/content/source'
 import { getRegistrationState } from '@/lib/domain/registration'
 import { publicActivities } from '@/lib/domain/selectors'
 import type { ActionResult } from '@/lib/domain/types'
@@ -26,7 +26,7 @@ export async function registerForActivity(activityId: string): Promise<ActionRes
   if (!id.success) return failure('Actividad no válida.')
 
   try {
-    const content = await getContent()
+    const content = await getContentFor(user)
     const activity = publicActivities(content.activities).find((a) => a.id === id.data)
     if (!activity) return failure('Esta actividad ya no está disponible.')
 
@@ -61,7 +61,7 @@ export async function cancelRegistration(activityId: string): Promise<ActionResu
   if (!id.success) return failure('Actividad no válida.')
 
   try {
-    const content = await getContent()
+    const content = await getContentFor(user)
     const activity = content.activities.find((a) => a.id === id.data)
     if (activity) {
       const state = getRegistrationState(activity, { registeredCount: 0, isRegistered: true, now: new Date() })

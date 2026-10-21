@@ -11,7 +11,7 @@ import { EmptyState } from '@/components/ui/States'
 import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
 import { creatableTerritories } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
-import { getContent } from '@/lib/content/source'
+import { getContentFor } from '@/lib/content/source'
 import { madridDate } from '@/lib/domain/dates'
 import { campaignActivityCount, featuredProject, sortProjectsForUser, visibleProjects } from '@/lib/domain/selectors'
 import { matchesTerritoryFilter, parseTerritoryFilter, territoryName } from '@/lib/domain/territories'
@@ -24,7 +24,7 @@ type Search = Promise<Record<string, string | string[] | undefined>>
 export default async function ParticipaPage({ searchParams }: { searchParams: Search }) {
   const user = await requireUser()
   const params = await searchParams
-  const content = await getContent()
+  const content = await getContentFor(user)
   const territory = parseTerritoryFilter(Array.isArray(params.t) ? params.t[0] : params.t)
 
   const campaign = featuredProject(content)

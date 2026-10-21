@@ -1,7 +1,8 @@
 import 'server-only'
 import { cache } from 'react'
 import { contentSource } from '@/lib/config/env'
-import type { ContentBundle } from '@/lib/domain/types'
+import { canSeeActivity } from '@/lib/auth/permissions'
+import type { ContentBundle, CurrentUser } from '@/lib/domain/types'
 import { fetchWorkbook } from '@/lib/sheets/client'
 import { parseWorkbook } from '@/lib/sheets/parse'
 import { demoWorkbook } from '@/demo/content'
@@ -24,3 +25,12 @@ export const getContent = cache(async (): Promise<ContentBundle> => {
   }
   return content
 })
+
+/**
+ * Contenido tal y como lo puede ver esta persona: sin las juntas cerradas si no es de la Junta Directiva.
+ * Usar siempre esta versión en páginas y acciones que muestran o actúan sobre actos.
+ */
+export async function getContentFor(user: Pick<CurrentUser, 'role' | 'territory' | 'junta'>): Promise<ContentBundle> {
+  const content = await getContent()
+  return { ...content, activities: content.activities.filter((a) => canSeeActivity(user, a)) }
+}

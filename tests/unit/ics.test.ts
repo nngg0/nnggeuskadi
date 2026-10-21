@@ -16,6 +16,8 @@ const activity: Activity = {
   status: 'confirmada',
   visible: true,
   featured: true,
+  kind: 'acto',
+  access: 'abierto',
 }
 
 describe('añadir al calendario', () => {

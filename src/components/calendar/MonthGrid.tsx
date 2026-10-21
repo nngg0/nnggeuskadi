@@ -97,7 +97,7 @@ export function MonthGrid({
                       key={a.id}
                       className={cn(
                         'size-2 rounded-full',
-                        selected || inCampaign ? 'bg-white' : isCampaignDay ? 'bg-night' : registeredIds.has(a.id) ? 'bg-success' : 'bg-sky',
+                        selected || inCampaign ? 'bg-white' : isCampaignDay ? 'bg-night' : a.kind === 'junta' ? 'bg-junta' : registeredIds.has(a.id) ? 'bg-success' : 'bg-sky',
                       )}
                     />
                   ))}
@@ -133,6 +133,7 @@ export function MonthGrid({
       <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-line pt-3 text-xs text-slate">
         <span className="inline-flex items-center gap-1.5"><span className="size-3 rounded-md bg-electric/30 ring-1 ring-inset ring-sky/60" />Hay acto</span>
         <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-success" />Estás inscrito</span>
+        <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-junta" />Junta directiva</span>
         <span className="inline-flex items-center gap-1.5"><span className="size-3 rounded-md ring-2 ring-inset ring-electric" />Hoy</span>
         {campaignRange ? (
           <span className="inline-flex items-center gap-1.5"><span className="size-3 rounded-md bg-flag-red" />Campaña electoral</span>
