@@ -70,7 +70,7 @@ Valores aceptados en todas las hojas:
 | `estado` | | `confirmada` (por defecto), `cerrada` (cierre manual), `cancelada`, `borrador` (oculta) |
 | `visible` | | Por defecto sí |
 | `destacado` | | Se prioriza en Inicio |
-| `tipo` | | Vacío o `acto` = acto normal · `junta` = **junta directiva** (acto interno de NNGG, en violeta) |
+| `tipo` | | Vacío o `acto` = acto normal · `junta` = **junta directiva** (acto interno de NNGG, en gris) |
 | `acceso` | | Solo juntas: `abierto` (todos los afiliados, por defecto) · `cerrado` (solo miembros de la Junta Directiva) |
 
 Las columnas `tipo` y `acceso` son opcionales: sin ellas todo son actos normales. Hacen falta para crear juntas desde la web.

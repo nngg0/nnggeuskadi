@@ -44,7 +44,7 @@ Sin chat, foros, comentarios, seguidores ni gamificación: no sustituye a WhatsA
 | **Dirección** | En fichas de su territorio, la dirección ve quién se ha inscrito o se ha ofrecido (solo nombre visible) para poder contactar. Listado de **Miembros**: la provincial, su territorio; la regional, todos. |
 | **Crear (+) y editar** | En Actos y Proyectos, Administración, la dirección regional y las provinciales (solo en su provincia) crean y editan actos y proyectos, incluidos los ámbitos en los que se puede participar. Se guardan en el Sheet; el permiso se comprueba en servidor. |
 | **Altas** | «Solicitar acceso» en la pantalla de entrada (nombre, nombre de usuario y contraseña). **Administración** aprueba, eligiendo provincia (Álava, Bizkaia o Gipuzkoa) y rol, o rechaza en Solicitudes. Después puede cambiar el rol y la provincia de cualquier miembro en Miembros. |
-| **Juntas directivas** | Actos internos de NNGG, en violeta. Abiertas (todos los afiliados) o cerradas (solo la Junta Directiva; se filtran en servidor). Se crean y editan como cualquier acto. Quién es de la Junta lo marcan Administración y la dirección regional en Miembros. |
+| **Juntas directivas** | Actos internos de NNGG, en gris. Abiertas (todos los afiliados) o cerradas (solo la Junta Directiva; se filtran en servidor). Se crean y editan como cualquier acto. Quién es de la Junta lo marcan Administración y la dirección regional en Miembros. |
 | **PWA** | Instalable en móvil y escritorio, iconos, página sin conexión, aviso offline, preparada para notificaciones push. |
 
 ## Stack

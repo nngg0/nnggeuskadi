@@ -35,9 +35,9 @@
   --color-danger: #ff6474;
   --color-danger-50: #3c2440;
 
-  /* Juntas directivas (actos internos de NNGG): violeta, distinto del azul de los actos. */
-  --color-junta: #b9a2ff;
-  --color-junta-50: #2d2a63;
+  /* Juntas directivas (actos internos de NNGG): gris plata, distinto del azul de los actos. */
+  --color-junta: #c7cfdc;
+  --color-junta-50: #2c3850;
 
   /* Bandera de España: banderita entre secciones (tonos del folleto). */
   --color-flag-red: #b3342b;

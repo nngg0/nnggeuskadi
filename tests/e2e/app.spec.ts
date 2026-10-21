@@ -655,7 +655,7 @@ test.describe('roles de los miembros', () => {
 })
 
 test.describe('juntas directivas', () => {
-  test('un afiliado ve las juntas abiertas, en violeta, pero no las cerradas (ni por enlace ni en el calendario)', async ({ page }) => {
+  test('un afiliado ve las juntas abiertas, en gris, pero no las cerradas (ni por enlace ni en el calendario)', async ({ page }) => {
     await loginAs(page, /Alba/)
     await page.goto('/calendario')
     const abierta = page.locator('article', { hasText: 'Junta directiva abierta: balance del trimestre' })
