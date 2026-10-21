@@ -32,7 +32,7 @@ end $$;
 -- Administración: list_members trae el id; asciende, cambia de provincia y valida.
 set local request.jwt.claim.sub = '00000000-0000-0000-0000-0000000000a1';
 do $$ begin
-  assert (select id from public.list_members() where email = 'afi@example.org') = '00000000-0000-0000-0000-0000000000c1', 'list_members trae el id';
+  assert (select id from public.list_members_v2() where email = 'afi@example.org') = '00000000-0000-0000-0000-0000000000c1', 'list_members trae el id';
 
   perform public.set_member_role('00000000-0000-0000-0000-0000000000c1', 'direccion_provincial');
   perform public.set_member_role('00000000-0000-0000-0000-0000000000b1', 'afiliado', 'gipuzkoa');
@@ -83,7 +83,7 @@ begin
   end loop;
   perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', true);
   perform public.set_member_junta('00000000-0000-0000-0000-0000000000c1', true);
-  assert (select junta_directiva from public.list_members() where email = 'afi@example.org'), 'list_members trae la marca de Junta';
+  assert (select junta_directiva from public.list_members_v2() where email = 'afi@example.org'), 'list_members trae la marca de Junta';
   begin
     perform public.set_member_junta('00000000-0000-0000-0000-0000000000ff', true);
     raise exception 'miembro inexistente';

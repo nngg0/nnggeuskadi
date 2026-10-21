@@ -205,7 +205,7 @@ export const supabasePersonalStore: PersonalStore = {
 
   async listMembers() {
     const supabase = await createSupabaseServerClient()
-    const { data, error } = await supabase.rpc('list_members')
+    const { data, error } = await supabase.rpc('list_members_v2')
     if (error) fail('miembros', error)
     return (
       (data ?? []) as { id: string; display_name: string; email: string; territory: string; role: string; interests: string[]; created_at: string; junta_directiva?: boolean }[]

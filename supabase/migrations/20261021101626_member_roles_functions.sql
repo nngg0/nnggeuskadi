@@ -5,28 +5,16 @@
 -- - Afiliados y direcciones provinciales pertenecen a una provincia (Álava, Bizkaia, Gipuzkoa);
 --   Euskadi solo para la dirección regional y Administración.
 -- - Se actualiza también member_allowlist para que el alta autorizada sea coherente.
--- list_members devuelve ahora el id del perfil para poder dirigirse a cada persona.
 --
 -- Junta Directiva: marca en el perfil (junta_directiva). Quien la tiene ve las juntas cerradas.
 -- La ponen o quitan Administración y la dirección regional (set_member_junta). Nadie se la pone a sí mismo:
 -- la columna no está entre las que un usuario puede actualizar de su propio perfil.
+-- Idempotente (if not exists / or replace).
 -- =====================================================================
 
-alter table public.profiles add column junta_directiva boolean not null default false;
+alter table public.profiles add column if not exists junta_directiva boolean not null default false;
 
-drop function public.list_members();
-
-create function public.list_members()
-returns table (id uuid, display_name text, email text, territory text, role text, interests text[], created_at timestamptz, junta_directiva boolean)
-language sql stable security definer set search_path = '' as $$
-  select p.id, p.display_name, u.email::text, p.territory, p.role, p.interests, p.created_at, p.junta_directiva
-  from public.profiles p
-  join auth.users u on u.id = p.id
-  where public.can_manage_territory(p.territory)
-  order by p.territory, p.display_name
-$$;
-
-create function public.set_member_role(p_user_id uuid, p_role text, p_territory text default null)
+create or replace function public.set_member_role(p_user_id uuid, p_role text, p_territory text default null)
 returns void
 language plpgsql security definer set search_path = '' as $$
 declare
@@ -42,7 +30,6 @@ begin
   if p_user_id = auth.uid() and p_role <> 'administracion' then
     raise exception 'cannot_demote_self: no puedes quitarte el rol de Administración' using errcode = '42501';
   end if;
-
   select coalesce(p_territory, p.territory) into v_territory from public.profiles p where p.id = p_user_id for update;
   if not found then
     raise exception 'member_not_found: miembro no encontrado' using errcode = 'P0002';
@@ -53,14 +40,12 @@ begin
   if p_role in ('afiliado', 'direccion_provincial') and v_territory = 'euskadi' then
     raise exception 'missing_province: elige Álava, Bizkaia o Gipuzkoa' using errcode = '22023';
   end if;
-
   update public.profiles set role = p_role, territory = v_territory where id = p_user_id;
-
   select lower(u.email) into v_email from auth.users u where u.id = p_user_id;
   update public.member_allowlist set role = p_role, territory = v_territory where email = v_email;
 end $$;
 
-create function public.set_member_junta(p_user_id uuid, p_junta boolean)
+create or replace function public.set_member_junta(p_user_id uuid, p_junta boolean)
 returns void
 language plpgsql security definer set search_path = '' as $$
 begin
@@ -75,8 +60,6 @@ begin
   end if;
 end $$;
 
-revoke all on function public.list_members() from public, anon;
-grant execute on function public.list_members() to authenticated;
 revoke all on function public.set_member_role(uuid, text, text) from public, anon;
 grant execute on function public.set_member_role(uuid, text, text) to authenticated;
 revoke all on function public.set_member_junta(uuid, boolean) from public, anon;
