@@ -8,8 +8,9 @@ import { Icon, type IconName } from '@/components/ui/Icon'
 import { Tag } from '@/components/ui/Tag'
 
 /** Bloque de fecha: "VIE / 17 / OCT". */
-export function DateBlock({ date, className, tone = 'night' }: { date: string; className?: string; tone?: 'night' | 'electric' | 'light' | 'junta' }) {
+export function DateBlock({ date, className, tone = 'night' }: { date: string; className?: string; tone?: 'night' | 'electric' | 'light' | 'junta' | 'granate' }) {
   const tones = {
+    granate: 'bg-granate text-white',
     night: 'bg-night text-white',
     junta: 'bg-junta text-night',
     electric: 'bg-electric text-white',
@@ -82,7 +83,7 @@ export function RegistrationTag({ state }: { state: RegistrationState }) {
     case 'not_open':
       return <Tag tone="warning">Abre el {formatDayMonth(state.opensAt.slice(0, 10))}</Tag>
     case 'cancelled':
-      return <Tag tone="danger">Cancelada</Tag>
+      return <Tag tone="granate">Cancelado</Tag>
     case 'past':
       return <Tag tone="neutral">{state.wasRegistered ? 'Asististe' : 'Finalizada'}</Tag>
     case 'open':

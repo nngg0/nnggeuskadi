@@ -98,7 +98,7 @@ export function MonthGrid({
                       key={a.id}
                       className={cn(
                         'size-2 rounded-full',
-                        selected || inCampaign ? 'bg-white' : isCampaignDay ? 'bg-night' : a.kind === 'junta' ? 'bg-junta' : registeredIds.has(a.id) ? 'bg-success' : 'bg-sky',
+                        selected || inCampaign ? 'bg-white' : isCampaignDay ? 'bg-night' : a.status === 'cancelada' ? 'bg-granate' : a.kind === 'junta' ? 'bg-junta' : registeredIds.has(a.id) ? 'bg-success' : 'bg-sky',
                       )}
                     />
                   ))}

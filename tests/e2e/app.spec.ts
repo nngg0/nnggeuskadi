@@ -519,7 +519,7 @@ test.describe('editar actos', () => {
     await page.getByLabel('Estado').selectOption('cancelada')
     await page.getByRole('button', { name: 'Guardar cambios' }).click()
     await expect(page).toHaveURL('/actividades/ACT-042')
-    await expect(page.getByText('Cancelada').first()).toBeVisible()
+    await expect(page.getByText('Cancelado').first()).toBeVisible()
   })
 
   test('la provincial no edita actos de otra provincia, ni moviéndolos a otra con el formulario manipulado', async ({ page }) => {
@@ -761,4 +761,15 @@ test('vista mensual: los actos que ya han pasado van al final y en gris', async 
   const section = page.getByRole('region', { name: 'Ya han pasado' })
   await expect(section.getByText('Asamblea de inicio de curso')).toBeVisible()
   await expect(section.locator('.grayscale')).toHaveCount(1)
+})
+
+test('los actos cancelados se ven en granate y su tarjeta no se puede abrir', async ({ page }) => {
+  await loginAs(page, /Alba/)
+  await page.goto('/calendario')
+  const card = page.locator('article', { hasText: 'Charla con concejales jóvenes' })
+  await expect(card).toHaveAttribute('data-cancelado', 'true')
+  await expect(card.getByText('Cancelado', { exact: true })).toBeVisible()
+  await expect(card.getByRole('link')).toHaveCount(0)
+  await card.click()
+  await expect(page).toHaveURL('/calendario')
 })

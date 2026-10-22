@@ -39,6 +39,10 @@
   --color-junta: #c7cfdc;
   --color-junta-50: #2c3850;
 
+  /* Actos cancelados: granate. */
+  --color-granate: #a3263a;
+  --color-granate-50: #3a1823;
+
   /* Bandera de España: banderita entre secciones (tonos del folleto). */
   --color-flag-red: #b3342b;
   --color-flag-yellow: #ecbb3a;
