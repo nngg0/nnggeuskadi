@@ -122,7 +122,7 @@ export default async function ActivityPage({ params }: { params: Params }) {
           <div className="mt-6">
             <RegistrationPanel activityId={activity.id} state={view.state} />
           </div>
-          {view.state.kind !== 'past' && view.state.kind !== 'cancelled' ? (
+          {view.state.kind !== 'past' && view.state.kind !== 'cancelled' && view.state.kind !== 'tbc' ? (
             <div className="mt-5 border-t border-line pt-5">
               <p className="eyebrow mb-3 text-slate">Añadir a mi calendario</p>
               <AddToCalendar activity={activity} />

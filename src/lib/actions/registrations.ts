@@ -11,6 +11,7 @@ import { actionUser, contentIdSchema, failure, NOT_AUTHENTICATED, success, UNEXP
 
 const STATE_MESSAGES: Record<string, string> = {
   cancelled: 'Esta actividad se ha cancelado.',
+  tbc: 'Los detalles de este acto todavía están por confirmar.',
   past: 'Esta actividad ya se ha celebrado.',
   registered: 'Ya estás inscrito en esta actividad.',
   closed: 'La inscripción está cerrada.',

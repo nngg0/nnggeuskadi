@@ -7,7 +7,7 @@ import { Container, PageHeader } from '@/components/layout/PageHeader'
 import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/States'
 import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
-import { creatableTerritories } from '@/lib/auth/permissions'
+import { can, creatableTerritories } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { cn } from '@/lib/cn'
 import { getContentFor } from '@/lib/content/source'
@@ -66,7 +66,10 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
             selectedDay ? a.date === selectedDay : a.date.startsWith(month),
           ),
         )
-  const views = await activityViews(listActivities, user.id, now)
+  const allViews = await activityViews(listActivities, user.id, now)
+  // En la vista mensual, los ya pasados van al final (y en gris, abajo).
+  const views = view === 'mes' ? allViews.filter((v) => v.state.kind !== 'past') : allViews
+  const monthPastViews = view === 'mes' ? allViews.filter((v) => v.state.kind === 'past') : []
   // En la lista, lo que ya ha pasado va al final y en gris.
   const pastViews =
     view === 'lista' ? await activityViews(filterActivitiesByTerritory(pastActivities(content.activities, now), territory).slice(0, PAST_LIMIT), user.id, now) : []
@@ -124,13 +127,23 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
               <p className="eyebrow mb-3 text-slate">
                 {selectedDay ? formatRelativeDay(selectedDay, today) : `Todo ${formatMonthYear(month)}`}
                 {' · '}
-                {views.length} {views.length === 1 ? 'actividad' : 'actividades'}
+                {allViews.length} {allViews.length === 1 ? 'acto' : 'actos'}
               </p>
-              {views.length > 0 ? (
+              {allViews.length > 0 ? (
                 <div className="grid gap-3">
                   {views.map((v) => (
-                    <ActivityCard key={v.activity.id} view={v} withCalendar className="animate-rise" />
+                    <ActivityCard key={v.activity.id} view={v} withCalendar canEdit={can(user, 'content.create', { territory: v.activity.territory })} className="animate-rise" />
                   ))}
+                  {monthPastViews.length > 0 ? (
+                    <section aria-label="Ya han pasado" className="mt-3 grid gap-3">
+                      <h3 className="eyebrow text-slate">Ya han pasado</h3>
+                      <div className="grid gap-3 opacity-60 grayscale">
+                        {monthPastViews.map((v) => (
+                          <ActivityCard key={v.activity.id} view={v} />
+                        ))}
+                      </div>
+                    </section>
+                  ) : null}
                 </div>
               ) : (
                 <EmptyState title="Sin actividades este mes" icon="calendar">
@@ -148,7 +161,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
                     <h2 className="eyebrow mb-3 text-slate">{formatMonthYear(key)}</h2>
                     <div className="grid gap-3 md:grid-cols-2">
                       {items.map((v) => (
-                        <ActivityCard key={v.activity.id} view={v} withCalendar className="animate-rise" />
+                        <ActivityCard key={v.activity.id} view={v} withCalendar canEdit={can(user, 'content.create', { territory: v.activity.territory })} className="animate-rise" />
                       ))}
                     </div>
                   </section>

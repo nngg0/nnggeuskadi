@@ -6,7 +6,8 @@ import type { Territory, TerritoryId } from './territories'
 /* Nunca contiene datos personales.                                    */
 /* ------------------------------------------------------------------ */
 
-export const ACTIVITY_STATUSES = ['confirmada', 'borrador', 'cerrada', 'cancelada'] as const
+/** por_confirmar: anunciado, pero con los detalles pendientes; la tarjeta no se abre ni admite inscripción. */
+export const ACTIVITY_STATUSES = ['confirmada', 'por_confirmar', 'borrador', 'cerrada', 'cancelada'] as const
 export type ActivityStatus = (typeof ACTIVITY_STATUSES)[number]
 
 /** «junta»: acto interno de NNGG (junta directiva), en otro color. */

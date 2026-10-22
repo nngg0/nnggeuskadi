@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 
-type Tone = 'neutral' | 'electric' | 'success' | 'warning' | 'danger' | 'dark' | 'junta'
+type Tone = 'neutral' | 'electric' | 'success' | 'warning' | 'danger' | 'dark' | 'junta' | 'granate'
 
 const TONES: Record<Tone, string> = {
   neutral: 'bg-mist text-slate',
@@ -11,6 +11,7 @@ const TONES: Record<Tone, string> = {
   danger: 'bg-danger-50 text-danger',
   dark: 'bg-white/10 text-white',
   junta: 'bg-junta-50 text-junta',
+  granate: 'bg-granate text-white',
 }
 
 export function Tag({ children, tone = 'neutral', className }: { children: ReactNode; tone?: Tone; className?: string }) {

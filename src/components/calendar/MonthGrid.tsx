@@ -76,6 +76,7 @@ export function MonthGrid({
           const isToday = date === today
           const mine = items.some((a) => registeredIds.has(a.id))
           const isCampaignDay = date === campaignDay
+          const isPastDay = date < today
           const inCampaign = !isCampaignDay && campaignRange !== null && date >= campaignRange.start && date <= campaignRange.end
           const label = [
             String(i + 1),
@@ -97,7 +98,7 @@ export function MonthGrid({
                       key={a.id}
                       className={cn(
                         'size-2 rounded-full',
-                        selected || inCampaign ? 'bg-white' : isCampaignDay ? 'bg-night' : a.kind === 'junta' ? 'bg-junta' : registeredIds.has(a.id) ? 'bg-success' : 'bg-sky',
+                        selected || inCampaign ? 'bg-white' : isCampaignDay ? 'bg-night' : a.status === 'cancelada' ? 'bg-granate' : a.kind === 'junta' ? 'bg-junta' : registeredIds.has(a.id) ? 'bg-success' : 'bg-sky',
                       )}
                     />
                   ))}
@@ -113,9 +114,11 @@ export function MonthGrid({
                 ? 'z-10 scale-110 bg-flag-yellow text-night shadow-lg shadow-flag-yellow/40 ring-2 ring-white'
                 : inCampaign
                   ? cn('bg-flag-red text-white', items.length ? 'ring-2 ring-inset ring-white/80' : 'bg-flag-red/70')
-                  : items.length
-                    ? 'bg-electric/30 text-white ring-1 ring-inset ring-sky/60 hover:bg-electric/45'
-                    : 'text-slate/70',
+                  : items.length && isPastDay
+                    ? 'bg-line/50 text-slate grayscale hover:bg-line'
+                    : items.length
+                      ? 'bg-electric/30 text-white ring-1 ring-inset ring-sky/60 hover:bg-electric/45'
+                      : 'text-slate/70',
             isToday && !selected && 'ring-2 ring-inset ring-electric',
             mine && !selected && !isCampaignDay && !inCampaign && 'bg-success/30 ring-success/70',
           )

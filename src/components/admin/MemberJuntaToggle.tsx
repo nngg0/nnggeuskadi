@@ -7,10 +7,12 @@ import { setMemberJunta } from '@/lib/actions/access'
 export function MemberJuntaToggle({ id, name, junta: initial }: { id: string; name: string; junta: boolean }) {
   const [junta, setJunta] = useState(initial)
   const [error, setError] = useState<string | null>(null)
+  const [saved, setSaved] = useState(false)
   const [pending, startTransition] = useTransition()
 
   function toggle(next: boolean) {
     setError(null)
+    setSaved(false)
     setJunta(next)
     startTransition(async () => {
       try {
@@ -18,6 +20,8 @@ export function MemberJuntaToggle({ id, name, junta: initial }: { id: string; na
         if (!r.ok) {
           setJunta(!next)
           setError(r.message)
+        } else {
+          setSaved(true)
         }
       } catch {
         setJunta(!next)
@@ -44,6 +48,7 @@ export function MemberJuntaToggle({ id, name, junta: initial }: { id: string; na
         Junta Directiva
       </label>
       {error ? <p role="status" className="text-xs font-semibold text-danger">{error}</p> : null}
+      {saved && !pending ? <p role="status" className="text-xs font-semibold text-success">Guardado</p> : null}
     </div>
   )
 }

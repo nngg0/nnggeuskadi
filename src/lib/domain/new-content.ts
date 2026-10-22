@@ -9,9 +9,9 @@ import { ACTIVITY_ACCESS, ACTIVITY_KINDS, type ActivityStatus, type Opportunity 
  * El permiso (quién y en qué territorio) se comprueba en la acción con `can(user, 'content.create', …)`.
  */
 
-export const NEW_ACTIVITY_STATUSES = ['confirmada', 'borrador'] as const
+export const NEW_ACTIVITY_STATUSES = ['confirmada', 'por_confirmar', 'borrador'] as const
 /** Al editar también se puede cerrar la inscripción o cancelar el acto. */
-export const EDIT_ACTIVITY_STATUSES = ['confirmada', 'borrador', 'cerrada', 'cancelada'] as const
+export const EDIT_ACTIVITY_STATUSES = ['confirmada', 'por_confirmar', 'borrador', 'cerrada', 'cancelada'] as const
 export const NEW_PROJECT_STATUSES = ['en_preparacion', 'en_marcha'] as const
 export const MAX_NEW_OPPORTUNITIES = 12
 /** Al editar, el proyecto también se puede cerrar y cada ámbito, abrir o cerrar. */

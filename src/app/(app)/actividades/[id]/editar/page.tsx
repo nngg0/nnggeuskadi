@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ActivityForm, type ActivityFormValues } from '@/components/content/ActivityForm'
+import { DeleteActivity } from '@/components/content/DeleteActivity'
 import { Container, PageHeader } from '@/components/layout/PageHeader'
 import { Icon } from '@/components/ui/Icon'
 import { can, creatableTerritories } from '@/lib/auth/permissions'
@@ -10,6 +11,7 @@ import { getContent } from '@/lib/content/source'
 import { madridDate } from '@/lib/domain/dates'
 import { territoryName } from '@/lib/domain/territories'
 import type { Activity } from '@/lib/domain/types'
+import { personalStore } from '@/lib/personal'
 
 export const metadata: Metadata = { title: 'Editar acto' }
 
@@ -44,6 +46,7 @@ export default async function EditActivityPage({ params }: { params: Params }) {
   const territories = creatableTerritories(user)
     .filter((t) => active.has(t))
     .map((t) => ({ id: t, name: territoryName(t, content.territories) }))
+  const registeredCount = (await personalStore().registrationCounts([activity.id])).get(activity.id) ?? 0
   const backHref = activity.status === 'borrador' ? '/calendario' : `/actividades/${encodeURIComponent(activity.id)}`
 
   return (
@@ -59,6 +62,7 @@ export default async function EditActivityPage({ params }: { params: Params }) {
             Volver sin guardar
           </Link>
           <ActivityForm territories={territories} today={madridDate(new Date())} initial={formValues(activity)} />
+          <DeleteActivity id={activity.id} title={activity.title} registeredCount={registeredCount} />
         </div>
       </Container>
     </>

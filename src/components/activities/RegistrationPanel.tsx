@@ -97,6 +97,7 @@ export function RegistrationPanel({ activityId, state }: { activityId: string; s
       text: state.kind === 'not_open' ? `Podrás inscribirte a partir del ${formatInstant(state.opensAt)}.` : '',
     },
     cancelled: { title: 'Actividad cancelada', text: 'La organización ha cancelado esta actividad.' },
+    tbc: { title: '⏳ Detalles por confirmar', text: 'Cuando se confirmen la hora y el lugar podrás inscribirte.' },
     past: { title: 'Actividad finalizada', text: 'Esta actividad ya se ha celebrado.' },
   }
   const current = info[state.kind]

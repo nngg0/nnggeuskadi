@@ -15,6 +15,8 @@ const COOKIE = 'nngg_demo_content'
 const MAX_COOKIE_CHARS = 3200
 const MAX_DEMO_TEXT = 400
 const WRITABLE = ['ACTIVIDADES', 'PROYECTOS', 'OPORTUNIDADES'] as const satisfies readonly SheetName[]
+/** Marca de fila borrada en la demo (no es una columna del Sheet). */
+export const DEMO_DELETED = '_borrado'
 
 const entriesSchema = z
   .array(z.object({ s: z.enum(WRITABLE), r: z.record(z.string().max(40), z.string().max(MAX_DEMO_TEXT)) }))
@@ -60,6 +62,10 @@ export async function withDemoRecords(workbook: RawWorkbook): Promise<RawWorkboo
     if (!table?.[0]) continue
     try {
       const rowNumber = r.id ? rowNumberOf(table, r.id) : null
+      if (r[DEMO_DELETED]) {
+        if (rowNumber !== null) result[s] = table.filter((_, i) => i !== rowNumber - 1)
+        continue
+      }
       result[s] =
         rowNumber === null
           ? [...table, recordToRow(table[0], r)]
