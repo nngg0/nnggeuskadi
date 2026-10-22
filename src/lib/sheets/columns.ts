@@ -34,4 +34,6 @@ export const CONFIG_KEYS = {
   featuredProject: 'campana_principal',
   campaignStart: 'campana_inicio',
   campaignEnd: 'campana_fin',
+  campaignSlogan: 'campana_lema',
+  campaignImage: 'campana_imagen',
 } as const

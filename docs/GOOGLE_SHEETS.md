@@ -107,6 +107,8 @@ compartido con la organización), `fecha`, `destacado`, `visible`.
 | `inicio_subtitulo` | (Ya no se muestra) |
 | `categorias_documentos` | Orden de categorías, separadas por comas |
 | `campana_principal` | id del proyecto que se muestra como **bloque principal** en Inicio y Participa (p. ej. `PRY-29N`). Vacío = sin bloque |
+| `campana_lema` | Lema grande del bloque de campaña, con el estilo de los carteles (p. ej. `POR FIN`). Vacío = sin lema |
+| `campana_imagen` | Imagen del bloque de campaña en pantallas anchas: ruta de la app (`/campana/29n-urna.png`) o URL `https` |
 
 ### TERRITORIOS
 

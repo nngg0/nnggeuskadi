@@ -124,6 +124,8 @@ export function demoWorkbook(now: Date = new Date()): RawWorkbook {
         ['inicio_titulo', 'Lo que estamos haciendo juntos.'],
         ['inicio_subtitulo', 'Qué viene, qué estamos preparando y dónde puedes echar una mano.'],
         ['campana_principal', 'PRY-29N'],
+        ['campana_lema', 'POR FIN'],
+        ['campana_imagen', '/campana/29n-urna.png'],
         ['categorias_documentos', 'Organización, Argumentarios, Comunicación, Campañas, Formación, Material gráfico'],
       ],
     ),

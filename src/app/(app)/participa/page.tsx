@@ -64,6 +64,8 @@ export default async function ParticipaPage({ searchParams }: { searchParams: Se
             today={madridDate(new Date())}
             activityCount={campaignActivityCount(content.activities, campaignView.project, new Date())}
             primary="view"
+            slogan={content.config.campaignSlogan}
+            image={content.config.campaignImage}
           />
           <FlagDivider />
         </>
