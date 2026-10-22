@@ -89,3 +89,15 @@ describe('validación del Sheet', () => {
     }
   })
 })
+
+describe('lema e imagen de la campaña', () => {
+  it('lee campana_lema y solo acepta imágenes de la app o https', () => {
+    const conf = (imagen: string) =>
+      parseWorkbook({ CONFIGURACION: [['clave', 'valor'], ['campana_lema', 'POR FIN'], ['campana_imagen', imagen]] }).config
+    expect(conf('/campana/29n-urna.png')).toMatchObject({ campaignSlogan: 'POR FIN', campaignImage: '/campana/29n-urna.png' })
+    expect(conf('https://example.org/cartel.png').campaignImage).toBe('https://example.org/cartel.png')
+    for (const bad of ['javascript:alert(1)', 'http://example.org/x.png', 'data:image/png;base64,AAA', '/../secreto', '']) {
+      expect(conf(bad).campaignImage).toBeNull()
+    }
+  })
+})

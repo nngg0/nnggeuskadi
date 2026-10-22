@@ -72,7 +72,13 @@ export default async function HomePage() {
       {campaignView ? (
         <>
           <FlagDivider />
-          <CampaignBlock view={campaignView} today={today} activityCount={campaignActivityCount(content.activities, campaignView.project, now)} />
+          <CampaignBlock
+            view={campaignView}
+            today={today}
+            activityCount={campaignActivityCount(content.activities, campaignView.project, now)}
+            slogan={content.config.campaignSlogan}
+            image={content.config.campaignImage}
+          />
           <FlagDivider />
         </>
       ) : null}

@@ -367,6 +367,17 @@ export function parseTerritories(table: RawTable | undefined): Parsed<Territory>
   return { items, issues: parsed.issues }
 }
 
+/** Solo rutas de la propia app (/…) o URLs https: nada de javascript:, data: ni http. */
+function safeImage(value: string): string | null {
+  const v = value.trim()
+  if (/^\/[A-Za-z0-9_./-]+$/.test(v) && !v.includes('..')) return v
+  try {
+    return new URL(v).protocol === 'https:' ? v : null
+  } catch {
+    return null
+  }
+}
+
 export const DEFAULT_CONFIG: AppConfig = {
   heroTitle: 'Lo que estamos haciendo juntos.',
   heroSubtitle: 'Qué viene, qué estamos preparando y dónde puedes participar.',
@@ -374,6 +385,8 @@ export const DEFAULT_CONFIG: AppConfig = {
   featuredProjectId: null,
   campaignStart: null,
   campaignEnd: null,
+  campaignSlogan: null,
+  campaignImage: null,
   raw: {},
 }
 
@@ -396,6 +409,8 @@ export function parseConfig(table: RawTable | undefined): Parsed<AppConfig> {
         featuredProjectId: raw[CONFIG_KEYS.featuredProject]?.trim() || null,
         campaignStart: parseDate(raw[CONFIG_KEYS.campaignStart] ?? ''),
         campaignEnd: parseDate(raw[CONFIG_KEYS.campaignEnd] ?? ''),
+        campaignSlogan: raw[CONFIG_KEYS.campaignSlogan]?.trim().slice(0, 40) || null,
+        campaignImage: safeImage(raw[CONFIG_KEYS.campaignImage] ?? ''),
         raw,
       },
     ],

@@ -90,6 +90,10 @@ export interface AppConfig {
   /** Periodo de campaña (en rojo en el calendario). Null = por defecto, los 15 días antes del día de reflexión. */
   campaignStart: string | null
   campaignEnd: string | null
+  /** Lema grande del bloque de campaña (p. ej. «POR FIN»). Null = sin lema. */
+  campaignSlogan: string | null
+  /** Imagen del bloque de campaña: ruta de la app (/campana/…) o URL https. Null = sin imagen. */
+  campaignImage: string | null
   /** Pares clave/valor sin interpretar, para futuras opciones. */
   raw: Record<string, string>
 }
