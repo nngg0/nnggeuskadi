@@ -84,6 +84,8 @@ export function RegistrationTag({ state }: { state: RegistrationState }) {
       return <Tag tone="warning">Abre el {formatDayMonth(state.opensAt.slice(0, 10))}</Tag>
     case 'cancelled':
       return <Tag tone="granate">Cancelado</Tag>
+    case 'tbc':
+      return <Tag tone="warning">⏳ Detalles por confirmar</Tag>
     case 'past':
       return <Tag tone="neutral">{state.wasRegistered ? 'Asististe' : 'Finalizada'}</Tag>
     case 'open':

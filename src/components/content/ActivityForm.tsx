@@ -26,6 +26,7 @@ export interface ActivityFormValues {
 
 const STATUS_LABELS: Record<ActivityStatus, string> = {
   confirmada: 'Publicado',
+  por_confirmar: 'Detalles por confirmar (no se puede abrir)',
   borrador: 'Borrador (no se ve)',
   cerrada: 'Inscripción cerrada',
   cancelada: 'Cancelado',
@@ -104,6 +105,7 @@ export function ActivityForm({
           ) : (
             <>
               <option value="confirmada">Publicar ahora</option>
+              <option value="por_confirmar">Anunciar con detalles por confirmar</option>
               <option value="borrador">Guardar como borrador (no se ve)</option>
             </>
           )}

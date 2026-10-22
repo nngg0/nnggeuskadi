@@ -7,7 +7,7 @@ import { Container, PageHeader } from '@/components/layout/PageHeader'
 import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/States'
 import { TerritoryFilter } from '@/components/ui/TerritoryFilter'
-import { creatableTerritories } from '@/lib/auth/permissions'
+import { can, creatableTerritories } from '@/lib/auth/permissions'
 import { requireUser } from '@/lib/auth/session'
 import { cn } from '@/lib/cn'
 import { getContentFor } from '@/lib/content/source'
@@ -132,7 +132,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
               {allViews.length > 0 ? (
                 <div className="grid gap-3">
                   {views.map((v) => (
-                    <ActivityCard key={v.activity.id} view={v} withCalendar className="animate-rise" />
+                    <ActivityCard key={v.activity.id} view={v} withCalendar canEdit={can(user, 'content.create', { territory: v.activity.territory })} className="animate-rise" />
                   ))}
                   {monthPastViews.length > 0 ? (
                     <section aria-label="Ya han pasado" className="mt-3 grid gap-3">
@@ -161,7 +161,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Sea
                     <h2 className="eyebrow mb-3 text-slate">{formatMonthYear(key)}</h2>
                     <div className="grid gap-3 md:grid-cols-2">
                       {items.map((v) => (
-                        <ActivityCard key={v.activity.id} view={v} withCalendar className="animate-rise" />
+                        <ActivityCard key={v.activity.id} view={v} withCalendar canEdit={can(user, 'content.create', { territory: v.activity.territory })} className="animate-rise" />
                       ))}
                     </div>
                   </section>

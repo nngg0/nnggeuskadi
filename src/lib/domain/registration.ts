@@ -4,6 +4,7 @@ import { madridToInstant } from './dates'
 export type RegistrationState =
   | { kind: 'cancelled' }
   | { kind: 'past'; wasRegistered: boolean }
+  | { kind: 'tbc' }
   | { kind: 'registered'; canCancel: boolean }
   | { kind: 'closed' }
   | { kind: 'not_open'; opensAt: string }
@@ -38,6 +39,8 @@ export function getRegistrationState(activity: Activity, ctx: RegistrationContex
   const { registeredCount, isRegistered, now } = ctx
   if (activity.status === 'cancelada') return { kind: 'cancelled' }
   if (isPast(activity, now)) return { kind: 'past', wasRegistered: isRegistered }
+  // Detalles por confirmar: se anuncia, pero todavía no hay ficha ni inscripción.
+  if (activity.status === 'por_confirmar') return { kind: 'tbc' }
   // El inscrito puede cancelar hasta que empiece la actividad, aunque la inscripción ya esté cerrada.
   if (isRegistered) return { kind: 'registered', canCancel: true }
   if (activity.status === 'cerrada' || activity.status === 'borrador') return { kind: 'closed' }

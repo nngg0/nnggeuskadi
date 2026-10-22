@@ -71,4 +71,9 @@ describe('getRegistrationState', () => {
     expect(getRegistrationState(activity({ date: '2026-10-05', time: '12:30' }), ctx()).kind).toBe('open')
     expect(getRegistrationState(activity({ date: '2026-10-05', time: '11:30' }), ctx()).kind).toBe('past')
   })
+
+  it('detalles por confirmar: ni ficha ni inscripción, aunque esté abierta', () => {
+    expect(getRegistrationState(activity({ status: 'por_confirmar' }), ctx(0))).toEqual({ kind: 'tbc' })
+    expect(getRegistrationState(activity({ status: 'por_confirmar', date: '2026-10-01' }), ctx(0)).kind).toBe('past')
+  })
 })

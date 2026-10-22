@@ -773,3 +773,30 @@ test('los actos cancelados se ven en granate y su tarjeta no se puede abrir', as
   await card.click()
   await expect(page).toHaveURL('/calendario')
 })
+
+test.describe('detalles por confirmar', () => {
+  test('la tarjeta muestra «⏳ Detalles por confirmar» y no se puede abrir ni inscribirse', async ({ page }) => {
+    await loginAs(page, /Alba/)
+    await page.goto('/calendario')
+    const card = page.locator('article', { hasText: 'Escuela de verano 2027 · Presentación' })
+    await expect(card.getByText('⏳ Detalles por confirmar')).toBeVisible()
+    await expect(card).toHaveAttribute('data-por-confirmar', 'true')
+    await expect(card.getByRole('link')).toHaveCount(0)
+    await page.goto('/actividades/ACT-038')
+    await expect(page.getByRole('button', { name: 'Inscribirme' })).toHaveCount(0)
+    await expect(page.getByText('Cuando se confirmen la hora y el lugar podrás inscribirte.')).toBeVisible()
+  })
+
+  test('quien puede editar confirma los detalles desde la tarjeta y entonces ya se abre', async ({ page }) => {
+    await loginAs(page, /Adrián/)
+    await page.goto('/calendario')
+    const card = page.locator('article', { hasText: 'Escuela de verano 2027 · Presentación' })
+    await card.getByRole('link', { name: 'Editar Escuela de verano 2027 · Presentación' }).click()
+    await expect(page.getByLabel('Estado')).toHaveValue('por_confirmar')
+    await page.getByLabel('Estado').selectOption('confirmada')
+    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await expect(page).toHaveURL('/actividades/ACT-038')
+    await page.goto('/calendario')
+    await expect(page.locator('article', { hasText: 'Escuela de verano 2027 · Presentación' }).getByRole('link', { name: 'Escuela de verano 2027 · Presentación', exact: true })).toBeVisible()
+  })
+})
